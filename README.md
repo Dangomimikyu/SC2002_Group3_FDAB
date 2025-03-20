@@ -7,7 +7,18 @@ Submission due date: 25 April 2025
 2. Officer
 3. Manager
 4. Project
-5. ApplicantCapabilities
+5. Applicant Capabilities
+6. BTO Project
+7. BTO Listing
+8. Inquires
+9. Application Form
+10. Withdrawal Request
+11. Authentication System
+12. Manager report
+
+## Relationships:
+(Composition vs Aggregation vs Association)
+
 
 ## Sequence diagrams
 1. 
@@ -16,9 +27,9 @@ Submission due date: 25 April 2025
 
 ## Design considerations
 
-## Scalability
+### Scalability
 
-## Maintainability 
+### Maintainability 
 
 ## Reflection
 ### Difficulties
