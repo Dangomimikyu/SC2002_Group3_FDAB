@@ -1,0 +1,57 @@
+import java.util.LinkedList;
+
+public class Applicant extends User{
+
+    Applicant(String n, String nric, int a, String m, String p) {
+        super(n, nric, a, m, p);
+    }
+
+    //view list of projects open to user group
+    public LinkedList <Project> ViewProjectsOpentoUser() {}
+
+    //apply for a project
+    public void ApplyforProject(Project proj) {}
+
+    //view project applied for, including application status
+    public void viewProjectStatus(Project proj) {}
+
+    public WithdrawalRequest requestWithdrawal() {}
+
+    public Enquiry createEnquiry() {}
+    public Enquiry viewEnquiry() {}
+    public Enquiry editEnquiry() {}
+
+
+}
+
+
+// • Can only view the list of projects that are open to their user group (Single
+// or Married) and if their visibility has been toggled “on”.
+// • Able to apply for a project – cannot apply for multiple projects.
+// o Singles, 35 years old and above, can ONLY apply for 2-Room
+// o Married, 21 years old and above, can apply for any flat types (2-
+// Room or 3-Room)
+// • Able to view the project he/she applied for, even after visibility is turned
+// off, and the application status
+// o Pending: Entry status upon application – No conclusive decision
+// made about the outcome of the application
+// o Successful: Outcome of the application is successful, hence invited
+// to make a flat booking with the HDB Officer
+// o Unsuccessful: Outcome of the application is unsuccessful, hence
+// cannot make a flat booking for this application. Applicant may apply
+// for another project.
+// o Booked: Secured a unit after a successful application and completed
+// a flat booking with the HDB Officer.
+// • If Application status is “Successful”, Applicant can book one flat
+// through the HDB Officer (Only HDB Officer can help to book a flat) -
+// cannot book more than one flat, within a project or across different
+// project
+// SC/CE/CZ2002 Object-Oriented Design & Programming Assignment
+// • Allowed to request withdrawal for their BTO application before/after flat
+// booking
+// • Able to submit enquiries, a string, regarding the projects.
+// • Able to view, edit, and delete their enquiries.
+
+// • All users can use filters to view project (location, flat types, etc.) Assume
+// that default is by alphabetical order. User filter settings are saved when
+// they switch menu pages. 
