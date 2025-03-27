@@ -1,5 +1,6 @@
 //User is the superclass for Applicant, HDBManager and HDBOfficer
 //will include basic necessary attributes and get/set methods
+import java.util.Scanner;
 
 public class User {
 
@@ -33,7 +34,19 @@ public class User {
         return password;
     }    
 
-    //View and reply to enquiries
+    //All users able to view and reply to enquiries
+    public void viewEnquiry(Enquiry e) {
+        System.out.println("\nPurpose of Enquiry: " + e.getPurposeOfEnquiry() + "\nDetails: " + e.getDetails() + "\nDate: " + e.getDate() 
+        + "\nStatus: " + e.getStatus() + "\nReply: " + e.getReply());
+    }
+    public Enquiry replytoEnquiry(Enquiry e) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter your reply to this enquiry: ");
+        String reply = sc.nextLine();
+        sc.close();
+        e.setReply(reply);
+        return e;
+    }
     //View project details,regardless of visibility settings
     
 }

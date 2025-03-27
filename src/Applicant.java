@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Scanner;
 
 public class Applicant extends User{
 
@@ -15,12 +16,39 @@ public class Applicant extends User{
     //view project applied for, including application status
     public void viewProjectStatus(Project proj) {}
 
-    public WithdrawalRequest requestWithdrawal() {}
+    // public WithdrawalRequest requestWithdrawal() {}
 
-    public Enquiry createEnquiry() {}
-    public Enquiry viewEnquiry() {}
-    public Enquiry editEnquiry() {}
-
+    public Enquiry createEnquiry() {
+        Enquiry e = new Enquiry(getName());
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the purpose of your enquiry: ");
+        e.setPurposeOfEnquiry(sc.nextLine());
+        System.out.println("Enter the details of your enquiry: ");
+        e.setDetails(sc.nextLine());
+        sc.close();
+        return e;
+    }
+    public Enquiry editEnquiry(Enquiry e) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter the purpose of your enquiry(don't type anything and just submit if you would not like to edit this part): ");
+        String user_input = sc.nextLine();
+        if (user_input != "") {
+            e.setPurposeOfEnquiry(user_input);
+            e.updateTime();
+        }
+        System.out.println("Enter the details of your enquiry(don't type anything and just submit if you would not like to edit this part): ");
+        user_input = sc.nextLine();
+        if (user_input != "") {
+            e.setDetails(user_input);
+            e.updateTime();
+        }
+        sc.close();
+        return e;
+    }
+    public Enquiry deleteEnquiry(Enquiry e) {
+        e.setStatus("deleted by creator");
+        return e;
+    }
 
 }
 
