@@ -27,7 +27,7 @@ public class Applicant extends User{
     // • If Application status is “Successful”, Applicant can book one flat through the HDB Officer 
     // (Only HDB Officer can help to book a flat)
     // cannot book more than one flat, within a project or across different project
-    public void viewProjectStatus(Project proj) {}
+    public void viewAppliedProjectStatus(Project proj) {}
 
     // • Allowed to request withdrawal for their BTO application before/after flat booking
     // public WithdrawalRequest requestWithdrawal() {}
@@ -40,14 +40,22 @@ public class Applicant extends User{
     public void ViewProjectsOpentoUser(LinkedList <Project> all_projects, String filter) {
         for (Project proj : all_projects) {
             if (proj.getGroupProjOpento().equals(getMaritalStatus()) && proj.isVisible()) {
-                viewProjectDetails(proj);
+                getProjectDetails(proj);
             }
         }
     }
 
     // • Able to submit enquiries, a string, regarding the projects.
     // • Able to view, edit, and delete their enquiries.
-    public Enquiry createEnquiry() {
+    public void viewEnquirysOnlyByUser(LinkedList<Enquiry> all_enquires) {
+        for (Enquiry enquiry : all_enquires) {
+            if (enquiry.getCreatorOfEnquiry().equals(getName())) {
+                getEnquiryDetails(enquiry);
+            }
+        }
+    }
+
+    public Enquiry CreateEnquiry() {
         Enquiry e = new Enquiry(getName());
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter the purpose of your enquiry: ");
@@ -57,7 +65,7 @@ public class Applicant extends User{
         sc.close();
         return e;
     }
-    public Enquiry editEnquiry(Enquiry e) {
+    public Enquiry EditEnquiry(Enquiry e) {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter the purpose of your enquiry(don't type anything and just submit if you would not like to edit this part): ");
         String user_input = sc.nextLine();
@@ -74,7 +82,7 @@ public class Applicant extends User{
         sc.close();
         return e;
     }
-    public Enquiry deleteEnquiry(Enquiry e) {
+    public Enquiry DeleteEnquiry(Enquiry e) {
         e.setStatus("Deleted by Creator");
         return e;
     }

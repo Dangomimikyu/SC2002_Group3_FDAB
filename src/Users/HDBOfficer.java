@@ -79,8 +79,10 @@ public class HDBOfficer extends Applicant{
     // • Not allowed to edit the project details.
     public void ViewProjectsOpentoUser(LinkedList <Project> all_projects, String filter) {
         for (Project proj : all_projects) {
-            if (proj.getGroupProjOpento().equals(getMaritalStatus())) {
-                viewProjectDetails(proj);
+            for (String officer : proj.getOfficersInCharge()) {
+                if (getName().equals(officer)) {
+                    viewProjectDetails(proj);
+                }
             }
         }
     }

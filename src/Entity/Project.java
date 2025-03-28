@@ -146,7 +146,11 @@ public class Project {
         this.OfficerSlots = OS;
     }
 
-    public String getOfficersInCharge() {
+    public LinkedList<String> getOfficersInCharge() {
+        return OfficersInCharge;
+    }
+
+    public String displayOfficersInCharge() {
         String displayString = "";
         for (String off: OfficersInCharge) {
             displayString += off + ", ";

@@ -55,5 +55,16 @@ public class User {
                            "\nOfficer Slots: " + proj.getOfficerSlots() +
                            "\nOfficers assigned: " + proj.getOfficersInCharge());
     }
+
+    //helper function to get enquiry details (independent function from filtering enquires for types of users)
+    public void getEnquiryDetails(Enquiry e) {
+        System.out.println("\nPurpose of Enquiry: " + e.getPurposeOfEnquiry() +
+        "\nCreator of Enquiry: " + e.getCreatorOfEnquiry() 
+        + "\nDetails: " + e.getDetails() + "\nDate: " + e.getDate() 
+        + "\nStatus: " + e.getStatus() + "\nReply: " + e.getReply());
+    }
+
+    public void Login() {}
+    public void Logout() {}
     
 }
