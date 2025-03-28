@@ -1,5 +1,8 @@
+package Entity;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import Users.*;
 
 public class Enquiry {
     private String PurposeOfEnquiry; //question or request for information?
@@ -9,7 +12,7 @@ public class Enquiry {
     private String status; //open or closed
     private String reply; // content of reply
 
-    Enquiry(String COE) {
+    public Enquiry(String COE) {
         this.PurposeOfEnquiry = "";
         this.CreatorOfEnquiry = COE;
         this.details = "";

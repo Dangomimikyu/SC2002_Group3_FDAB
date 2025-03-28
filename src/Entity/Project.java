@@ -1,3 +1,8 @@
+package Entity;
+
+import java.util.LinkedList;
+import Users.*;
+
 public class Project {
     private boolean isVisible = true; //on or off
     private String OpentoUserGroup = ""; //single or married
@@ -14,9 +19,9 @@ public class Project {
     private String ApplicantClosingDate;
     private String ManagerInCharge;
     private int OfficerSlots;
-    private String[] OfficersInCharge;
+    private LinkedList<String> OfficersInCharge;
 
-    Project(String PN, String n, String T1, int T1no, int SPT1, String T2, int T2no, int SPT2, String AOD, String ACD, String MIC, int OS, String OIC) {
+    public Project(String PN, String n, String T1, int T1no, int SPT1, String T2, int T2no, int SPT2, String AOD, String ACD, String MIC, int OS, String OIC) {
         this.ProjectName = PN;
         this.Neighborhood = n;
         this.Type1 = T1;
@@ -29,14 +34,9 @@ public class Project {
         this.ApplicantClosingDate = ACD;
         this.ManagerInCharge = MIC;
         this.OfficerSlots = OS;
-        this.OfficersInCharge = new String[OS];
-        for (int i = 0; i < OfficerSlots; i++) {
-            OfficersInCharge[i] = "";
-        }
-        int index = 0;
-        for (String Officer : OIC.split(","))  {
-            this.OfficersInCharge[index] = Officer;
-            index++;
+        this.OfficersInCharge = new LinkedList<>();
+        for (String officer : OIC.split(","))  {
+            this.OfficersInCharge.add(officer);
         }  
     }
 
@@ -49,7 +49,7 @@ public class Project {
     public String getGroupProjOpento() {
         return OpentoUserGroup;
     }
-    public String setGroupProjOpento(String group) {
+    public void setGroupProjOpento(String group) {
         this.OpentoUserGroup = group;
     }
 
@@ -132,13 +132,7 @@ public class Project {
     }
 
     public int getNoOfOfficersCurrentlyAssigned() {
-        int size = 0;
-        for (String officer : OfficersInCharge) {
-            if (!officer.equals("")) {
-                size++;
-            }
-        }
-        return size;
+        return OfficersInCharge.size();
     }
 
     public int getOfficerSlots() {
@@ -150,43 +144,27 @@ public class Project {
             return;
         }
         this.OfficerSlots = OS;
-        String[] Old_OfficersInCharge = OfficersInCharge;
-        String[] New_OfficersInCharge = new String[OS];
-        for (int i = 0; i < OfficerSlots; i++) {
-            New_OfficersInCharge[i] = "";
-        }
-        int index = 0;
-        for (String officer : Old_OfficersInCharge)  {
-            if (!officer.equals("")) {
-                New_OfficersInCharge[index] = officer;
-                index++;
-            }
-        }  
-        this.OfficersInCharge = New_OfficersInCharge;
     }
 
-    public String[] getOfficersInCharge() {
-        return OfficersInCharge;
+    public String getOfficersInCharge() {
+        String displayString = "";
+        for (String off: OfficersInCharge) {
+            displayString += off + ", ";
+        }
+        return displayString;
     }
     public void addOfficersInCharge(String Officer) {
         if (getNoOfOfficersCurrentlyAssigned() == OfficerSlots) {
             System.out.println("There are no more slots to assign anymore new officers!");
             return;
         }
-        int index = 0;
-        for (String off : OfficersInCharge) {
-            if (off.equals("")) {
-                OfficersInCharge[index] = Officer;
-                break;
-            }
-            index++;
-        }
+        OfficersInCharge.add(Officer);
     }
     public void deleteOfficerInChage(String Officer) {
         int index = 0;
         for (String off : OfficersInCharge) {
             if (off.equals(Officer)) {
-                OfficersInCharge[index] = "";
+                OfficersInCharge.remove(index);
                 return;
             }           
             index++;
