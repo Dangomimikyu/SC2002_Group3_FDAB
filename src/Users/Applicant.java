@@ -1,90 +1,126 @@
 package Users;
 
 import Entity.*;
-import java.util.LinkedList;
+import Controller.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Applicant extends User{
+public class Applicant extends System_User{
 
-    public Applicant(String n, String nric, int a, String m, String p) {
-        super(n, nric, a, m, p);
+    public Applicant(String n, String nric, int a, String m, String p, String TOP) {
+        super(n, nric, a, m, p, "Applicant");
     }
 
-    // • Can only view the list of projects that are open to their user group (Single
-    // or Married) and if their visibility has been toggled “on”.
+    //Applicants can create new Enquiries regarding any project
+    public EnquiryManager CreateEnquiry(EnquiryManager Enquiry_Manager, String title, String project_name, String message) {
+        Enquiry_Manager.addEnquiry(this, title, project_name, message);
+        return Enquiry_Manager;
+    }
 
-    // • Able to apply for a project – cannot apply for multiple projects.
-    // o Singles, 35 years old and above, can ONLY apply for 2-Room
-    // o Married, 21 years old and above, can apply for any flat types (2-Room or 3-Room)
-    public void ApplyforProject(Project proj) {}
-
-    // • Able to view the project he/she applied for and the application status, even after visibility is turned off
-    // o Pending: Entry status upon application – No conclusive decision made about the outcome of the application
-    // o Successful: Outcome of the application is successful, hence invited to make a flat booking with the HDB Officer
-    // o Unsuccessful: Outcome of the application is unsuccessful, hence cannot make a flat booking for this application. 
-    // Applicant may apply for another project.
-    // o Booked: Secured a unit after a successful application and completed a flat booking with the HDB Officer.
-    // • If Application status is “Successful”, Applicant can book one flat through the HDB Officer 
-    // (Only HDB Officer can help to book a flat)
-    // cannot book more than one flat, within a project or across different project
-    public void viewAppliedProjectStatus(Project proj) {}
-
-    // • Allowed to request withdrawal for their BTO application before/after flat booking
-    // public WithdrawalRequest requestWithdrawal() {}
-
-    // • Can only view the list of projects that are open to their user group (Single
-    // or Married) and if their visibility has been toggled “on”.
-    // • All users can use filters to view project (location, flat types, etc.) Assume
-    // that default is by alphabetical order. User filter settings are saved when
-    // they switch menu pages. 
-    public void ViewProjectsOpentoUser(LinkedList <Project> all_projects, String filter) {
-        for (Project proj : all_projects) {
-            if (proj.getGroupProjOpento().equals(getMaritalStatus()) && proj.isVisible()) {
-                getProjectDetails(proj);
+    //View all enquiries ONLY CREATED by the user
+    public void ViewCreatedEnquiries(EnquiryManager Enquiry_Manager) {
+        if (Enquiry_Manager.get_all_created_enquiries(this).size() == 0) {
+            System.out.println("Error: You do not have any existing created enquiries!");
+            return;
+        }
+        for (Enquiry enq : Enquiry_Manager.get_all_current_enquiries()) {
+            if (enq.Enquirer.getUserID().equals(getUserID())) {
+                enq.getDetails();
             }
         }
     }
+    
+    // EditEnquiry refers to ability modify latest message(provided it is from the creator) or to create new message
+    public EnquiryManager EditEnquiry(EnquiryManager Enquiry_Manager) {
+        //Prompt which enquiry created by user to edit
+        Scanner sc = new Scanner(System.in);
+        ArrayList<Enquiry> user_enquiries = Enquiry_Manager.get_all_created_enquiries(this);
 
-    // • Able to submit enquiries, a string, regarding the projects.
-    // • Able to view, edit, and delete their enquiries.
-    public void viewEnquirysOnlyByUser(LinkedList<Enquiry> all_enquires) {
-        for (Enquiry enquiry : all_enquires) {
-            if (enquiry.getCreatorOfEnquiry().equals(getName())) {
-                getEnquiryDetails(enquiry);
+        if (user_enquiries.size() == 0) {
+            System.out.println("Error: You do not have any existing created enquiries!");
+            return Enquiry_Manager;
+        }
+
+        int choice = 0;
+        int count = 0;
+        while (choice <= 0 || choice > count) {
+            count = 1;
+            System.out.println("\nPlease choose which enquiry to edit: ");
+            for (Enquiry enq : user_enquiries) {
+                System.out.println(count + ". " + enq.Title);
+                count++;
+            }
+            choice = sc.nextInt();
+        }
+        Enquiry enquiry_to_edit = user_enquiries.get(choice-1); 
+
+        //two choices: edit latest message or add latest message to a existing enquiry (cannot add consecutively from same user)
+        sc.nextLine();
+        String choice_2 = "nil";
+        if (enquiry_to_edit.thread.getLast().sender.getUserID().equals(getUserID())) {
+            y_n_loop:
+            while (true) {
+                System.out.println("No one has replied to your latest message yet. Would you like to edit your latest message? (Y/N): ");
+                choice_2 = sc.nextLine();
+                switch (choice_2) {
+                    case "Y": case "y":
+                    System.out.println("your latest message: " + enquiry_to_edit.thread.getLast().message);
+                    System.out.println("\nPlease enter your re-edited message: ");
+                    enquiry_to_edit.editLatestMessage(sc.nextLine());
+                    break y_n_loop;
+                    case "N": case "n":
+                    break y_n_loop;
+                    default:
+                    break;
+                }
             }
         }
+        else {
+            y_n_loop_2:
+            while (true) {
+                System.out.println("Someone has replied to this thread! Would you like to see and reply to the latest message? (Y/N): ");
+                choice_2 = sc.nextLine();
+                switch (choice_2) {
+                    case "Y": case "y":
+                    System.out.println(enquiry_to_edit.thread.getLast().sender.TypeofUser + " " + enquiry_to_edit.thread.getLast().sender.name + "'s message: " + enquiry_to_edit.thread.getLast().message);
+                    System.out.println("Please enter your reply: ");
+                    enquiry_to_edit.addMessage(sc.nextLine(),this);
+                    break y_n_loop_2;
+                    case "N": case "n":
+                    break y_n_loop_2;
+                    default:
+                    break;
+                }
+            }
+        }
+
+        Enquiry_Manager.editEnquiry(enquiry_to_edit);
+        return Enquiry_Manager;
     }
 
-    public Enquiry CreateEnquiry() {
-        Enquiry e = new Enquiry(getName());
+    //delete any created enquiry
+    public EnquiryManager DeleteEnquiry(EnquiryManager Enquiry_Manager) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter the purpose of your enquiry: ");
-        e.setPurposeOfEnquiry(sc.nextLine());
-        System.out.println("Enter the details of your enquiry: ");
-        e.setDetails(sc.nextLine());
-        sc.close();
-        return e;
-    }
-    public Enquiry EditEnquiry(Enquiry e) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Enter the purpose of your enquiry(don't type anything and just submit if you would not like to edit this part): ");
-        String user_input = sc.nextLine();
-        if (user_input != "") {
-            e.setPurposeOfEnquiry(user_input);
-            e.updateTime();
+        ArrayList<Enquiry> user_enquiries = Enquiry_Manager.get_all_created_enquiries(this);
+
+        if (user_enquiries.size() == 0) {
+            System.out.println("Error: You do not have any existing created enquiries!");
+            return Enquiry_Manager;
         }
-        System.out.println("Enter the details of your enquiry(don't type anything and just submit if you would not like to edit this part): ");
-        user_input = sc.nextLine();
-        if (user_input != "") {
-            e.setDetails(user_input);
-            e.updateTime();
+
+        int choice = 0;
+        int count = 0;
+        while (choice <= 0 || choice > count) {
+            count = 1;
+            System.out.println("\nPlease choose which enquiry to delete: ");
+            for (Enquiry enq : user_enquiries) {
+                System.out.println(count + ". " + enq.Title);
+                count++;
+            }
+            choice = sc.nextInt();
         }
-        sc.close();
-        return e;
-    }
-    public Enquiry DeleteEnquiry(Enquiry e) {
-        e.setStatus("Deleted by Creator");
-        return e;
+        Enquiry_Manager.deleteEnquiry(user_enquiries.get(choice-1));
+        return Enquiry_Manager;
     }
 
 }

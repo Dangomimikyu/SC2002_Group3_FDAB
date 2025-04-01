@@ -1,52 +1,60 @@
 package Entity;
 
-import java.util.LinkedList;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import Users.*;
 
 public class Project {
     private boolean isVisible = true; //on or off
-    private String OpentoUserGroup = ""; //single or married
+    private String OpentoUserGroup = "all"; //all, single or married
 
-    private String ProjectName;
-    private String Neighborhood;
-    private String Type1;
-    private int NoOfUnitsForType1;
-    private int SellingPriceForType1;
-    private String Type2;
-    private int NoOfUnitsForType2;
-    private int SellingPriceForType2;
-    private String ApplicantOpeningDate;
-    private String ApplicantClosingDate;
-    private String ManagerInCharge;
-    private int OfficerSlots;
-    private LinkedList<String> OfficersInCharge;
+    public String ProjectName;
+    public String Neighborhood;
+    public String Type1; //2-room flat
+    public int NoOfUnitsForType1;
+    public int SellingPriceForType1;
+    public String Type2; //3-room flat
+    public int NoOfUnitsForType2;
+    public int SellingPriceForType2;
+    public LocalDate ApplicantOpeningDate;
+    public LocalDate ApplicantClosingDate;
+    public System_User ManagerInCharge;
+    public int OfficerSlots;
+    public ArrayList<System_User> OfficersInCharge;
 
-    public Project(String PN, String n, String T1, int T1no, int SPT1, String T2, int T2no, int SPT2, String AOD, String ACD, String MIC, int OS, String OIC) {
+    public Project(String PN, String n, String T1, String T1no, String SPT1, String T2, String T2no, String SPT2, String AOD, String ACD, String MIC, String OS, String OIC, String v, String group) {
         this.ProjectName = PN;
         this.Neighborhood = n;
         this.Type1 = T1;
-        this.NoOfUnitsForType1 = T1no;
-        this.SellingPriceForType1 = SPT1;
+        this.NoOfUnitsForType1 = Integer.parseInt(T1no);
+        this.SellingPriceForType1 = Integer.parseInt(SPT1);
         this.Type2 = T2;
-        this.NoOfUnitsForType2 = T1no;
-        this.SellingPriceForType2 = SPT2;
-        this.ApplicantOpeningDate = AOD;
-        this.ApplicantClosingDate = ACD;
-        this.ManagerInCharge = MIC;
-        this.OfficerSlots = OS;
-        this.OfficersInCharge = new LinkedList<>();
-        for (String officer : OIC.split(","))  {
-            this.OfficersInCharge.add(officer);
+        this.NoOfUnitsForType2 = Integer.parseInt(T1no);
+        this.SellingPriceForType2 = Integer.parseInt(SPT2);
+        this.ApplicantOpeningDate = LocalDate.parse(AOD, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        this.ApplicantClosingDate = LocalDate.parse(ACD, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        String[] manager_info = MIC.split("-");
+        this.ManagerInCharge = new System_User(manager_info[0],manager_info[1],Integer.parseInt(manager_info[2]),manager_info[3],"","Manager");
+        this.OfficerSlots = Integer.parseInt(OS);
+        this.OfficersInCharge = new ArrayList<>();
+        for (String officer : OIC.split("\\|"))  {
+            String[] officer_info = officer.split("-");
+            this.OfficersInCharge.add(new System_User(officer_info[0],officer_info[1],Integer.parseInt(officer_info[2]),officer_info[3],"","Officer"));
         }  
+        this.isVisible = Boolean.valueOf(v);
+        this.OpentoUserGroup = group;
     }
 
+
+    //functions for Managers
     public boolean isVisible() {
         return isVisible;
     }
     public void setVisibility(boolean val) {
         this.isVisible = val;
     }
-    public String getGroupProjOpento() {
+    public String getUserGroupOpento() {
         return OpentoUserGroup;
     }
     public void setGroupProjOpento(String group) {
@@ -54,90 +62,12 @@ public class Project {
     }
 
 
-    public String getProjectName() {
-        return ProjectName;
-    }
-    public void setProjectName(String PN) {
-        this.ProjectName = PN;
-    }
-
-    public String getNeighbourhood() {
-        return Neighborhood;
-    }
-    public void setNeighbourhood(String n) {
-        this.Neighborhood = n;
-    }
-
-    public String getType1() {
-        return Type1;
-    }
-    public void setType1(String T1) {
-        this.Type1 = T1;
-    }
-
-    public int getNoOfUnitsForType1() {
-        return NoOfUnitsForType1;
-    }
-    public void setNoOfUnitsForType1(int T1no) {
-        this.NoOfUnitsForType1 = T1no;
-    }
-
-    public int getSellingPriceForType1() {
-        return SellingPriceForType1;
-    }
-    public void setSellingPriceForType1(int SPT1) {
-        this.SellingPriceForType1 = SPT1;
-    }
-
-    public String getType2() {
-        return Type2;
-    }
-    public void setType2(String T2) {
-        this.Type2 = T2;
-    }
-
-    public int getNoOfUnitsForType2() {
-        return NoOfUnitsForType2;
-    }
-    public void setNoOfUnitsForType2(int T2no) {
-        this.NoOfUnitsForType2 = T2no;
-    }
-
-    public int getSellingPriceForType2() {
-        return SellingPriceForType2;
-    }
-    public void setSellingPriceForType2(int SPT2) {
-        this.SellingPriceForType2 = SPT2;
-    }
-
-    public String getApplicantOpeningDate() {
-        return ApplicantOpeningDate;
-    }
-    public void setApplicantOpeningDate(String AOD) {
-        this.ApplicantOpeningDate = AOD;
-    }
-
-    public String getApplicantClosingDate() {
-        return ApplicantClosingDate;
-    }
-    public void setApplicantClosingDate(String ACD) {
-        this.ApplicantClosingDate = ACD;
-    }
-
-    public String getManagerInCharge() {
-        return ManagerInCharge;
-    }
-    public void setManagerInCharge(String MIC) {
-        this.ManagerInCharge = MIC;
-    }
-
+    //Functions related to modification of officers in charge
+    
     public int getNoOfOfficersCurrentlyAssigned() {
         return OfficersInCharge.size();
     }
 
-    public int getOfficerSlots() {
-        return OfficerSlots;
-    }
     public void setOfficerSlots(int OS) {
         if (OS < getNoOfOfficersCurrentlyAssigned()) {
             System.out.println("There are more officers assigned than the slots you are trying to assign! Consider removing existing officers to reduce number of slots.");
@@ -146,34 +76,41 @@ public class Project {
         this.OfficerSlots = OS;
     }
 
-    public LinkedList<String> getOfficersInCharge() {
-        return OfficersInCharge;
-    }
-
-    public String displayOfficersInCharge() {
-        String displayString = "";
-        for (String off: OfficersInCharge) {
-            displayString += off + ", ";
-        }
-        return displayString;
-    }
-    public void addOfficersInCharge(String Officer) {
+    public void addOfficersInCharge(System_User officer) {
         if (getNoOfOfficersCurrentlyAssigned() == OfficerSlots) {
             System.out.println("There are no more slots to assign anymore new officers!");
             return;
         }
-        OfficersInCharge.add(Officer);
+        OfficersInCharge.add(new System_User(officer.name,officer.getUserID(),officer.age,officer.marital_status,"","Officer"));
     }
-    public void deleteOfficerInChage(String Officer) {
+    public void deleteOfficerInCharge(String NRIC) {
         int index = 0;
-        for (String off : OfficersInCharge) {
-            if (off.equals(Officer)) {
+        for (System_User officer : OfficersInCharge) {
+            if (officer.getUserID().equals(NRIC)) {
                 OfficersInCharge.remove(index);
                 return;
             }           
             index++;
         }
         System.out.println("Cannot find such an officer in project!");
+    }
+
+    public void viewProjectDetails() {
+        System.out.println("\nProject Name: " + ProjectName + 
+                           "\nNeighbourhood: " + Neighborhood +
+                           "\nNumber of Units for " + Type1 + "flats: " + NoOfUnitsForType1 +
+                           "\nSelling Price for " + Type1 + "flats: " + SellingPriceForType1 +
+                           "\nNumber of Units for " + Type2 + "flats: " + NoOfUnitsForType2 +
+                           "\nSelling Price for" + Type2 + "flats: " + SellingPriceForType2 +
+                           "\nApplication Opening Date: " + ApplicantOpeningDate +
+                           "\nApplication Closing Date: " + ApplicantClosingDate +
+                           "\nManagers in Charge: " + ManagerInCharge +
+                           "\nOfficer Slots: " + OfficerSlots +
+                           "\nOfficers in Charge: ");
+        
+        for (System_User officer : OfficersInCharge) {
+            System.out.print(officer.name+", ");
+        }
     }
 
 }

@@ -1,62 +1,48 @@
 package Entity;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import Users.*;
 
 public class Enquiry {
-    private String PurposeOfEnquiry; //question or request for information?
-    private String CreatorOfEnquiry; //creator of enquiry
-    private String details; //Content of Enquiry
-    private String date; //date and time of Enquiry made/last updated
-    private String status; //open or closed
-    private String reply; // content of reply
+    public final String Title;
+    public final System_User Enquirer; //creator of enquiry
+    public final String RegardingProject; //in regards to (project name)
+    public ArrayList<EnquiryMessage> thread = new ArrayList<>(); //Content of Enquiry
 
-    public Enquiry(String COE) {
-        this.PurposeOfEnquiry = "";
-        this.CreatorOfEnquiry = COE;
-        this.details = "";
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
-        this.date = dateFormat.toString();
-        this.status = "open";
-        this.reply = "nil";
+    //construction for when user creates enquiry in main menu
+    public Enquiry(String title, System_User user, String project_name, String first_message) {
+        this.Title = title;
+        this.Enquirer = user;
+        this.RegardingProject = project_name;
+        this.thread.add(new EnquiryMessage(first_message,user));
     }
 
-    public String getPurposeOfEnquiry() {
-        return PurposeOfEnquiry;
+    //construction for reading from enquiries.csv (messages are added one by one to enquiry)
+    public Enquiry(String title, System_User user, String project_name) {
+        this.Title = title;
+        this.Enquirer = user;
+        this.RegardingProject = project_name;
     }
-    public void setPurposeOfEnquiry(String POE) {
-        this.PurposeOfEnquiry = POE;
+
+    //add message/reply to enquiry
+    public void addMessage(String message, System_User user) {
+        this.thread.add(new EnquiryMessage(message,user));
     }
-    public String getCreatorOfEnquiry() {
-        return CreatorOfEnquiry;
+
+    //edit latest message
+    public void editLatestMessage(String editted_message) {
+        thread.getLast().message = editted_message;
     }
-    public void setCreatorOfEnquiry(String COE) {
-        this.CreatorOfEnquiry = COE;
+
+    //display details of enquiry
+    public void getDetails() {
+        System.out.println("\n-----------\nTitle: " + Title +
+        "\nCreator: " + Enquirer.name +
+        "\nRegarding Project: " + RegardingProject + 
+        "\n-----------");
+        for (EnquiryMessage em : thread) {
+            System.out.println("\nSender: " + em.sender.name + "\nMessage: " + em.message);
+        }
     }
-    public String getDetails() {
-        return details;
-    }
-    public void setDetails(String d) {
-        this.details = d;
-    }
-    public String getDate() {
-        return date;
-    }
-    public void updateTime() {
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss");
-        this.date = dateFormat.toString();
-    }
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String s) {
-        this.status = s;
-    }
-    public String getReply() {
-        return reply;
-    }
-    public void setReply(String r) {
-        this.reply = r;
-    }
+
 }

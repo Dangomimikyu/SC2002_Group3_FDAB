@@ -1,86 +1,116 @@
 package Users;
+import java.util.ArrayList;
 import java.util.Scanner;
 
+import Controller.EnquiryManager;
 import Entity.*;
 
-public class HDBManager extends User{
+public class HDBManager extends System_User{
 
-    public HDBManager(String n, String nric, int a, String m, String p) {
-        super(n, nric, a, m, p);
+    public HDBManager(String n, String nric, int a, String m, String p, String TOP) {
+        super(n, nric, a, m, p, "Manager");
     }
 
-    // • Able to view enquiries of ALL projects.
-    // • Able to view and reply to enquiries regarding the project he/she is
-    // handling. 
-    public void viewEnquiry(Enquiry e) {
-        System.out.println("\nPurpose of Enquiry: " + e.getPurposeOfEnquiry() + "\nDetails: " + e.getDetails() + "\nDate: " + e.getDate() 
-        + "\nStatus: " + e.getStatus() + "\nReply: " + e.getReply());
+    //View ALL enquiries
+    public void ViewAllEnquiries(EnquiryManager Enquiry_Manager) {
+        boolean no_enquiries = true;
+        for (Enquiry enq : Enquiry_Manager.get_all_current_enquiries()) {
+            enq.getDetails();
+            no_enquiries = false;
+        }
+        if (no_enquiries) {
+            System.out.println("Error: There are no enquiries throughout all projects!");
+        }
     }
-    public Enquiry replytoEnquiry(Enquiry e) {
+
+    //View and reply to enquiries regarding handled projects
+    public EnquiryManager ViewAndReplytoProjectEnquiries(EnquiryManager Enquiry_Manager, ArrayList<Project> all_handled_projects) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter your reply to this enquiry: ");
-        String reply = sc.nextLine();
-        sc.close();
-        e.setReply(reply);
-        return e;
-    }
-
-        //View project details,regardless of visibility settings
-        public void viewProjectDetails(Project proj) {
-            System.out.println("\nProject Name: " + proj.getProjectName() + 
-                               "\nNeighbourhood: " + proj.getNeighbourhood() +
-                               "\nType 1: " + proj.getType1() +
-                               "\nNumber of Units for Type 1: " + proj.getNoOfUnitsForType1() +
-                               "\nSelling Price for Type 1: " + proj.getSellingPriceForType1() +
-                               "\nType 2: " + proj.getType2() +
-                               "\nNumber of Units for Type 2: " + proj.getNoOfUnitsForType2() +
-                               "\nSelling Price for Type 2: " + proj.getSellingPriceForType2() +
-                               "\nApplication Opening Date: " + proj.getApplicantOpeningDate() +
-                               "\nApplication Closing Date: " + proj.getApplicantClosingDate() +
-                               "\nManagers in Charge: " + proj.getManagerInCharge() +
-                               "\nOfficer Slots: " + proj.getOfficerSlots() +
-                               "\nOfficers assigned: " + proj.getOfficersInCharge());
+        ArrayList<Enquiry> all_handled_enquiries = new ArrayList<>();
+        for (Enquiry enq : Enquiry_Manager.get_all_current_enquiries()) {
+            for (Project p : all_handled_projects) {
+                if (enq.RegardingProject.equals(p.ProjectName)) {
+                    enq.getDetails();
+                    all_handled_enquiries.add(enq);
+                    break;
+                } 
+            }
         }
 
-    //create,edit,delete BTO project listings
-    //Toggle project's visibility
-    //View projects created by other creators, regardless of visibility (filterable)
-    //View and reject/approve HDB Officer Registration
-    //Approve/reject Applicant's BTO Application
-    //Approve/reject Applicant's BTO Withdrawal
-    //Generate Report (filterable)
-}
+        if (all_handled_enquiries.size() == 0) {
+            System.out.println("Error: There are no enquiries regarding any projects your handling!");
+            return Enquiry_Manager;
+        }
 
-// • Able to create, edit, and delete BTO project listings.
-// • A BTO project information entered by the HDB Manager will include
-// information like:
-// o Project Name
-// o Neighborhood (e.g. Yishun, Boon Lay, etc.)
-// o Types of Flat – Assume there are only 2-Room and 3-Room
-// o The number of units for the respective types of flat
-// o Application opening date
-// o Application closing date
-// o HDB Manager in charge (automatically tied to the HDB Manager
-// who created the listing)
-// o Available HDB Officer Slots (max 10)
-// • Can only be handling one project within an application period (from
-// application opening date, inclusive, to application closing date,
-// inclusive)
-// • Able to toggle the visibility of the project to “on” or “off”. This will be
-// reflected in the project list that will be visible to applicants.
-// • Able to view all created projects, including projects created by other
-// HDB Manager, regardless of visibility setting.
-// • Able to filter and view the list of projects that they have created only.
-// • Able to view pending and approved HDB Officer registration.
-// • Able to approve or reject HDB Officer’s registration as the HDB
-// Manager in-charge of the project – update project’s remaining HDB
-// Officer slots
-// • Able to approve or reject Applicant’s BTO application – approval is
-// limited to the supply of the flats (number of units for the respective flat
-// types)
-// • Able to approve or reject Applicant's request to withdraw the application.
-// • Able to generate a report of the list of applicants with their respective
-// flat booking – flat type, project name, age, marital status
-// o There should be filters to generate a list based on various categories
-// (e.g. report of married applicants’ choice of flat type)
-// • Cannot apply for any BTO project as an Applicant.
+        String choice_to_edit_or_not;
+        edit_enquiry_y_n_loop:
+        while (true) {
+            System.out.println("Would you like to edit any enquiries? (Y/N): ");
+            choice_to_edit_or_not = sc.nextLine();
+            switch (choice_to_edit_or_not) {
+            case "Y": case "y":
+            break edit_enquiry_y_n_loop;
+            case "N": case "n":
+            return Enquiry_Manager;
+            default:
+            break;
+            }
+        }
+
+        int choice = 0;
+        int count = 0;
+        while (choice <= 0 || choice > count) {
+            count = 1;
+            System.out.println("\nPlease choose which enquiry to edit: ");
+            for (Enquiry enq : all_handled_enquiries ) {
+                System.out.println(count + ". " + enq.Title);
+                count++;
+            }
+            choice = sc.nextInt();
+        }
+        Enquiry enquiry_to_edit = all_handled_enquiries.get(choice-1); 
+
+        //two choices: edit latest message (if its user created) or reply to latest message (cannot add consecutively from same user)
+        sc.nextLine();
+        String choice_2 = "nil";
+        if (enquiry_to_edit.thread.getLast().sender.getUserID().equals(getUserID())) {
+            y_n_loop:
+            while (true) {
+                System.out.println("No one has replied to your latest message yet. Would you like to edit your latest message? (Y/N): ");
+                choice_2 = sc.nextLine();
+                switch (choice_2) {
+                    case "Y": case "y":
+                    System.out.println("your latest message: " + enquiry_to_edit.thread.getLast().message);
+                    System.out.println("\nPlease enter your re-edited message: ");
+                    enquiry_to_edit.editLatestMessage(sc.nextLine());
+                    break y_n_loop;
+                    case "N": case "n":
+                    break y_n_loop;
+                    default:
+                    break;
+                }
+            }
+        }
+        else {
+            y_n_loop_2:
+            while (true) {
+                System.out.println("Someone has replied to this thread! Would you like to see and reply to the latest message? (Y/N): ");
+                choice_2 = sc.nextLine();
+                switch (choice_2) {
+                    case "Y": case "y":
+                    System.out.println(enquiry_to_edit.thread.getLast().sender.TypeofUser + " " + enquiry_to_edit.thread.getLast().sender.name + "'s message: " + enquiry_to_edit.thread.getLast().message);
+                    System.out.println("\nPlease enter your reply: ");
+                    enquiry_to_edit.addMessage(sc.nextLine(),this);
+                    break y_n_loop_2;
+                    case "N": case "n":
+                    break y_n_loop_2;
+                    default:
+                    break;
+                }
+            }
+        }
+        Enquiry_Manager.editEnquiry(enquiry_to_edit);
+        return Enquiry_Manager;
+    }
+    
+}

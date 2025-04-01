@@ -1,103 +1,112 @@
 package Users;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Scanner;
 
+import Controller.EnquiryManager;
 import Entity.*;
 
-// • HDB Officer possess all applicant’s capabilities.
+//HDB Officer possess all applicant’s capabilities.
+
 public class HDBOfficer extends Applicant{
 
-    public HDBOfficer(String n, String nric, int a, String m, String p) {
-        super(n, nric, a, m, p);
+    public HDBOfficer(String n, String nric, int a, String m, String p, String TOP) {
+        super(n, nric, a, m, p, "Officer");
     }
 
-    //Register to join a project team and view its status (mutually exclusive for the same project)
-    // • Able to register to join a project if the following criteria are meant:
-    // o No intention to apply for the project as an Applicant (Cannot apply
-    // for the project as an Applicant before and after becoming an HDB
-    // Officer of the project)
-    // o Not a HDB Officer (registration not approved) for another project
-    // within an application period (from application opening date,
-    // inclusive, to application closing date, inclusive)
-
-    // • Registration to be a HDB Officer of the project is subject to approval
-    // from the HDB Manager in charge of the project.
-    // Once approved, their profile will reflect the project he/she is a HDB
-    // Officer for.
-
-    // • Able to apply for other projects in which he/she is not handling – Once
-    // applied for a BTO project, he/she cannot register to handle the same
-    // project
-    public void RegisterforProj(Project proj) {}
-
-    //Flat selection work: update applicant's profile with type of flat chosen under the project and no of flats for each flat type remaining
-    //Generate flat selection receipt
-
-    // • Able to see the status of their registration to be a HDB Officer for a
-    // project
-    public void viewProjectStatus(Project proj) {}
-
-    // • Able to view and reply to enquiries regarding the project he/she is handling
-    public void viewEnquiry(Enquiry e) {
-        System.out.println("\nPurpose of Enquiry: " + e.getPurposeOfEnquiry() + "\nDetails: " + e.getDetails() + "\nDate: " + e.getDate() 
-        + "\nStatus: " + e.getStatus() + "\nReply: " + e.getReply());
-    }
-    public Enquiry replytoEnquiry(Enquiry e) {
+    //View and reply to enquiries regarding handled projects
+    public EnquiryManager ViewAndReplytoProjectEnquiries(EnquiryManager Enquiry_Manager, ArrayList<Project> all_handled_projects) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter your reply to this enquiry: ");
-        String reply = sc.nextLine();
-        sc.close();
-        e.setReply(reply);
-        return e;
-    }
+        ArrayList<Enquiry> all_handled_enquiries = new ArrayList<>();
+        for (Enquiry enq : Enquiry_Manager.get_all_current_enquiries()) {
+            for (Project p : all_handled_projects) {
+                if (enq.RegardingProject.equals(p.ProjectName)) {
+                    enq.getDetails();
+                    all_handled_enquiries.add(enq);
+                    break;
+                } 
+            }
+        }
 
-    //View project details,regardless of visibility settings
-    public void viewProjectDetails(Project proj) {
-        System.out.println("\nProject Name: " + proj.getProjectName() + 
-                           "\nNeighbourhood: " + proj.getNeighbourhood() +
-                           "\nType 1: " + proj.getType1() +
-                           "\nNumber of Units for Type 1: " + proj.getNoOfUnitsForType1() +
-                           "\nSelling Price for Type 1: " + proj.getSellingPriceForType1() +
-                           "\nType 2: " + proj.getType2() +
-                           "\nNumber of Units for Type 2: " + proj.getNoOfUnitsForType2() +
-                           "\nSelling Price for Type 2: " + proj.getSellingPriceForType2() +
-                           "\nApplication Opening Date: " + proj.getApplicantOpeningDate() +
-                           "\nApplication Closing Date: " + proj.getApplicantClosingDate() +
-                           "\nManagers in Charge: " + proj.getManagerInCharge() +
-                           "\nOfficer Slots: " + proj.getOfficerSlots() +
-                           "\nOfficers assigned: " + proj.getOfficersInCharge());
-    }
+        if (all_handled_enquiries.size() == 0) {
+            System.out.println("Error: There are no enquiries regarding any projects your handling!");
+            return Enquiry_Manager;
+        }
 
-    // • Able to view the details of the project he/she is handling regardless of
-    // the visibility setting.
+        String choice_to_edit_or_not;
+        edit_enquiry_y_n_loop:
+        while (true) {
+            System.out.println("Would you like to edit any enquiries? (Y/N): ");
+            choice_to_edit_or_not = sc.nextLine();
+            switch (choice_to_edit_or_not) {
+            case "Y": case "y":
+            break edit_enquiry_y_n_loop;
+            case "N": case "n":
+            return Enquiry_Manager;
+            default:
+            break;
+            }
+        }
 
-    // • All users can use filters to view project (location, flat types, etc.) Assume
-    // that default is by alphabetical order. User filter settings are saved when
-    // they switch menu pages. 
+        int choice = 0;
+        int count = 0;
+        while (choice <= 0 || choice > count) {
+            count = 1;
+            System.out.println("\nPlease choose which enquiry to edit: ");
+            for (Enquiry enq : all_handled_enquiries ) {
+                System.out.println(count + ". " + enq.Title);
+                count++;
+            }
+            choice = sc.nextInt();
+        }
+        Enquiry enquiry_to_edit = all_handled_enquiries.get(choice-1); 
 
-    // • Not allowed to edit the project details.
-    public void ViewProjectsOpentoUser(LinkedList <Project> all_projects, String filter) {
-        for (Project proj : all_projects) {
-            for (String officer : proj.getOfficersInCharge()) {
-                if (getName().equals(officer)) {
-                    viewProjectDetails(proj);
+        //two choices: edit latest message (if its user created) or reply to latest message (cannot add consecutively from same user)
+        sc.nextLine();
+        String choice_2 = "nil";
+        if (enquiry_to_edit.thread.getLast().sender.getUserID().equals(getUserID())) {
+            y_n_loop:
+            while (true) {
+                System.out.println("No one has replied to your latest message yet. Would you like to edit your latest message? (Y/N): ");
+                choice_2 = sc.nextLine();
+                switch (choice_2) {
+                    case "Y": case "y":
+                    System.out.println("your latest message: " + enquiry_to_edit.thread.getLast().message);
+                    System.out.println("\nPlease enter your re-edited message: ");
+                    enquiry_to_edit.editLatestMessage(sc.nextLine());
+                    break y_n_loop;
+                    case "N": case "n":
+                    break y_n_loop;
+                    default:
+                    break;
                 }
             }
         }
+        else {
+            y_n_loop_2:
+            while (true) {
+                System.out.println("Someone has replied to this thread! Would you like to see and reply to the latest message? (Y/N): ");
+                choice_2 = sc.nextLine();
+                switch (choice_2) {
+                    case "Y": case "y":
+                    System.out.println(enquiry_to_edit.thread.getLast().sender.TypeofUser + " " + enquiry_to_edit.thread.getLast().sender.name + "'s message: " + enquiry_to_edit.thread.getLast().message);
+                    System.out.println("\nPlease enter your reply: ");
+                    enquiry_to_edit.addMessage(sc.nextLine(),this);
+                    break y_n_loop_2;
+                    case "N": case "n":
+                    break y_n_loop_2;
+                    default:
+                    break;
+                }
+            }
+        }
+        Enquiry_Manager.editEnquiry(enquiry_to_edit);
+        return Enquiry_Manager;
     }
 
+    //1. first, list all enquiries regarding project
+    //2. prompt officer if they would like to reply to one of the enquiries
+    //3. if the latest message from enquiry was not from user, ask if they want to reply
+    //4. if the latest message is from user, ask if they want to edit
+
 }
-
-
-// o With Applicant’s successful BTO application, HDB Officer’s flat
-// selection responsibilities:
-//  Update the number of flat for each flat type that are remaining
-//  Retrieve applicant’s BTO application with applicant’s NRIC
-//  Update applicant’s project status, from “successful” to
-// “booked”.
-//  Update applicant’s profile with the type of flat (2-Room or 3-
-// Room) chosen under a project
-// • Able to generate receipt of the applicants with their respective flat
-// booking details – Applicant’s Name, NRIC, age, marital status, flat type
-// booked and its project details.
