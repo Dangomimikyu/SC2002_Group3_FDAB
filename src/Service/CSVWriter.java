@@ -26,16 +26,11 @@ public class CSVWriter
         {
             if (!fileExists) 
             {
-                bw.write("Title,RegardingProject,Enquirer,Thread");
+                bw.write("Title,RegardingProject,Message,Enquirer,Reply,ReplySender");
             }
             bw.newLine();
             String enquirer_info = String.join("-",enq.Enquirer.name,enq.Enquirer.getUserID(),String.valueOf(enq.Enquirer.age),enq.Enquirer.marital_status,enq.Enquirer.TypeofUser);
-            String thread_info = "";
-            for (EnquiryMessage em : enq.thread) {
-                thread_info += String.join("-",em.message,em.sender.name,em.sender.getUserID(),String.valueOf(em.sender.age),em.sender.marital_status,em.sender.TypeofUser) + "|";
-            }
-            thread_info = thread_info.substring(0,thread_info.length()-1);
-            bw.write(String.join(",",enq.Title,enq.RegardingProject,enquirer_info,thread_info));
+            bw.write(String.join(",",enq.Title,enq.RegardingProject,enq.Message,enquirer_info,"",""));
         } 
         catch (IOException | NumberFormatException e) {}
     }
@@ -53,7 +48,7 @@ public class CSVWriter
             while ((line = br.readLine()) != null) 
             {
                 String[] data = line.split(",");
-                String[] enquirer_info = data[2].split("-");
+                String[] enquirer_info = data[3].split("-");
                 if (!data[0].equals(enq.Title) || 
                 !enquirer_info[1].equals(enq.Enquirer.getUserID()) ||
                 !data[1].equals(enq.RegardingProject))
@@ -66,7 +61,7 @@ public class CSVWriter
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
-            bw.write("Title,RegardingProject,Enquirer,Thread");
+            bw.write("Title,RegardingProject,Message,Enquirer,Reply,ReplySender");
             bw.newLine();
             for (String line : lines) 
             {
@@ -74,12 +69,14 @@ public class CSVWriter
                 bw.newLine();
             }
             String enquirer_info = String.join("-",enq.Enquirer.name,enq.Enquirer.getUserID(),String.valueOf(enq.Enquirer.age),enq.Enquirer.marital_status,enq.Enquirer.TypeofUser);
-            String thread_info = "";
-            for (EnquiryMessage em : enq.thread) {
-                thread_info += String.join("-",em.message,em.sender.name,em.sender.getUserID(),String.valueOf(em.sender.age),em.sender.marital_status,em.sender.TypeofUser) + "|";
+            String sender_info;
+            if (enq.Reply.equals("")) {
+                sender_info = "";
             }
-            thread_info = thread_info.substring(0,thread_info.length()-1);
-            bw.write(String.join(",",enq.Title,enq.RegardingProject,enquirer_info,thread_info));
+            else {
+                sender_info = String.join("-",enq.Sender.name,enq.Sender.getUserID(),String.valueOf(enq.Sender.age),enq.Sender.marital_status,enq.Sender.TypeofUser);
+            }
+            bw.write(String.join(",",enq.Title,enq.RegardingProject,enq.Message,enquirer_info,enq.Reply,sender_info));
 
         } 
         catch (IOException | NumberFormatException e) {}
@@ -98,7 +95,7 @@ public class CSVWriter
             while ((line = br.readLine()) != null) 
             {
                 String[] data = line.split(",");
-                String[] enquirer_info = data[2].split("-");
+                String[] enquirer_info = data[3].split("-");
                 if (!data[0].equals(enq.Title) || 
                 !enquirer_info[1].equals(enq.Enquirer.getUserID()) ||
                 !data[1].equals(enq.RegardingProject))
@@ -111,7 +108,7 @@ public class CSVWriter
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
-            bw.write("Title,RegardingProject,Enquirer,Thread");
+            bw.write("Title,RegardingProject,Message,Enquirer,Reply,ReplySender");
             for (String line : lines) 
             {
                 bw.newLine();

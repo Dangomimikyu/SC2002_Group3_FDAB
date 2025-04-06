@@ -6,21 +6,15 @@ import java.util.Scanner;
 
 public class System_User{
 
-    public final String name;
-    private final String NRIC;
-    public final int age;
-    public final String marital_status;
-    private final String password;
-    public final String TypeofUser;
+    public  String name;
+    private  String NRIC;
+    public  int age;
+    public  String marital_status;
+    private  String password;
+    public  String TypeofUser;
 
     //for initialising pre login useer
     public System_User() {
-        name = "";
-        NRIC = "";
-        age = -1;
-        marital_status = "";
-        password = "";
-        TypeofUser = "";
     }
 
     //for database storing of user information

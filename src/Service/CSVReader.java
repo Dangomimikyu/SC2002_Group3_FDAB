@@ -69,20 +69,26 @@ public class CSVReader
         try (BufferedReader br = new BufferedReader(new FileReader(EnquiriesFilePath)))
         {
             String line;
+            Enquiry e;
             br.readLine();
             
             while ((line = br.readLine()) != null) 
             {
-                String[] data = line.split(",");
+                String[] data = line.split(",",-1);
                 String title = data[0];
                 String project_name = data[1];
-                String[] enquirer_info = data[2].split("-");
-                String[] thread_info = data[3].split("\\|");
+                String message = data[2];
+                String[] enquirer_info  = data[3].split("-");
+                String reply = data[4];
+                String[] sender_info = data[5].split("-");
+
                 System_User creator = new System_User(enquirer_info[0],enquirer_info[1],Integer.parseInt(enquirer_info[2]),enquirer_info[3],"",enquirer_info[4]);
-                Enquiry e = new Enquiry(title,creator,project_name);
-                for (String message_info : thread_info) {
-                    String[] message_data = message_info.split("-");
-                    e.addMessage(message_data[0], new System_User(message_data[1],message_data[2],Integer.parseInt(message_data[3]),message_data[4],"",message_data[5]));
+                if (reply.equals("")) {
+                    e = new Enquiry(title,project_name,message,creator);
+                }
+                else {
+                    System_User sender = new System_User(sender_info[0],sender_info[1],Integer.parseInt(sender_info[2]),sender_info[3],"",sender_info[4]);
+                    e = new Enquiry(title,project_name,message,creator,reply,sender);
                 }
                 
                 list_of_all_enquiries.add(e);

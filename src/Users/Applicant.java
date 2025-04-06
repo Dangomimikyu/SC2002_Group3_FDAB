@@ -13,7 +13,7 @@ public class Applicant extends System_User{
 
     //Applicants can create new Enquiries regarding any project
     public EnquiryManager CreateEnquiry(EnquiryManager Enquiry_Manager, String title, String project_name, String message) {
-        Enquiry_Manager.addEnquiry(this, title, project_name, message);
+        Enquiry_Manager.RecordNewEnquiry(this, title, project_name, message);
         return Enquiry_Manager;
     }
 
@@ -24,7 +24,7 @@ public class Applicant extends System_User{
             return;
         }
         for (Enquiry enq : Enquiry_Manager.get_all_current_enquiries()) {
-            if (enq.Enquirer.getUserID().equals(getUserID())) {
+            if (enq.getCreatorID().equals(getUserID())) {
                 enq.getDetails();
             }
         }
@@ -54,47 +54,16 @@ public class Applicant extends System_User{
         }
         Enquiry enquiry_to_edit = user_enquiries.get(choice-1); 
 
-        //two choices: edit latest message or add latest message to a existing enquiry (cannot add consecutively from same user)
-        sc.nextLine();
-        String choice_2 = "nil";
-        if (enquiry_to_edit.thread.getLast().sender.getUserID().equals(getUserID())) {
-            y_n_loop:
-            while (true) {
-                System.out.println("No one has replied to your latest message yet. Would you like to edit your latest message? (Y/N): ");
-                choice_2 = sc.nextLine();
-                switch (choice_2) {
-                    case "Y": case "y":
-                    System.out.println("your latest message: " + enquiry_to_edit.thread.getLast().message);
-                    System.out.println("\nPlease enter your re-edited message: ");
-                    enquiry_to_edit.editLatestMessage(sc.nextLine());
-                    break y_n_loop;
-                    case "N": case "n":
-                    break y_n_loop;
-                    default:
-                    break;
-                }
-            }
-        }
-        else {
-            y_n_loop_2:
-            while (true) {
-                System.out.println("Someone has replied to this thread! Would you like to see and reply to the latest message? (Y/N): ");
-                choice_2 = sc.nextLine();
-                switch (choice_2) {
-                    case "Y": case "y":
-                    System.out.println(enquiry_to_edit.thread.getLast().sender.TypeofUser + " " + enquiry_to_edit.thread.getLast().sender.name + "'s message: " + enquiry_to_edit.thread.getLast().message);
-                    System.out.println("Please enter your reply: ");
-                    enquiry_to_edit.addMessage(sc.nextLine(),this);
-                    break y_n_loop_2;
-                    case "N": case "n":
-                    break y_n_loop_2;
-                    default:
-                    break;
-                }
-            }
+        if (!enquiry_to_edit.Reply.equals("")) {
+            System.out.println("Error: Someone has replied to your enquiry! You can't edit this enquiry anymore.");
+            return Enquiry_Manager;
         }
 
-        Enquiry_Manager.editEnquiry(enquiry_to_edit);
+        sc.nextLine(); // Consume newline left-over
+        System.out.println("Please enter your newly editted message: ");
+        String editted_message = sc.nextLine();
+        enquiry_to_edit.editMessage(editted_message);
+        Enquiry_Manager.RecordEnquiryEdits(enquiry_to_edit);
         return Enquiry_Manager;
     }
 
@@ -119,7 +88,14 @@ public class Applicant extends System_User{
             }
             choice = sc.nextInt();
         }
-        Enquiry_Manager.deleteEnquiry(user_enquiries.get(choice-1));
+        Enquiry enquiry_to_delete = user_enquiries.get(choice-1);
+
+        if (!enquiry_to_delete.Reply.equals("")) {
+            System.out.println("Error: Someone has replied to your enquiry! You can't delete this enquiry anymore.");
+            return Enquiry_Manager;
+        }
+
+        Enquiry_Manager.RecordEnquiryDeletion(enquiry_to_delete);
         return Enquiry_Manager;
     }
 

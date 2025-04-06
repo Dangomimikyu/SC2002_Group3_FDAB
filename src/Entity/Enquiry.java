@@ -4,44 +4,59 @@ import java.util.ArrayList;
 import Users.*;
 
 public class Enquiry {
-    public final String Title;
-    public final System_User Enquirer; //creator of enquiry
-    public final String RegardingProject; //in regards to (project name)
-    public ArrayList<EnquiryMessage> thread = new ArrayList<>(); //Content of Enquiry
+    public String Title;
+    public String RegardingProject; //in regards to (project name)
+    public String Message;
+    public System_User Enquirer; //creator of enquiry
+    public String Reply = "";
+    public System_User Sender = null; //latest sender of reply
 
     //construction for when user creates enquiry in main menu
-    public Enquiry(String title, System_User user, String project_name, String first_message) {
+    public Enquiry(String title, String project_name, String first_message, System_User enquirer) {
         this.Title = title;
-        this.Enquirer = user;
         this.RegardingProject = project_name;
-        this.thread.add(new EnquiryMessage(first_message,user));
+        this.Message = first_message;
+        this.Enquirer = enquirer;
     }
 
-    //construction for reading from enquiries.csv (messages are added one by one to enquiry)
-    public Enquiry(String title, System_User user, String project_name) {
+    //construction for when reading from enquiries.csv
+    public Enquiry(String title, String project_name, String first_message, System_User enquirer, String reply, System_User sender) {
         this.Title = title;
-        this.Enquirer = user;
         this.RegardingProject = project_name;
-    }
-
-    //add message/reply to enquiry
-    public void addMessage(String message, System_User user) {
-        this.thread.add(new EnquiryMessage(message,user));
+        this.Message = first_message;
+        this.Enquirer = enquirer;
+        this.Reply = reply;
+        this.Sender = sender;
     }
 
     //edit latest message
-    public void editLatestMessage(String editted_message) {
-        thread.getLast().message = editted_message;
+    public void editMessage(String editted_message) {
+        this.Message = editted_message;
+    }
+
+    //get the userID of the creator of enquiry
+    public String getCreatorID() {
+        return Enquirer.getUserID();
+    }
+
+    //get the userID of the sender
+    public String getLatestSenderID() {
+        return Sender.getUserID();
     }
 
     //display details of enquiry
     public void getDetails() {
         System.out.println("\n-----------\nTitle: " + Title +
-        "\nCreator: " + Enquirer.name +
+        "\nEnquirer: " + Enquirer.name +
         "\nRegarding Project: " + RegardingProject + 
         "\n-----------");
-        for (EnquiryMessage em : thread) {
-            System.out.println("\nSender: " + em.sender.name + "\nMessage: " + em.message);
+        if (!Reply.equals("")) {
+            System.out.println("Reply: " + Reply +
+            "\nSender: " + Sender.name +
+            "\n-----------");
+        }
+        else {
+            System.out.println("No reply yet!");
         }
     }
 

@@ -47,8 +47,8 @@ public class EnquiryManager {
     }
 
     //relates to the creation of a new enquiry
-    public void addEnquiry(System_User user, String title, String project_name, String message) {
-        Enquiry e = new Enquiry(title,user,project_name,message);
+    public void RecordNewEnquiry(System_User user, String title, String project_name, String message) {
+        Enquiry e = new Enquiry(title,project_name,message,user);
         if (isUniqueEnquiry(e)) {
             list_of_all_enquiries.add(e);
             localdata.addEnquiry(e);
@@ -59,7 +59,7 @@ public class EnquiryManager {
     }
 
     //edits an existing enquiry
-    public void editEnquiry(Enquiry edited_enquiry) {
+    public void RecordEnquiryEdits(Enquiry edited_enquiry) {
         int index = 0;
         for (Enquiry enq : list_of_all_enquiries) {
             if (enq.Title.equals(edited_enquiry.Title) &&
@@ -75,7 +75,7 @@ public class EnquiryManager {
     }
 
     //deletes an existing enquiry
-    public void deleteEnquiry(Enquiry enquiry_to_delete) {
+    public void RecordEnquiryDeletion(Enquiry enquiry_to_delete) {
         int index = 0;
         for (Enquiry enq : list_of_all_enquiries) {
             if (enq.Title.equals(enquiry_to_delete.Title) &&
