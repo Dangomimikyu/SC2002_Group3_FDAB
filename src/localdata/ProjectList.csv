@@ -1,2 +1,3 @@
-﻿Project Name,Neighborhood,Type 1,Number of units for Type 1,Selling price for Type 1,Type 2,Number of units for Type 2,Selling price for Type 2,Application opening date,Application closing date,Manager,Officer Slot,Officers,Visibility,OpentoUserGroup
-Acacia Breeze,Yishun,2-Room,2,350000,3-Room,3,450000,15/02/2025,20/03/2025,Jessica-S5678901G-26-Married,3,Daniel-T2109876H-36-Single|Emily-S6543210I-28-Single,true,all
+﻿Project Name,Neighborhood,SellingPriceFor2Room,SellingPrice3Room,NoOfUnitsLeft2Room,NoOfUnitsLeft3Room,Application opening date,Application closing date,Manager,Officer Slot,Officers,Visibility,OpentoUserGroup
+Acacia Breeze,Yishun,350000,450000,2,3,15/02/2025,20/03/2025,S5678901G,3,T2109876H-S6543210I,true,SINGLE
+Madagascar Palm,Woodlands,420000,600000,4,5,22/01/2025,19/04/2025,T8765432F,3,T1234567J,true,MARRIED

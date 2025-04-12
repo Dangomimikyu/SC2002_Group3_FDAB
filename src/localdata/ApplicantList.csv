@@ -1,0 +1,6 @@
+Name,NRIC,Age,MaritalStatus,Password,AppliedProject,AppliedProjectStatus
+John,S1234567A,35,Single,password,,UNAPPLIED
+Sarah,T7654321B,40,Married,password,,UNAPPLIED
+Grace,S9876543C,37,Married,password,,UNAPPLIED
+James,T2345678D,30,Married,password,,UNAPPLIED
+Rachel,S3456789E,25,Single,password,,UNAPPLIED
