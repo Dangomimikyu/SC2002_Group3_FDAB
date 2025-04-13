@@ -41,9 +41,14 @@ public class ProjectDetails {
         this.OpenDate = LocalDate.parse(AOD, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         this.CloseDate = LocalDate.parse(ACD, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         this.Manager = M;
+        //NOTE: managers can only handle ONE 'active' project at at time (can only create new ones if not handling an active one currently)
+        //definiton of active: visibility turned ON + within open date and close date
+        //however, they can still handle approving applications and rejecting withdrawals, and reply to enquiries of their projects
+        //if there are any leftover requests/enquiries that haven't been handled yet.
         this.OfficerSlots = OS;
         this.OfficerList = OIC;
         this.activeStatus = v;
+        //maybe include a check to automatically set visibility if past closing date?
         if (group.equals("SINGLE")) {
             this.OpentoUserGroup = UserGroup.SINGLE;
         } else if (group.equals("MARRIED")) {

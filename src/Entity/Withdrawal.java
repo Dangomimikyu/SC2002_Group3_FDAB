@@ -3,6 +3,7 @@ package Entity;
 import User.Applicant;
 
 // Withdrawal is the class that will be used to create the withdrawal request
+// according to FAQ, the withdrawal request is assumed to always be successful
 
 public class Withdrawal extends Request {
 

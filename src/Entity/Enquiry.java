@@ -18,7 +18,7 @@ public class Enquiry {
         this.Enquirer = enquirer;
     }
 
-    //check if the enquiry has been replied to
+    //check if the enquiry has been replied to (helper function to check if enquiry is editable or deletable)
     public boolean isUnreplied() {
         return Replier == null;
     }

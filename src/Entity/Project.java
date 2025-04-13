@@ -56,6 +56,7 @@ public class Project {
     }
 
     //for removing officers from the project (only for manager)
+    //TODO: NOTE: According to FAQ, officers cannot withdraw from officer positions in projects once successful. Still need this function?
     public void UnassignOfficer(HDB_Officer officer) {
         if (Details.OfficerList.size() == 0) {
             throw new IllegalArgumentException("No officers to remove!");
