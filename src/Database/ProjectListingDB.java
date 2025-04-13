@@ -16,10 +16,7 @@ public class ProjectListingDB implements Database<Project> {
     Reader reader = new Reader();
     Writer writer = new Writer();
 
-    // Singleton pattern to ensure only one instance of ProjectListingDB exists
-    private ProjectListingDB() {
-        // Private constructor to prevent instantiation
-    }
+    private ProjectListingDB() {}
     public static ProjectListingDB getInstance() {
         return instance;
     }

@@ -2,7 +2,7 @@ package Entity;
 
 import User.*;
 
-// Request is the superclass that will be used for all requests type entities in the system
+// Request is the abstract superclass that will be used for all requests type entities in the system
 // such as Applicant_Application, Officer_Application, Booking, Withdrawal
 //
 // users can only have one request in the system at any given point of time
@@ -19,7 +19,7 @@ import User.*;
 // officers CANNOT be both an applicant and an officer of the same project
 // officers CANNOT withdraw from their officer position if Officer_Application is successful.
 
-public class Request {
+public abstract class Request {
 
     public enum ApplicationStatus {
         PENDING,
@@ -30,6 +30,7 @@ public class Request {
     public enum FlatType {
         TWO_ROOM,
         THREE_ROOM,
+        NULL
     }
 
     public final Applicant initiator;

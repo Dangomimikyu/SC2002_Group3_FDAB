@@ -14,11 +14,8 @@ public class RequestsDB implements Database<Request> {
     private ArrayList<Request> requestList = new ArrayList<Request>();
     Reader reader = new Reader();
     Writer writer = new Writer();
-
-    // Singleton pattern to ensure only one instance of RequestsDB exists
-    private RequestsDB() {
-        // Private constructor to prevent instantiation
-    }
+    
+    private RequestsDB() {}
     public static RequestsDB getInstance() {
         return instance;
     }

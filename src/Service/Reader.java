@@ -32,6 +32,7 @@ public class Reader
                 String applied_project_status = data[6];
                 
                 userList.add(new Applicant(name, NRIC, age, marital_status, password, applied_project, applied_project_status));
+
             }
         } 
         catch (IOException | NumberFormatException e) {}
@@ -69,7 +70,7 @@ public class Reader
                 String NRIC = data[1];
                 String password = data[2];
                 
-                userList.add(new HDB_Manager(name, NRIC, password));
+                userList.add(new HDB_Manager(NRIC, password, name));
             }
         } 
         catch (IOException | NumberFormatException e) {}
@@ -96,21 +97,23 @@ public class Reader
                 int selling_price_3room = Integer.parseInt(data[3]);
                 int no_of_units_2room = Integer.parseInt(data[4]);
                 int no_of_units_3room = Integer.parseInt(data[5]);
-                String applicant_opening_date = data[6];
-                String applicant_closing_date = data[7];
+                String opening_date = data[6];
+                String closing_date = data[7];
                 String manager_id = data[8];
                 int max_officer_slots = Integer.parseInt(data[9]);
                 String[] officers_in_charge = data[10].split("-",-1);
-                boolean is_visible = Boolean.parseBoolean(data[11]);
+                boolean activeStatus = Boolean.parseBoolean(data[11]);
                 String open_to_user_group = data[12];
 
                 ArrayList<HDB_Officer> officers = new ArrayList<>();
-                for (String officerID : officers_in_charge) {
-                    HDB_Officer officer = (HDB_Officer)userList.stream()
-                        .filter(user -> user.userID.equals(officerID))
-                        .findFirst()
-                        .orElse(null);
-                    officers.add(officer);
+                if (!officers_in_charge[0].equals("")) {
+                    for (String officerID : officers_in_charge) {
+                        HDB_Officer officer = (HDB_Officer)userList.stream()
+                            .filter(user -> user.userID.equals(officerID))
+                            .findFirst()
+                            .orElse(null);
+                        officers.add(officer);
+                    }
                 }
                 HDB_Manager manager = (HDB_Manager)userList.stream()
                     .filter(user -> user.userID.equals(manager_id))
@@ -118,8 +121,8 @@ public class Reader
                     .orElse(null);
 
                 projList.add(new Project(project_name, neighborhood, selling_price_2room, selling_price_3room, no_of_units_2room, 
-                no_of_units_3room, applicant_opening_date, applicant_closing_date, manager, max_officer_slots, officers, 
-                is_visible, open_to_user_group));
+                no_of_units_3room, opening_date, closing_date, manager, max_officer_slots, officers, 
+                activeStatus, open_to_user_group));
 
             }
         }

@@ -16,10 +16,7 @@ public class EnquiryDB implements Database<Enquiry> {
     Reader reader = new Reader();
     Writer writer = new Writer();
 
-    // Singleton pattern to ensure only one instance of EnquiryDB exists
-    private EnquiryDB() {
-        // Private constructor to prevent instantiation
-    }
+    private EnquiryDB() {}
     public static EnquiryDB getInstance() {
         return instance;
     }

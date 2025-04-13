@@ -18,8 +18,17 @@ public class Enquiry {
         this.Enquirer = enquirer;
     }
 
+    //check if the enquiry has been replied to
     public boolean isUnreplied() {
         return Replier == null;
+    }
+
+    public String getEnquiryDetails() {
+        return "Title: " + Title + "\n" +
+               "Regarding Project: " + RegardingProject + "\n" +
+               "Description: " + Description + "\n" +
+               "Enquirer: " + Enquirer.name + "\n" +
+               (isUnreplied() ? "YET TO BE REPLIED" : "Reply: " + Reply + "\nReplier: " + Replier.name + "\n");
     }
 
 }

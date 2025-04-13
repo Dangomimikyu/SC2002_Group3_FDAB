@@ -23,28 +23,28 @@ public class Writer
     {
         String filePath = "";
 
-        if (user instanceof Applicant) 
-        {
-            filePath = "src/localdata/ApplicantList.csv";
-        } 
-        else if (user instanceof HDB_Officer) 
+        if (user instanceof HDB_Officer) 
         {
             filePath = "src/localdata/OfficerList.csv";
         } 
         else if (user instanceof HDB_Manager) 
         {
             filePath = "src/localdata/ManagerList.csv";
-        }
+        } 
+        else if (user instanceof Applicant)
+        {
+            filePath = "src/localdata/ApplicantList.csv";
+        } 
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true))) 
         {
             bw.newLine();
             String user_info = "";
-            if (user instanceof Applicant || user instanceof HDB_Officer) 
+            if (user instanceof Applicant) 
             {
                 Applicant app = (Applicant)user;
                 user_info = String.join(",",app.name,app.userID,String.valueOf(app.age)
-                ,app.maritalStatus,app.password,app.AppliedProject,String.valueOf(app.AppliedProjectStatus));
+                ,String.valueOf(app.maritalStatus),app.password,app.AppliedProject,String.valueOf(app.AppliedProjectStatus));
             } 
             else if (user instanceof HDB_Manager) 
             {
@@ -60,18 +60,18 @@ public class Writer
     {
         String filePath = "";
 
-        if (user instanceof Applicant) 
-        {
-            filePath = "src/localdata/ApplicantList.csv";
-        } 
-        else if (user instanceof HDB_Officer) 
+        if (user instanceof HDB_Officer) 
         {
             filePath = "src/localdata/OfficerList.csv";
         } 
         else if (user instanceof HDB_Manager) 
         {
             filePath = "src/localdata/ManagerList.csv";
-        }
+        } 
+        else if (user instanceof Applicant)
+        {
+            filePath = "src/localdata/ApplicantList.csv";
+        } 
 
         List<String> lines = new ArrayList<>();     
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) 
@@ -93,16 +93,19 @@ public class Writer
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
             String user_info ="";
-            if (user instanceof Applicant || user instanceof HDB_Officer) 
+            if (user instanceof Applicant) 
             {
                 bw.write("Name,NRIC,Age,MaritalStatus,Password,AppliedProject,AppliedProjectStatus");
                 Applicant app = (Applicant)user;
                 user_info = String.join(",",app.name,app.userID,String.valueOf(app.age)
-                ,app.maritalStatus,app.password,app.AppliedProject,String.valueOf(app.AppliedProjectStatus));
+                ,String.valueOf(app.maritalStatus),app.password,app.AppliedProject,String.valueOf(app.AppliedProjectStatus));
             } 
-            bw.write("Name,NRIC,Password");
-            HDB_Manager manager = (HDB_Manager)user;
-            user_info = String.join(",",manager.name,manager.userID,manager.password);
+            else if (user instanceof HDB_Manager) 
+            {
+                bw.write("Name,NRIC,Password");
+                HDB_Manager manager = (HDB_Manager)user;
+                user_info = String.join(",",manager.name,manager.userID,manager.password);
+            }
 
             bw.newLine();
             for (String line : lines) 
@@ -229,10 +232,11 @@ public class Writer
             String project_info = String.join(",",p.Details.ProjectName,p.Details.Neighborhood,
             String.valueOf(p.Details.SellingPrice_2Room), String.valueOf(p.Details.SellingPrice_3Room),
             String.valueOf(p.Details.NoOfUnitsLeft_2Room), String.valueOf(p.Details.NoOfUnitsLeft_3Room),
-            String.valueOf(p.Details.ApplicantOpeningDate), String.valueOf(p.Details.ApplicantClosingDate),
-            p.Details.ManagerInCharge.userID, String.valueOf(p.Details.MaxOfficerSlots),
-            String.join("-",p.Details.OfficersInCharge.stream().map(o -> o.userID).toArray(String[]::new)),
-            String.valueOf(p.Details.isVisible), String.valueOf(p.Details.OpentoUserGroup));
+            p.Details.OpenDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")), 
+            p.Details.CloseDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            p.Details.Manager.userID, String.valueOf(p.Details.OfficerSlots),
+            String.join("-",p.Details.OfficerList.stream().map(o -> o.userID).toArray(String[]::new)),
+            String.valueOf(p.Details.activeStatus), String.valueOf(p.Details.OpentoUserGroup));
 
             bw.write(project_info);
         } 
@@ -303,10 +307,11 @@ public class Writer
             String project_info = String.join(",",p.Details.ProjectName,p.Details.Neighborhood,
             String.valueOf(p.Details.SellingPrice_2Room), String.valueOf(p.Details.SellingPrice_3Room),
             String.valueOf(p.Details.NoOfUnitsLeft_2Room), String.valueOf(p.Details.NoOfUnitsLeft_3Room),
-            String.valueOf(p.Details.ApplicantOpeningDate), String.valueOf(p.Details.ApplicantClosingDate),
-            p.Details.ManagerInCharge.userID, String.valueOf(p.Details.MaxOfficerSlots),
-            String.join("-",p.Details.OfficersInCharge.stream().map(o -> o.userID).toArray(String[]::new)),
-            String.valueOf(p.Details.isVisible), String.valueOf(p.Details.OpentoUserGroup));
+            p.Details.OpenDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")), 
+            p.Details.CloseDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+            p.Details.Manager.userID, String.valueOf(p.Details.OfficerSlots),
+            String.join("-",p.Details.OfficerList.stream().map(o -> o.userID).toArray(String[]::new)),
+            String.valueOf(p.Details.activeStatus), String.valueOf(p.Details.OpentoUserGroup));
 
             bw.write(project_info);
         } 

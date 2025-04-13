@@ -4,17 +4,25 @@ package Database;
 //main.java will call the HDB_System class to access the database of the system
 
 public class HDB_System {
-    private UserInfoDB userInfoDB;
-    private EnquiryDB enquiryDB;
-    private ProjectListingDB projectListingDB;
-    private RequestsDB requestsDB;
+
+    private static final HDB_System instance = new HDB_System();
+
+    public UserInfoDB users = UserInfoDB.getInstance();
+    public EnquiryDB enquiries = EnquiryDB.getInstance();
+    public ProjectListingDB projects = ProjectListingDB.getInstance();
+    public RequestsDB requests = RequestsDB.getInstance();
+
+    private HDB_System() {}
+    public static HDB_System getInstance() {
+        return instance;
+    }
 
     public HDB_System(String ApplicantFilePath, String OfficerFilePath, String ManagerFilePath, 
     String EnquiriesFilePath, String ProjectFilePath, String RequestsFilePath) {
 
-        this.userInfoDB = new UserInfoDB(ApplicantFilePath, OfficerFilePath, ManagerFilePath);
-        this.enquiryDB = new EnquiryDB(EnquiriesFilePath, userInfoDB.ViewDB());
-        this.projectListingDB = new ProjectListingDB(ProjectFilePath, userInfoDB.ViewDB());
-        this.requestsDB = new RequestsDB(RequestsFilePath, userInfoDB.ViewDB());
+        this.users = new UserInfoDB(ApplicantFilePath, OfficerFilePath, ManagerFilePath);
+        this.enquiries = new EnquiryDB(EnquiriesFilePath, users.ViewDB());
+        this.projects = new ProjectListingDB(ProjectFilePath, users.ViewDB());
+        this.requests = new RequestsDB(RequestsFilePath, users.ViewDB());
     }
 }

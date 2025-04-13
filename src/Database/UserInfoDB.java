@@ -15,10 +15,7 @@ public class UserInfoDB implements Database<SystemUser> {
     Reader reader = new Reader();
     Writer writer = new Writer();
 
-    // Singleton pattern to ensure only one instance of UserInfoDB exists
-    private UserInfoDB() {
-        // Private constructor to prevent instantiation
-    }
+    private UserInfoDB() {}
     public static UserInfoDB getInstance() {
         return instance;
     }
@@ -34,7 +31,7 @@ public class UserInfoDB implements Database<SystemUser> {
     public void ModifyDB(SystemUser user, DB_Action action) {
         switch (action) {
             case ADD -> writer.WriteNewUser(user);
-            case DELETE -> throw new UnsupportedOperationException("Error: unable to delete users"); // TODO: handle exception
+            case DELETE -> throw new UnsupportedOperationException("Error: unable to delete users"); // TODO: handle deletion of users
             case EDIT -> writer.RewriteUser(user);
         }
     }
