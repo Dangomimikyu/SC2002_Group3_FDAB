@@ -13,6 +13,12 @@ public class MainApp {
         String RequestsFilePath = "src/localdata/Requests.csv";
         HDB_System HDB_system = HDB_System.getInstance();
         HDB_system = new HDB_System(ApplicantFilePath, OfficerFilePath, ManagerFilePath, EnquiriesFilePath, ProjectsFilePath, RequestsFilePath);
+
+        //test
+        HDB_system.users.ViewDB();
+        HDB_system.enquiries.ViewDB();
+        HDB_system.projects.ViewDB();
+        HDB_system.requests.ViewDB();
     }
 
 }

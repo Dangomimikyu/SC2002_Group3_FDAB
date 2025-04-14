@@ -8,7 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import Entity.*;
+
+import InteractableAttributePackage.*;
 import User.*;
 
 //CSVWriter controls how the data from the csv files are written

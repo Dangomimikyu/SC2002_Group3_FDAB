@@ -1,4 +1,4 @@
-package Entity;
+package InteractableAttributePackage;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

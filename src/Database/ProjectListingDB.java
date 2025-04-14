@@ -4,11 +4,12 @@
 package Database;
 
 import java.util.ArrayList;
+
+import InteractableAttributePackage.Project;
 import Service.*;
 import User.SystemUser;
-import Entity.Project;
 
-public class ProjectListingDB implements Database<Project> {
+public class ProjectListingDB extends Database {
 
     private static final ProjectListingDB instance = new ProjectListingDB();
 
@@ -25,15 +26,26 @@ public class ProjectListingDB implements Database<Project> {
         projList = reader.readProjects(ProjectFilePath, userList);
     }
 
-    public ArrayList<Project> ViewDB() {
+    public ArrayList<Project> getProjectDB() {
         return projList;
     }
 
-    public void ModifyDB(Project p, DB_Action action) {
+    public void ViewDB() {
+        System.out.println("\nAll projects in order by index: ");
+        int index = 0;
+        for (Project p : projList) {
+            System.out.println("================ " + index + " ================");
+            System.out.println(p.getProjectDetails());
+            index++;
+        }
+    }
+
+    //modify project by index
+    public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> writer.WriteNewProject(p);
-            case DELETE -> writer.DeleteProject(p);
-            case EDIT -> writer.RewriteProject(p);
+            case ADD -> writer.WriteNewProject(projList.get(index));
+            case DELETE -> writer.DeleteProject(projList.get(index));
+            case EDIT -> writer.RewriteProject(projList.get(index));
         }
     }
 }

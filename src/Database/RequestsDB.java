@@ -4,11 +4,12 @@
 package Database;
 
 import java.util.ArrayList;
+
+import InteractableAttributePackage.Request;
 import Service.*;
-import Entity.Request;
 import User.SystemUser;
 
-public class RequestsDB implements Database<Request> {
+public class RequestsDB extends Database {
     private static final RequestsDB instance = new RequestsDB();
 
     private ArrayList<Request> requestList = new ArrayList<Request>();
@@ -24,16 +25,26 @@ public class RequestsDB implements Database<Request> {
         requestList = reader.readRequests(RequestsFilePath, userList);
     }
 
-    public ArrayList<Request> ViewDB() {
+    public ArrayList<Request> getRequestDB() {
         return requestList;
     }
 
-    public void ModifyDB(Request r, DB_Action action) {
-        switch (action) {
-            case ADD -> writer.WriteNewRequest(r);
-            case DELETE -> writer.DeleteRequest(r);
-            case EDIT -> writer.RewriteRequest(r);
+    public void ViewDB() {
+        System.out.println("\nAll requests in order by index: ");
+        int index = 0;
+        for (Request r : requestList) {
+            System.out.println("================ " + index + " ================");
+            System.out.println(r.getRequestDetails());
+            index++;
         }
     }
 
+    //modify request by index
+    public void ModifyDB(int index, DB_Action action) {
+        switch (action) {
+            case ADD -> writer.WriteNewRequest(requestList.get(index));
+            case DELETE -> writer.DeleteRequest(requestList.get(index));
+            case EDIT -> writer.RewriteRequest(requestList.get(index));
+        }
+    }
 }

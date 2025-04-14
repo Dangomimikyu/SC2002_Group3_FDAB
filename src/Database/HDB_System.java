@@ -21,8 +21,8 @@ public class HDB_System {
     String EnquiriesFilePath, String ProjectFilePath, String RequestsFilePath) {
 
         this.users = new UserInfoDB(ApplicantFilePath, OfficerFilePath, ManagerFilePath);
-        this.enquiries = new EnquiryDB(EnquiriesFilePath, users.ViewDB());
-        this.projects = new ProjectListingDB(ProjectFilePath, users.ViewDB());
-        this.requests = new RequestsDB(RequestsFilePath, users.ViewDB());
+        this.enquiries = new EnquiryDB(EnquiriesFilePath, users.getUserDB());
+        this.projects = new ProjectListingDB(ProjectFilePath, users.getUserDB());
+        this.requests = new RequestsDB(RequestsFilePath, users.getUserDB());
     }
 }

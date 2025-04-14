@@ -4,11 +4,12 @@
 package Database;
 
 import java.util.ArrayList;
+
+import InteractableAttributePackage.Enquiry;
 import Service.*;
-import Entity.Enquiry;
 import User.SystemUser;
 
-public class EnquiryDB implements Database<Enquiry> {
+public class EnquiryDB extends Database {
 
     private static final EnquiryDB instance = new EnquiryDB();
 
@@ -25,15 +26,26 @@ public class EnquiryDB implements Database<Enquiry> {
         enqList = reader.readEnquiries(EnquiriesFilePath, userList);
     }
 
-    public ArrayList<Enquiry> ViewDB() {
+    public ArrayList<Enquiry> getEnquiryDB() {
         return enqList;
     }
 
-    public void ModifyDB(Enquiry e, DB_Action action) {
+    public void ViewDB() {
+        System.out.println("\nAll enquiries in order by index: ");
+        int index = 0;
+        for (Enquiry e : enqList) {
+            System.out.println("================ " + index + " ================");
+            System.out.println(e.getEnquiryDetails());
+            index++;
+        }
+    }
+
+    //modify enquiry by index
+    public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> writer.WriteNewEnquiry(e);
-            case DELETE -> writer.DeleteEnquiry(e);
-            case EDIT -> writer.RewriteEnquiry(e);
+            case ADD -> writer.WriteNewEnquiry(enqList.get(index));
+            case DELETE -> writer.DeleteEnquiry(enqList.get(index));
+            case EDIT -> writer.RewriteEnquiry(enqList.get(index));
         }
     }
 }

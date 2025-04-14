@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import Service.*;
 import User.SystemUser;
 
-public class UserInfoDB implements Database<SystemUser> {
+public class UserInfoDB extends Database {
 
     private static final UserInfoDB instance = new UserInfoDB();
 
@@ -24,15 +24,28 @@ public class UserInfoDB implements Database<SystemUser> {
         userList = reader.readUsers(ApplicantFilePath, OfficerFilePath, ManagerFilePath);
     }
 
-    public ArrayList<SystemUser> ViewDB() {
+    public ArrayList<SystemUser> getUserDB() {
         return userList;
     }
 
-    public void ModifyDB(SystemUser user, DB_Action action) {
+    public void ViewDB() {
+        System.out.println("\nAll users in order by index: ");
+        int index = 0;
+        for (SystemUser u : userList) {
+            System.out.println("================ " + index + " ================");
+            System.out.println("UserID: " + u.userID
+                    + "\nName: " + u.name
+                    + "\nUser Perms: " + u.getClass().getSimpleName());
+            index++;
+        }
+    }
+
+    //modify user by index
+    public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> writer.WriteNewUser(user);
+            case ADD -> writer.WriteNewUser(userList.get(index));
             case DELETE -> throw new UnsupportedOperationException("Error: unable to delete users"); // TODO: handle deletion of users
-            case EDIT -> writer.RewriteUser(user);
+            case EDIT -> writer.RewriteUser(userList.get(index));
         }
     }
 }
