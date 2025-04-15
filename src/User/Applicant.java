@@ -5,9 +5,10 @@ import Entity.Enquiry;
 import Entity.EnquiryManager;
 import Entity.Applicant_Application;
 import java.util.List;
+import java.util.Scanner;
 
 public class Applicant extends SystemUser{
-
+    Scanner scanner = new Scanner(System.in);
     public enum ApplicantStatus {
         PENDING, SUCCESSFUL, UNSUCCESSFUL, BOOKED
         
@@ -72,6 +73,12 @@ public class Applicant extends SystemUser{
     }
 
     public void CreateEnquiry() {
+        System.out.println("Enter the title of the enquiry:");
+        String title = scanner.nextLine();
+        System.out.println("Enter the name of the project you are referring to:");
+        String projectName = scanner.nextLine();
+        System.out.println("Enter the description of the enquiry:");
+        String description = scanner.nextLine();
         Enquiry newEnquiry = new Enquiry(title, projectName, description, this);
         enquiryManager.addEnquiry(newEnquiry);
         System.out.println("Enquiry created: " + newEnquiry.getEnquiryDetails());
@@ -89,8 +96,12 @@ public class Applicant extends SystemUser{
     }
 
     public void EditEnquiry() {
+        System.out.println("Enter the title of the enquiry you want to edit:");
+        String title = scanner.nextLine();
         Enquiry enquiry = enquiryManager.getEnquiryByTitleAndApplicant(title, this);
         if (enquiry != null) {
+            System.out.println("Enter the new description:");
+            String newDescription = scanner.nextLine();
             enquiry.Description = newDescription; 
             System.out.println("Enquiry updated: " + enquiry.getEnquiryDetails());
         } else {
@@ -99,6 +110,8 @@ public class Applicant extends SystemUser{
     }
 
     public void DeleteEnquiry() {
+        System.out.println("Enter the title of the enquiry you want to delete:");
+        String title = scanner.nextLine();
         Enquiry enquiry = enquiryManager.getEnquiryByTitleAndApplicant(title, this);
         if (enquiry != null) {
             enquiryManager.removeEnquiry(enquiry);
