@@ -4,20 +4,24 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import User.*;
+import User.Applicant.MaritalStatus;
 
 // ProjectDetails is a class that contains all the details of the project
 public class ProjectDetails {
 
-    enum UserGroup {
-        SINGLE, MARRIED, ALL
+    public enum Location {
+        BUGIS, LITTLE_INDIA, CHINATOWN, MARINA_BAY, CLARKE_QUAY, ORCHARD, DEMPSEY, QUEENSTOWN, FARRER_PARK, REDHILL, 
+        JALAN_BESAR, SENTOSA_TANJONG, PAGAR_KALLANG, KEONG_SAIK, TIONG_BAHRU, BEDOK, PASIR_RIS, CHANGI, PAYA_LEBAR, 
+        EAST_COAST, SIGLAP, GEYLANG, TAMPINES, KATONG, TANAH_MERAH, HOUGANG, SENGKANG, PUNGGOL, SERANGOON, TAI_SENG, 
+        SELETAR, ANG_MO_KIO, THOMSON, BALIESTER, SEMBAWANG, KRANJI, YISHUN, WOODLANDS, LIM_CHU_KANG, TOA_PAYOH, BUKIT_PANJANG, 
+        CLEMENTI, BUKIT_TIMAH, HILLVIEW, BUKIT_BATOK, HOLLAND_VILLAGE, BUONA_VISTA,JURONG ,CHOA_CHU_KANG , JURONG_WEST, JURONG_EAST
     }
 
     public boolean activeStatus = true;
-    public UserGroup OpentoUserGroup;
+    public MaritalStatus OpentoUserGroup;
     //regarding editing project name: since it's a unique identifier, should it be allowed to be changed? might mess up how enquires/requests are identified
     public String ProjectName;
-    //TODO: maybe type should be an enum? for now, just let it be a string
-    public String Neighborhood;
+    public Location Neighborhood;
     //all projects are assumed to have 2 room and 3 room flats, so no need to specify type of flats in constructor
     public int SellingPrice_2Room; 
     public int SellingPrice_3Room;
@@ -33,7 +37,7 @@ public class ProjectDetails {
     public ProjectDetails(String PN, String n, int SP2R, int SP3R, int Units2R, int Units3R, String AOD, String ACD, HDB_Manager M
     , int OS, ArrayList<HDB_Officer> OIC, boolean v, String group) {
         this.ProjectName = PN;
-        this.Neighborhood = n;
+        this.Neighborhood = Location.valueOf(n.toUpperCase());
         this.SellingPrice_2Room = SP2R;
         this.SellingPrice_3Room = SP3R;
         this.NoOfUnitsLeft_2Room = Units2R;
@@ -49,13 +53,7 @@ public class ProjectDetails {
         this.OfficerList = OIC;
         this.activeStatus = v;
         //maybe include a check to automatically set visibility if past closing date?
-        if (group.equals("SINGLE")) {
-            this.OpentoUserGroup = UserGroup.SINGLE;
-        } else if (group.equals("MARRIED")) {
-            this.OpentoUserGroup = UserGroup.MARRIED;
-        } else if (group.equals("ALL")) {
-            this.OpentoUserGroup = UserGroup.ALL;
-        }
+        this.OpentoUserGroup = MaritalStatus.valueOf(group.toUpperCase());
 
     }
 

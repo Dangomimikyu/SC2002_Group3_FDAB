@@ -1,4 +1,7 @@
 import Database.*;
+import Filter.*;
+import Filter.IFilter.orderBy;
+import User.Applicant.MaritalStatus;
 
 public class MainApp {
     public static void main(String[] args) {
@@ -15,10 +18,16 @@ public class MainApp {
         HDB_system = new HDB_System(ApplicantFilePath, OfficerFilePath, ManagerFilePath, EnquiriesFilePath, ProjectsFilePath, RequestsFilePath);
 
         //test
-        HDB_system.users.ViewDB();
-        HDB_system.enquiries.ViewDB();
-        HDB_system.projects.ViewDB();
-        HDB_system.requests.ViewDB();
+        //HDB_system.users.ViewDB();
+        //HDB_system.enquiries.ViewDB();
+
+        //HDB_system.projects.ViewDB(new Filter_Alphabetic(null, orderBy.ASCENDING));
+        //HDB_system.enquiries.ViewDB(new Filter_Alphabetic(null, orderBy.ASCENDING));
+        //HDB_system.requests.ViewDB(new Filter_Alphabetic(null, orderBy.ASCENDING));
+        //HDB_system.users.ViewDB(new Filter_Marital(MaritalStatus.MARRIED));
+        //HDB_system.users.ViewDB(new Filter_Alphabetic(null, orderBy.ASCENDING));
+
+        //HDB_system.requests.ViewDB();
     }
 
 }

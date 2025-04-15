@@ -230,7 +230,7 @@ public class Writer
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true))) 
         {
             bw.newLine();
-            String project_info = String.join(",",p.Details.ProjectName,p.Details.Neighborhood,
+            String project_info = String.join(",",p.Details.ProjectName,String.valueOf(p.Details.Neighborhood),
             String.valueOf(p.Details.SellingPrice_2Room), String.valueOf(p.Details.SellingPrice_3Room),
             String.valueOf(p.Details.NoOfUnitsLeft_2Room), String.valueOf(p.Details.NoOfUnitsLeft_3Room),
             p.Details.OpenDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")), 
@@ -305,7 +305,7 @@ public class Writer
                 bw.write(line);
             }
             bw.newLine();
-            String project_info = String.join(",",p.Details.ProjectName,p.Details.Neighborhood,
+            String project_info = String.join(",",p.Details.ProjectName,String.valueOf(p.Details.Neighborhood),
             String.valueOf(p.Details.SellingPrice_2Room), String.valueOf(p.Details.SellingPrice_3Room),
             String.valueOf(p.Details.NoOfUnitsLeft_2Room), String.valueOf(p.Details.NoOfUnitsLeft_3Room),
             p.Details.OpenDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")), 

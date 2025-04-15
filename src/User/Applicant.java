@@ -18,20 +18,30 @@ public class Applicant extends SystemUser{
     }
 
     public enum MaritalStatus {
-        SINGLE, MARRIED
+        //all is for projects that are open to all marital status
+        //users wont ever have this 'ALL' status, only projects will have this status
+        SINGLE, MARRIED, ALL
     }
 
     public int age;
     public MaritalStatus maritalStatus;
-    public String AppliedProject; //applied project name
+    public String AppliedProject = ""; //applied project name
     public ApplicantStatus AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL;
 
     public Applicant(String n, String nric, int a, String m, String p, String AP, String APS) {
         super(nric, p, n);
         this.age = a;
         this.maritalStatus = MaritalStatus.valueOf(m);
-        this.ApplicantPerms = usertype.APPLICANT;
+        this.UserPerms = usertype.APPLICANT;
         this.AppliedProject = AP;
         this.AppliedProjectStatus = ApplicantStatus.valueOf(APS);
+    }
+
+    public String getUserDetails() {
+        return  super.getUserDetails()
+                + "\nAge: " + age
+                + "\nMarital Status: " + maritalStatus
+                + "\nApplied Project: " + (AppliedProject.equals("") ? "N/A" : AppliedProject)
+                + "\nApplicant Status: " + AppliedProjectStatus;
     }
 }
