@@ -30,7 +30,8 @@ public class MainApp {
         if (user instanceof HDB_Officer)
         {
             HDB_Officer offUser = (HDB_Officer)user;
-
+            OfficerMenu.SetUser(offUser);
+            OfficerMenu.start();
         }
         else if (user instanceof Applicant)
         {
