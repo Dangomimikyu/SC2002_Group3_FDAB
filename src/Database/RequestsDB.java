@@ -63,10 +63,7 @@ public class RequestsDB extends Database {
         //special case for Filter_Alphabetic, as it needs to sort the requests in ascending or descending order
         if (filter instanceof Filter_Alphabetic) {
             Filter_Alphabetic filter_alpha = (Filter_Alphabetic)filter;
-            ArrayList<Request> sortedRequests = new ArrayList<>();
-            for (Request r : reqList) {
-                sortedRequests.add(r);
-            }
+            ArrayList<Request> sortedRequests = new ArrayList<>(reqList);
             sortedRequests.removeIf(r -> !filter.FilterBy(r));
             if (filter_alpha.order == IFilter.orderBy.ASCENDING) {
                 sortedRequests.sort((r1, r2) -> r1.initiator.name.compareToIgnoreCase(r2.initiator.name));

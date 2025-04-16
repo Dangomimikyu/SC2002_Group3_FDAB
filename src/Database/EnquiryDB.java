@@ -63,10 +63,7 @@ public class EnquiryDB extends Database {
         //special case for Filter_Alphabetic, as it needs to sort the enquiries in ascending or descending order
         if (filter instanceof Filter_Alphabetic) {
             Filter_Alphabetic filter_alpha = (Filter_Alphabetic)filter;
-            ArrayList<Enquiry> sortedEnquiries = new ArrayList<>();
-            for (Enquiry e : enqList) {
-                sortedEnquiries.add(e);
-            };
+            ArrayList<Enquiry> sortedEnquiries = new ArrayList<>(enqList);
             sortedEnquiries.removeIf(e -> !filter.FilterBy(e));
             if (filter_alpha.order == IFilter.orderBy.ASCENDING) {
                 sortedEnquiries.sort((e1, e2) -> e1.Title.compareToIgnoreCase(e2.Title));
@@ -76,7 +73,7 @@ public class EnquiryDB extends Database {
             }
             for (Enquiry e : sortedEnquiries) {
                 for (int i = 0; i < enqList.size(); i++) {
-                    if (enqList.get(i).Title.equals(e.Title) && enqList.get(i).Description.equals(e.Description) 
+                    if (enqList.get(i).Title.equals(e.Title) && enqList.get(i).RegardingProject.equals(e.RegardingProject) 
                     && enqList.get(i).Enquirer.userID.equals(e.Enquirer.userID)) {
                         System.out.println("================ " + i + " ================");
                         System.out.println(e.getEnquiryDetails());

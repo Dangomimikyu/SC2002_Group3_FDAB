@@ -1,7 +1,7 @@
 import Database.*;
 import Filter.*;
 import Filter.IFilter.orderBy;
-import User.Applicant.MaritalStatus;
+import InteractableAttributePackage.Request.FlatType;
 
 public class MainApp {
     public static void main(String[] args) {
@@ -19,8 +19,9 @@ public class MainApp {
         //HDB_system.users.ViewDB();
         //HDB_system.enquiries.ViewDB();
 
-        //HDB_system.projects.ViewDB(new Filter_Alphabetic(null, orderBy.ASCENDING));
-        //HDB_system.enquiries.ViewDB(new Filter_Alphabetic(null, orderBy.ASCENDING));
+        //HDB_system.users.ViewDB(new Filter_Age(34,-1, orderBy.DESCENDING));
+        //HDB_system.projects.ViewDB(new Filter_FlatType(FlatType.NULL,orderBy.DESCENDING));
+        //HDB_system.enquiries.ViewDB(new Filter_Marital(MaritalStatus.SINGLE));
         //HDB_system.requests.ViewDB(new Filter_Alphabetic(null, orderBy.ASCENDING));
         //HDB_system.users.ViewDB(new Filter_Marital(MaritalStatus.MARRIED));
         //HDB_system.users.ViewDB(new Filter_Alphabetic(null, orderBy.ASCENDING));

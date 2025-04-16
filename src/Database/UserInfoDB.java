@@ -4,6 +4,8 @@
 package Database;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+
 import Service.*;
 import User.*;
 import Filter.*;
@@ -62,10 +64,7 @@ public class UserInfoDB extends Database {
         //special case for Filter_Alphabetic, as it needs to sort the users in ascending or descending order
         if (filter instanceof Filter_Alphabetic) {
             Filter_Alphabetic filter_alpha = (Filter_Alphabetic)filter;
-            ArrayList<SystemUser> sortedUsers = new ArrayList<>();
-            for (SystemUser u : userList) {
-                sortedUsers.add(u);
-            }
+            ArrayList<SystemUser> sortedUsers = new ArrayList<>(userList);
             sortedUsers.removeIf(u -> !filter.FilterBy(u));
             if (filter_alpha.order == IFilter.orderBy.ASCENDING) {
                 sortedUsers.sort((u1, u2) -> u1.name.compareToIgnoreCase(u2.name));
@@ -87,12 +86,10 @@ public class UserInfoDB extends Database {
 
         //special case for filtering by age, as it also needs to sort the users in ascending or descending order
         else if (filter instanceof Filter_Age) {
-            ArrayList<Applicant> sortedUsers = new ArrayList<Applicant>();
-            for (SystemUser u : userList) {
-                if (u instanceof Applicant) {
-                    sortedUsers.add((Applicant)u);
-                }
-            }
+            ArrayList<Applicant> sortedUsers = userList.stream()
+            .filter(obj -> obj instanceof Applicant)
+            .map(obj -> (Applicant) obj)
+            .collect(Collectors.toCollection(ArrayList::new));
             sortedUsers.removeIf(u -> !filter.FilterBy(u));
             if (((Filter_Age)filter).order == IFilter.orderBy.ASCENDING) {
                 sortedUsers.sort((u1, u2) -> Double.compare(u1.age, u2.age));

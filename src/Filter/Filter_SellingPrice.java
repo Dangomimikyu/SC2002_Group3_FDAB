@@ -13,7 +13,7 @@ public class Filter_SellingPrice implements IFilter{
     public FlatType flatType = FlatType.NULL;
 
     //by default, if min and max == -1(in this case, means not specified), there is no limit to that price range
-    public Filter_SellingPrice(float min, float max, orderBy order, FlatType flatType) {
+    public Filter_SellingPrice(int min, int max, orderBy order, FlatType flatType) {
         if (min != -1) {
             this.minPrice = min;
         }

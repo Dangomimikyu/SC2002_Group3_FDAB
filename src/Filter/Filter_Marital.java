@@ -1,6 +1,7 @@
 //Filter_Martial filters objects by marital status. It checks if the object is a Project, Enquiry, Request or User and filters accordingly.
 
 package Filter;
+
 import InteractableAttributePackage.*;
 import User.*;
 import User.Applicant.MaritalStatus;
@@ -23,13 +24,10 @@ public class Filter_Marital implements IFilter {
         //if o is an enquiry, check if the enquiry's description, title or reply contains the specified marital status keyword
         } else if (o instanceof Enquiry) {
             Enquiry e = (Enquiry) o;
-            String e_description = e.Description.toLowerCase();
-            String e_title = e.Title.toLowerCase();
-            String e_reply = e.Reply.toLowerCase();
             if (maritalStatus == MaritalStatus.SINGLE) {
-                return (e_description.contains("single") || e_title.contains("single") || e_reply.contains("single"));
+                return ((e.Description+e.Title+e.Reply).toLowerCase().contains("single"));
             } else if (maritalStatus == MaritalStatus.MARRIED) {
-                return (e_description.contains("married") || e_title.contains("married") || e_reply.contains("married"));
+                return ((e.Description+e.Title+e.Reply).toLowerCase().contains("married"));
             } else {
                 return false;
             }
