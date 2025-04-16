@@ -14,9 +14,7 @@ public class MainApp {
         String ProjectsFilePath = "src/localdata/ProjectList.csv";
         String EnquiriesFilePath = "src/localdata/Enquiries.csv";
         String RequestsFilePath = "src/localdata/Requests.csv";
-        HDB_System HDB_system = HDB_System.getInstance();
-        HDB_system = new HDB_System(ApplicantFilePath, OfficerFilePath, ManagerFilePath, EnquiriesFilePath, ProjectsFilePath, RequestsFilePath);
-
+        HDB_System HDB_system = new HDB_System(ApplicantFilePath, OfficerFilePath, ManagerFilePath, EnquiriesFilePath, ProjectsFilePath, RequestsFilePath);
         //test
         //HDB_system.users.ViewDB();
         //HDB_system.enquiries.ViewDB();

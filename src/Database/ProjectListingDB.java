@@ -15,7 +15,7 @@ import java.time.temporal.ChronoUnit;
 
 public class ProjectListingDB extends Database {
 
-    private static final ProjectListingDB instance = new ProjectListingDB();
+    private static ProjectListingDB instance;
 
     private ArrayList<Project> projList = new ArrayList<Project>();
     Reader reader = new Reader();
@@ -23,10 +23,13 @@ public class ProjectListingDB extends Database {
 
     private ProjectListingDB() {}
     public static ProjectListingDB getInstance() {
+        if (instance == null) {
+            instance = new ProjectListingDB();
+        }
         return instance;
     }
 
-    public ProjectListingDB(String ProjectFilePath, ArrayList<SystemUser> userList) {
+    public void InitialiseDB(String ProjectFilePath, ArrayList<SystemUser> userList) {
         projList = reader.readProjects(ProjectFilePath, userList);
     }
 

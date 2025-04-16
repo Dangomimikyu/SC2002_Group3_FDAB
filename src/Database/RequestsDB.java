@@ -11,7 +11,8 @@ import User.SystemUser;
 import Filter.*;
 
 public class RequestsDB extends Database {
-    private static final RequestsDB instance = new RequestsDB();
+
+    private static RequestsDB instance;
 
     private ArrayList<Request> reqList = new ArrayList<Request>();
     Reader reader = new Reader();
@@ -19,10 +20,13 @@ public class RequestsDB extends Database {
     
     private RequestsDB() {}
     public static RequestsDB getInstance() {
+        if (instance == null) {
+            instance = new RequestsDB();
+        }
         return instance;
     }
 
-    public RequestsDB(String RequestsFilePath, ArrayList<SystemUser> userList) {
+    public void InitialiseDB(String RequestsFilePath, ArrayList<SystemUser> userList) {
         reqList = reader.readRequests(RequestsFilePath, userList);
     }
 

@@ -10,7 +10,7 @@ import Filter.*;
 
 public class UserInfoDB extends Database {
 
-    private static final UserInfoDB instance = new UserInfoDB();
+    private static UserInfoDB instance;
 
     private ArrayList<SystemUser> userList = new ArrayList<SystemUser>();
     Reader reader = new Reader();
@@ -18,10 +18,13 @@ public class UserInfoDB extends Database {
 
     private UserInfoDB() {}
     public static UserInfoDB getInstance() {
+        if (instance == null) {
+            instance = new UserInfoDB();
+        }
         return instance;
     }
 
-    public UserInfoDB(String ApplicantFilePath, String OfficerFilePath, String ManagerFilePath) {
+    public void InitialiseDB(String ApplicantFilePath, String OfficerFilePath, String ManagerFilePath) {
         userList = reader.readUsers(ApplicantFilePath, OfficerFilePath, ManagerFilePath);
     }
 

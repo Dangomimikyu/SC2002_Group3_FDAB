@@ -12,7 +12,7 @@ import Filter.*;
 
 public class EnquiryDB extends Database {
 
-    private static final EnquiryDB instance = new EnquiryDB();
+    private static EnquiryDB instance;
 
     private ArrayList<Enquiry> enqList = new ArrayList<Enquiry>();
     Reader reader = new Reader();
@@ -20,10 +20,13 @@ public class EnquiryDB extends Database {
 
     private EnquiryDB() {}
     public static EnquiryDB getInstance() {
+        if (instance == null) {
+            instance = new EnquiryDB();
+        }
         return instance;
     }
 
-    public EnquiryDB(String EnquiriesFilePath, ArrayList<SystemUser> userList) {
+    public void InitialiseDB(String EnquiriesFilePath, ArrayList<SystemUser> userList) {
         enqList = reader.readEnquiries(EnquiriesFilePath, userList);
     }
 
