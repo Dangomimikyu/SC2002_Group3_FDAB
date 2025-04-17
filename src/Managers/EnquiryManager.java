@@ -1,11 +1,13 @@
 package Managers;
 
+import Database.Database;
 import Database.EnquiryDB;
 import Database.ProjectListingDB;
 import Entity.Enquiry;
 import User.Applicant;
 import User.SystemUser;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Scanner;
@@ -75,5 +77,20 @@ public class EnquiryManager
         {
             System.out.println("No enquiry by that name.");
         }
+    }
+
+    public void AddNewEnquiry(Enquiry e)
+    {
+        EnquiryDB.getInstance().ModifyDB(e, Database.DB_Action.ADD);
+    }
+
+    public void EditEnquiry(Enquiry e)
+    {
+        EnquiryDB.getInstance().ModifyDB(e, Database.DB_Action.EDIT);
+    }
+
+    public void DeleteEnquiry(Enquiry e)
+    {
+        EnquiryDB.getInstance().ModifyDB(e, Database.DB_Action.DELETE);
     }
 }
