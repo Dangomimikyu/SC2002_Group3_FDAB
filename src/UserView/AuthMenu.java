@@ -1,6 +1,5 @@
 package UserView;
 import User.SystemUser;
-import Main.MainApp;
 
 public class AuthMenu extends Menu
 {
