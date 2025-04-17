@@ -10,45 +10,42 @@ public class Filter_Alphabetic implements IFilter {
     public String first_char = null; //default character is null, which means won't filter based on the first character
     public orderBy order = orderBy.ASCENDING; //default order is ascending
 
-    public Filter_Alphabetic(String first_char, orderBy order) {
-        this.first_char = first_char;
-        this.order = order;
+    public Filter_Alphabetic(String fc, orderBy ord) {
+        this.first_char = fc;
+        this.order = ord;
     }
 
     public boolean FilterBy(Object o) {
 
         //if first_char is null, return true (no filtering of first_char)
-        if (first_char == null) {
-            return true;
-        }
+        if (first_char == null) { return true; }
 
-        //if o is a Project, check if the project name starts with the specified character
-        if (o instanceof Project) {
-            Project p = (Project)o;
-            return p.Details.ProjectName.toLowerCase().startsWith(first_char.toLowerCase());
-        } 
+        if (o instanceof Project) { StartsWithChar((Project)o); } 
+        else if (o instanceof Enquiry) { StartsWithChar((Enquiry)o); } 
+        else if (o instanceof SystemUser) { StartsWithChar((SystemUser)o); }
+        else if (o instanceof Request) { StartsWithChar((Request)o); }
 
-        //if o is an enquiry, check if the enquiry's title starts with the specified character
-        else if (o instanceof Enquiry) {
-            Enquiry e = (Enquiry)o;
-            return e.Title.toLowerCase().startsWith(first_char.toLowerCase());
-        } 
-
-        //if o is a User, check if the user's name starts with the specified character
-        else if (o instanceof SystemUser) {
-            SystemUser u = (SystemUser)o;
-            return u.name.toLowerCase().startsWith(first_char.toLowerCase());
-        } 
-
-        //if o is a Request, check if the request's initiator name start with the specified character
-        else if (o instanceof Request) {
-            Request r = (Request)o;
-            return r.initiator.name.toLowerCase().startsWith(first_char.toLowerCase());
-        }
-
-        //if o is a not a Project, Enquiry, Request or User, throw an exception
-        throw new UnsupportedOperationException("Cannot filter by alphabetic for this object type");
+        throw new UnsupportedOperationException("Filtering by Alphabetic is not supported for this object type!");
     }
 
+    //StartsWithChar checks if project's name start with the specificed character
+    private boolean StartsWithChar(Project p) {
+        return p.Details.ProjectName.toLowerCase().startsWith(first_char.toLowerCase());
+    }
+
+    //StartsWithChar checks if enquiries's title start with the specificed character
+    private boolean StartsWithChar(Enquiry e) {
+        return e.Title.toLowerCase().startsWith(first_char.toLowerCase());
+    }
+
+    //StartsWithChar checks if user's name start with the specificed character
+    private boolean StartsWithChar(SystemUser u) {
+        return u.name.toLowerCase().startsWith(first_char.toLowerCase());
+    }
     
+    //StartsWithChar checks if request's initiator's name start with the specificed character
+    private boolean StartsWithChar(Request r) {
+        return r.initiator.name.toLowerCase().startsWith(first_char.toLowerCase());
+    }
+
 }

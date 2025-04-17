@@ -2,13 +2,13 @@
 package Filter;
 
 public interface IFilter {
-    //FilterBy is the method that will be used to filter the database
-    //it will return true if the object passed in matches the filter criteria
-    //How it works works dynamically based on the type of object passed in and the filter subclass
+
     public enum orderBy {
         ASCENDING,
         DESCENDING
     }
     
+    //FilterBy returns a boolean by first recognizing the object 
+    //and applying the appropriate checks to see if object passes the filter criterias 
     public boolean FilterBy(Object o);        
 }

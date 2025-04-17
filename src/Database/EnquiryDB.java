@@ -4,7 +4,6 @@
 package Database;
 
 import java.util.ArrayList;
-
 import InteractableAttributePackage.Enquiry;
 import Service.*;
 import User.SystemUser;
@@ -20,9 +19,7 @@ public class EnquiryDB extends Database {
 
     private EnquiryDB() {}
     public static EnquiryDB getInstance() {
-        if (instance == null) {
-            instance = new EnquiryDB();
-        }
+        if (instance == null) { instance = new EnquiryDB(); }
         return instance;
     }
 
@@ -45,44 +42,12 @@ public class EnquiryDB extends Database {
     }
 
     public void ViewDB(IFilter filter) {
-        //if filtering by flat type, show all enquiries with description, title and replies containing keywords of that type
-        if (filter instanceof Filter_FlatType) {
-            System.out.println("Filter by enquiries containing flat type keyword: " + ((Filter_FlatType)filter).flatType);
-        }
-        else if (filter instanceof Filter_Marital) {
-            System.out.println("Filter by enquiries containing marital status keyword: " + ((Filter_Marital)filter).maritalStatus);
-        }
-        else if (filter instanceof Filter_Alphabetic) {
-            System.out.println("Filter by enquiries title starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
-             + "\nin " + ((Filter_Alphabetic)filter).order + " order");
-        }
-        else  { 
-            throw new UnsupportedOperationException("This filter type is not supported for enquiries");
-        }
         
-        //special case for Filter_Alphabetic, as it needs to sort the enquiries in ascending or descending order
-        if (filter instanceof Filter_Alphabetic) {
-            Filter_Alphabetic filter_alpha = (Filter_Alphabetic)filter;
-            ArrayList<Enquiry> sortedEnquiries = new ArrayList<>(enqList);
-            sortedEnquiries.removeIf(e -> !filter.FilterBy(e));
-            if (filter_alpha.order == IFilter.orderBy.ASCENDING) {
-                sortedEnquiries.sort((e1, e2) -> e1.Title.compareToIgnoreCase(e2.Title));
-            }
-            else if (filter_alpha.order == IFilter.orderBy.DESCENDING) {
-                sortedEnquiries.sort((e1, e2) -> e2.Title.compareToIgnoreCase(e1.Title));
-            }
-            for (Enquiry e : sortedEnquiries) {
-                for (int i = 0; i < enqList.size(); i++) {
-                    if (enqList.get(i).Title.equals(e.Title) && enqList.get(i).RegardingProject.equals(e.RegardingProject) 
-                    && enqList.get(i).Enquirer.userID.equals(e.Enquirer.userID)) {
-                        System.out.println("================ " + i + " ================");
-                        System.out.println(e.getEnquiryDetails());
-                        break;
-                    }
-                }
-            }
-        }
+        displayFilterInformation(filter);
+        
+        if (filter instanceof Filter_Alphabetic) { SortInOrder((Filter_Alphabetic)filter); }
 
+        //for filters with no orderBy attribute
         else {
             int index = 0;
             for (Enquiry e : enqList) {
@@ -125,5 +90,49 @@ public class EnquiryDB extends Database {
         }
     }
 
+    //prints the headers and information for which enquiries will be filtered by
+    private void displayFilterInformation(IFilter filter) {
+        if (filter instanceof Filter_FlatType) {
+            System.out.println("Filter by enquiries containing flat type keyword: " + ((Filter_FlatType)filter).flatType);
+        }
+        else if (filter instanceof Filter_Marital) {
+            System.out.println("Filter by enquiries containing marital status keyword: " + ((Filter_Marital)filter).maritalStatus);
+        }
+        else if (filter instanceof Filter_Alphabetic) {
+            System.out.println("Filter by enquiries title starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
+             + "\nin " + ((Filter_Alphabetic)filter).order + " order");
+        }
+        else  { 
+            throw new UnsupportedOperationException("This filter type is not supported for enquiries");
+        }
+    }
+
+    //Sorts lexicographically in specified order
+    private void SortInOrder(Filter_Alphabetic filter) {
+        ArrayList<Enquiry> sortedEnquiries = new ArrayList<>(enqList);
+            sortedEnquiries.removeIf(e -> !filter.FilterBy(e));
+            if (filter.order == IFilter.orderBy.ASCENDING) {
+                sortedEnquiries.sort((e1, e2) -> e1.Title.compareToIgnoreCase(e2.Title));
+            }
+            else if (filter.order == IFilter.orderBy.DESCENDING) {
+                sortedEnquiries.sort((e1, e2) -> e2.Title.compareToIgnoreCase(e1.Title));
+            }
+            displaySortedWithOriginalIndex(sortedEnquiries);
+    }
+
+    //print the enquiries in sorted order, as well as its original index in the original list
+    //this is to show the user the original index of that enquiry in the original list, so that they can modify it if needed
+    private void displaySortedWithOriginalIndex(ArrayList<Enquiry> SortedEnquiries) {
+        for (Enquiry e : SortedEnquiries) {
+            for (int i = 0; i < enqList.size(); i++) {
+                if (enqList.get(i).Title.equals(e.Title) && enqList.get(i).RegardingProject.equals(e.RegardingProject) 
+                && enqList.get(i).Enquirer.userID.equals(e.Enquirer.userID)) {
+                    System.out.println("================ " + i + " ================");
+                    System.out.println(e.getEnquiryDetails());
+                    break;
+                }
+            }
+        }
+    }
 
 }

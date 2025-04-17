@@ -20,9 +20,7 @@ public class RequestsDB extends Database {
     
     private RequestsDB() {}
     public static RequestsDB getInstance() {
-        if (instance == null) {
-            instance = new RequestsDB();
-        }
+        if (instance == null) { instance = new RequestsDB(); }
         return instance;
     }
 
@@ -45,43 +43,12 @@ public class RequestsDB extends Database {
     }
 
     public void ViewDB(IFilter filter) {
-        //if filtering by flat type, show all withdrawals with current booking of that flat type and all bookings trying to book that flat type
-        if (filter instanceof Filter_FlatType) {
-            System.out.println("Filter by bookings and withdrawals that are booked/trying to book flat type: " + ((Filter_FlatType)filter).flatType);
-        }
-        else if (filter instanceof Filter_Marital) {
-            System.out.println("Filter by requests with initiators that are of marital status: " + ((Filter_Marital)filter).maritalStatus);
-        }
-        else if (filter instanceof Filter_Alphabetic) {
-            System.out.println("Filter by request initiator's name starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
-            + "\nin " + ((Filter_Alphabetic)filter).order + " order");           
-        }
-        else {
-            throw new UnsupportedOperationException("This filter type is not supported for requests");
-        }
 
-        //special case for Filter_Alphabetic, as it needs to sort the requests in ascending or descending order
-        if (filter instanceof Filter_Alphabetic) {
-            Filter_Alphabetic filter_alpha = (Filter_Alphabetic)filter;
-            ArrayList<Request> sortedRequests = new ArrayList<>(reqList);
-            sortedRequests.removeIf(r -> !filter.FilterBy(r));
-            if (filter_alpha.order == IFilter.orderBy.ASCENDING) {
-                sortedRequests.sort((r1, r2) -> r1.initiator.name.compareToIgnoreCase(r2.initiator.name));
-            }
-            else if (filter_alpha.order == IFilter.orderBy.DESCENDING) {
-                sortedRequests.sort((r1, r2) -> r2.initiator.name.compareToIgnoreCase(r1.initiator.name));
-            }
-            for (Request r : sortedRequests) {
-                for (int i = 0; i < reqList.size(); i++) {
-                    if (reqList.get(i).initiator.userID.equals(r.initiator.userID)) {
-                        System.out.println("================ " + i + " ================");
-                        System.out.println(r.getRequestDetails());
-                        break;
-                    }
-                }
-            }
-        }
+        displayFilterInformation(filter);
 
+        if (filter instanceof Filter_Alphabetic) { SortInOrder((Filter_Alphabetic)filter); }
+
+        //for filters with no orderBy attributes
         else {
             int index = 0;
             for (Request r : reqList) {
@@ -121,6 +88,50 @@ public class RequestsDB extends Database {
                 writer.RewriteRequest(request);
                 reqList.set(reqList.indexOf(request), request);
             }   
+        }
+    }
+
+    //prints the headers and information for which requests will be filtered by
+    private void displayFilterInformation(IFilter filter) {
+        if (filter instanceof Filter_FlatType) {
+            System.out.println("Filter by bookings and withdrawals that are booked/trying to book flat type: " + ((Filter_FlatType)filter).flatType);
+        }
+        else if (filter instanceof Filter_Marital) {
+            System.out.println("Filter by requests with initiators that are of marital status: " + ((Filter_Marital)filter).maritalStatus);
+        }
+        else if (filter instanceof Filter_Alphabetic) {
+            System.out.println("Filter by request initiator's name starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
+            + "\nin " + ((Filter_Alphabetic)filter).order + " order");           
+        }
+        else {
+            throw new UnsupportedOperationException("This filter type is not supported for requests");
+        }
+    }
+
+    //Sorts lexicographically in specified order
+    private void SortInOrder(Filter_Alphabetic filter) {
+        ArrayList<Request> sortedRequests = new ArrayList<>(reqList);
+        sortedRequests.removeIf(r -> !filter.FilterBy(r));
+        if (filter.order == IFilter.orderBy.ASCENDING) {
+            sortedRequests.sort((r1, r2) -> r1.initiator.name.compareToIgnoreCase(r2.initiator.name));
+        }
+        else if (filter.order == IFilter.orderBy.DESCENDING) {
+            sortedRequests.sort((r1, r2) -> r2.initiator.name.compareToIgnoreCase(r1.initiator.name));
+        }
+        displaySortedWithOriginalIndex(sortedRequests);
+    }
+
+    //print the requests in sorted order, as well as its original index in the original list
+    //this is to show the user the original index of that request in the original list, so that they can modify it if needed
+    private void displaySortedWithOriginalIndex(ArrayList<Request> sortedRequests) {
+        for (Request r : sortedRequests) {
+            for (int i = 0; i < reqList.size(); i++) {
+                if (reqList.get(i).initiator.userID.equals(r.initiator.userID)) {
+                    System.out.println("================ " + i + " ================");
+                    System.out.println(r.getRequestDetails());
+                    break;
+                }
+            }
         }
     }
 }

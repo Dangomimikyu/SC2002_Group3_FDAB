@@ -10,44 +10,46 @@ public class Filter_Marital implements IFilter {
 
     public MaritalStatus maritalStatus;
 
-    public Filter_Marital(MaritalStatus maritalStatus) {
-        this.maritalStatus = maritalStatus;
+    public Filter_Marital(MaritalStatus ms) {
+        this.maritalStatus = ms;
     }
 
     public boolean FilterBy(Object o) {
 
-        //If o is a Project, check if project is open to the specified marital status
-        if (o instanceof Project) {
-            Project p = (Project) o;
-            return p.Details.OpentoUserGroup == maritalStatus;
+        if (o instanceof Project) { isOpenToUserGroup((Project)o); }
+        else if (o instanceof Enquiry) { hasMaritalStatusKeyword((Enquiry)o); }
+        else if (o instanceof Request) { hasMaritalStatusKeyword((Request)o); }
+        else if (o instanceof Applicant) { isOfMaritalStatus((Applicant)o); }
+        //HDB_Managers don't have marital status as an attributes, hence will return false
+        else if (o instanceof HDB_Manager) { return false; }
 
-        //if o is an enquiry, check if the enquiry's description, title or reply contains the specified marital status keyword
-        } else if (o instanceof Enquiry) {
-            Enquiry e = (Enquiry) o;
-            if (maritalStatus == MaritalStatus.SINGLE) {
-                return ((e.Description+e.Title+e.Reply).toLowerCase().contains("single"));
-            } else if (maritalStatus == MaritalStatus.MARRIED) {
-                return ((e.Description+e.Title+e.Reply).toLowerCase().contains("married"));
-            } else {
-                return false;
-            }
-
-        //if o is a request, check if the request initiator's marital status matches the specified marital status
-        } else if (o instanceof Request) {
-            Request r = (Request) o;
-            return r.initiator.maritalStatus == maritalStatus;
-        }
-
-        //if o is an Applicant or HDBOfficer, check if the user's marital status matches the specified marital status
-        //if o is an HDB_Manager, automatically return false as HDB_Manager is not a valid type to filter by marital status
-        if (o instanceof Applicant) {
-            Applicant a = (Applicant) o;
-            return a.maritalStatus == maritalStatus;
-        } else if (o instanceof HDB_Manager) {
-            return false;
-        }
-        //else if o is not a Project, Enquiry, Request or User, throw error as it is not a valid type to filter by marital status
-        throw new IllegalArgumentException("Object is not a Project, Enquiry, Request or User.");
+        throw new IllegalArgumentException("Filtering by marital status is not supported for this object type!");
         
+    }
+
+    //isOpenToUserGroup checks if project is open to the specified marital status
+    private boolean isOpenToUserGroup(Project p) {
+        return p.Details.OpentoUserGroup == maritalStatus;
+    }
+
+    //hasMaritalStatusKeyword checks if the enquiry's description, title or reply contains the specified marital status keyword
+    private boolean hasMaritalStatusKeyword(Enquiry e) {
+        if (maritalStatus == MaritalStatus.SINGLE) {
+            return ((e.Description+e.Title+e.Reply).toLowerCase().contains("single"));
+        } else if (maritalStatus == MaritalStatus.MARRIED) {
+            return ((e.Description+e.Title+e.Reply).toLowerCase().contains("married"));
+        } else {
+            return false;
+        } 
+    }
+
+    //hasMaritalStatusKeyword checks if the request initiator's marital status matches the specified marital status
+    private boolean hasMaritalStatusKeyword(Request r) {
+        return r.initiator.maritalStatus == maritalStatus;
+    }    
+
+    //isOfMaritalStatus checks if applicant is of specified marital status
+    private boolean isOfMaritalStatus(Applicant u) {
+        return u.maritalStatus == maritalStatus;
     }
 }

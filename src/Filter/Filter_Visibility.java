@@ -12,15 +12,13 @@ public class Filter_Visibility implements IFilter {
 
     public boolean FilterBy(Object o) {
 
-        //If o is a Project, check if the project is visible or not
-        if (o instanceof Project) {
-            Project p = (Project) o;
-            return p.Details.activeStatus == isVisible;
-        }
+        if (o instanceof Project) { isVisible((Project)o); }
 
-        //any other object is not supported, hence will throw an exception
-        throw new UnsupportedOperationException("Filtering by visibility is only supported for Projects");
+        throw new UnsupportedOperationException("Filtering by visibility is not supported for this object type!");
     }
+
+    //isVisible checks if the project's active status is on or off
+    private boolean isVisible(Project p) { return p.Details.activeStatus == isVisible; }
         
     
 }

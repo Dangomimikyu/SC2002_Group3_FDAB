@@ -14,13 +14,13 @@ public class Filter_Location implements IFilter {
 
     public boolean FilterBy(Object o) {
 
-        //If o is a Project, check if the project is in the specified location
-        if (o instanceof Project) {
-            Project p = (Project) o;
-            return p.Details.Neighborhood == location;
-        }
+        if (o instanceof Project) { isInLocation((Project)o);}
 
-        //any other object is not supported, hence will throw an exception
-        throw new UnsupportedOperationException("Filtering by location is only supported for Projects");
+        throw new UnsupportedOperationException("Filtering by location is not supported for this object type!");
+    }
+
+    //isInLocation checks if the project is in the specified location
+    private boolean isInLocation(Project p) {
+        return p.Details.Neighborhood == location;
     }
 }
