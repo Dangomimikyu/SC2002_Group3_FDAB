@@ -93,23 +93,6 @@ public class ApplicantMenu extends Menu
         }
     }
 
-    // chose to separate because they don't share a super class
-    private static void PrintProjects(ArrayList<Project> list)
-    {
-        for (Project p : list)
-        {
-            System.out.println(p.getProjectDetails());
-        }
-    }
-
-    private static void PrintEnquiries(ArrayList<Enquiry> list)
-    {
-        for (Enquiry e : list)
-        {
-            System.out.println(e.getEnquiryDetails());
-        }
-    }
-
     private static void ViewProjects()
     {
         // filter by applicant's status and stuff

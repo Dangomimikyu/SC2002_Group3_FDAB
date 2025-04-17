@@ -11,21 +11,26 @@ public class ManagerMenu extends Menu
     {
         Display();
     }
-
+    public static void SetUser(HDB_Manager u)
+    {
+        user = u;
+    }
     private static void Display()
     {
         int choice = -1;
         while (choice != 7) {
-            System.out.println("============================");
-            System.out.println("|      Applicant menu      |");
-            System.out.println("| 1. Go to Applicant view  |");
-            System.out.println("| 2. Join a project        |");
-            System.out.println("| 3. View Project status   |");
-            System.out.println("| 4. View all applicants   |");
-            System.out.println("| 5. Update applicant flat |");
-            System.out.println("| 6. Generate flat receipt |");
-            System.out.println("| 7. Log out               |");
-            System.out.println("============================");
+            System.out.println("=====================================");
+            System.out.println("|            Manager menu           |");
+            System.out.println("| 1. Create project listing         |");
+            System.out.println("| 2. Edit project listing           |");
+            System.out.println("| 3. Delete project listing         |");
+            System.out.println("| 4. View other projects            |");
+            System.out.println("| 5. Handle officer registration    |");
+            System.out.println("| 6. Handle applicant requests      |");
+            System.out.println("| 7. Generate report                |");
+            System.out.println("| 8. View enquiries                 |");
+            System.out.println("| 9. Reply to an enquiry            |");
+            System.out.println("=====================================");
             System.out.print("Enter choice: ");
             try {
                 choice = sc.nextInt();
@@ -37,25 +42,31 @@ public class ManagerMenu extends Menu
 
             switch (choice)
             {
-                case 1:
+                case 1: // make new project
                     break;
 
-                case 2:
+                case 2: // edit project
                     break;
 
-                case 3:
+                case 3: // delete project
                     break;
 
-                case 4:
+                case 4: // view other project
                     break;
 
-                case 5:
+                case 5: // handle officer registration
                     break;
 
-                case 6:
+                case 6: // handle applicant requests (apply and withdrawal)
                     break;
 
-                case 7:
+                case 7: // generate report
+                    break;
+
+                case 8: // view enquiries
+                    break;
+
+                case 9: // reply to enquiry
                     break;
 
                 default:
@@ -64,10 +75,5 @@ public class ManagerMenu extends Menu
 
             }
         }
-    }
-
-    public static void SetUser(HDB_Manager u)
-    {
-        user = u;
     }
 }
