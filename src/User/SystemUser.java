@@ -7,7 +7,7 @@ public class SystemUser{
         APPLICANT, OFFICER, MANAGER
     }
 
-    public usertype ApplicantPerms;
+    public usertype UserPerms;
     public final String userID;
     public final String password;
     public final String name;
@@ -16,6 +16,12 @@ public class SystemUser{
         this.userID = nric;
         this.password = p;
         this.name = n;
+    }
+
+    public String getUserDetails() {
+        return  "User Perms: " + this.UserPerms.toString()
+                + "\nUserID: " + userID
+                + "\nName: " + name;
     }
     
 }

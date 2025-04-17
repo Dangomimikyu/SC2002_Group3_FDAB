@@ -1,8 +1,8 @@
-package Entity;
+package InteractableAttributePackage;
 
 import java.util.ArrayList;
 
-import Entity.Request.FlatType;
+import InteractableAttributePackage.Request.FlatType;
 import User.*;
 
 public class Project {

@@ -1,4 +1,4 @@
-package Entity;
+package InteractableAttributePackage;
 
 import User.*;
 
