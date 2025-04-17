@@ -21,12 +21,34 @@ public class MainApp {
         HDB_System HDB_system = HDB_System.getInstance();
         HDB_system = new HDB_System(ApplicantFilePath, OfficerFilePath, ManagerFilePath, EnquiriesFilePath, ProjectsFilePath, RequestsFilePath);
 
+        Login();
+
+        UseSystem();
+
+        // save changes then log out the user
+    }
+
+    private static void Init()
+    {
+        ApplicantFilePath = "src/localdata/ApplicantList.csv";
+        OfficerFilePath = "src/localdata/OfficerList.csv";
+        ManagerFilePath = "src/localdata/ManagerList.csv";
+        ProjectsFilePath = "src/localdata/ProjectList.csv";
+        EnquiriesFilePath = "src/localdata/Enquiries.csv";
+        RequestsFilePath = "src/localdata/Requests.csv";
+    }
+
+    private static void Login()
+    {
         while (user == null)
         {
             // either they get locked out at Auth or they back out at the LoginMenu
             LoginMenu.start();
         }
+    }
 
+    private static void UseSystem()
+    {
         if (user instanceof HDB_Officer)
         {
             HDB_Officer offUser = (HDB_Officer)user;
@@ -42,23 +64,14 @@ public class MainApp {
         else if (user instanceof HDB_Manager)
         {
             HDB_Manager mgrUser = (HDB_Manager)user;
+            ManagerMenu.SetUser(mgrUser);
+            ManagerMenu.start();
         }
-
-        // save changes then log out the user
-    }
-
-    private static void Init()
-    {
-        ApplicantFilePath = "src/localdata/ApplicantList.csv";
-        OfficerFilePath = "src/localdata/OfficerList.csv";
-        ManagerFilePath = "src/localdata/ManagerList.csv";
-        ProjectsFilePath = "src/localdata/ProjectList.csv";
-        EnquiriesFilePath = "src/localdata/Enquiries.csv";
-        RequestsFilePath = "src/localdata/Requests.csv";
     }
 
     public static void SetUser(SystemUser u)
     {
         user = u;
     }
+
 }
