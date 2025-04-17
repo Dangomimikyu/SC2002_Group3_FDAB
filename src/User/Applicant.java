@@ -1,9 +1,10 @@
 package User;
 
-import Entity.Project;
-import Entity.Enquiry;
-import Entity.EnquiryManager;
-import Entity.Applicant_Application;
+import Database.ProjectListingDB;
+import InteractableAttributePackage.*;
+import Managers.EnquiryManager;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,7 +12,7 @@ public class Applicant extends SystemUser{
     Scanner scanner = new Scanner(System.in);
     public enum ApplicantStatus {
         PENDING, SUCCESSFUL, UNSUCCESSFUL, BOOKED
-        
+
         // PENDING means the applicant has is waiting for approval from the officer
         // SUCCESSFUL means the applicant has successfully applied for a project
         // UNSUCCESSFUL means the applicant has gotten their application rejected, withdrawal approved or have yet to sent an application(can re-apply)
@@ -22,28 +23,55 @@ public class Applicant extends SystemUser{
     }
 
     public enum MaritalStatus {
-        SINGLE, MARRIED
+        SINGLE, MARRIED, ALL
     }
 
     public int age;
     public MaritalStatus maritalStatus;
     public String AppliedProject;
     public ApplicantStatus AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL;
+    private EnquiryManager enquiryManager = EnquiryManager.getInstance();
+    private String flatTypeBooked = "";   
 
-    private EnquiryManager enquiryManager = new EnquiryManager();
-    private String flatTypeBooked = null;
-
-    public Applicant(String n, String nric, int a, String m, String p, String AP, String APS) {
+    public Applicant(String nric, String p, String n, int a, String m) {
         super(nric, p, n);
         this.age = a;
         this.maritalStatus = MaritalStatus.valueOf(m);
-        this.ApplicantPerms = usertype.APPLICANT;
-        this.AppliedProject = AP;
-        this.AppliedProjectStatus = ApplicantStatus.valueOf(APS);
     }
 
-    public void ApplyProject(Project pr) {
-        if (this.AppliedProjectStatus == ApplicantStatus.UNSUCCESSFUL)   {
+    public void viewProjectList() {
+        ArrayList<Project> projectList = ProjectListingDB.getInstance().getProjectDB();
+        boolean hasVisibleProjects = false;
+
+        System.out.println("Available Projects:");
+        for (Project project : projectList) {
+            // Check if the project is active and visible to the user's marital status group
+            if (project.Details.activeStatus && 
+            (project.Details.OpentoUserGroup.toString().equals("ALL") || 
+            project.Details.OpentoUserGroup == this.maritalStatus)) {
+                System.out.println(project.getProjectDetails());
+                hasVisibleProjects = true;
+            }
+        }
+        // If no projects are available for the user's marital status or visibility is off
+        // Print a message indicating that no projects are available
+        if (!hasVisibleProjects) {
+            System.out.println("No projects available for your marital status or visibility is off.");
+        }
+    }
+
+
+
+    public void ApplyProject(String projectName) {
+        Project pr = ProjectListingDB.getInstance().getProjectDB().stream()
+                .filter(p -> p.Details.ProjectName.equals(projectName))
+                .findFirst()
+                .orElse(null);
+        if (pr == null) {
+            System.out.println("Project not found.");
+            return;
+        }
+        if (this.AppliedProjectStatus != ApplicantStatus.UNSUCCESSFUL)   {
             System.out.println("Applicant has already applied for a project");
             return;
         }
@@ -53,12 +81,7 @@ public class Applicant extends SystemUser{
             return;
         }
 
-        if (!pr.Details.activeStatus) {
-            System.out.println("The project is not visible to applicants.");
-            return;
-        }
-
-        String applicantGroup = this.maritalStatus.toString();
+        String applicantGroup = this.maritalStatus.name();
         String projectGroup = pr.Details.OpentoUserGroup.name();
 
         if (!(projectGroup.equals("ALL") || projectGroup.equals(applicantGroup))) {
@@ -72,6 +95,66 @@ public class Applicant extends SystemUser{
         System.out.println("Application submitted successfully!");
     }
 
+
+
+
+
+
+    public void BookFlat() {
+        // Chekk if the applicant has applied for the project successfully
+        if (this.AppliedProjectStatus != ApplicantStatus.SUCCESSFUL) {
+            System.out.println("You are not eligible to book a flat. Please ensure your application is approved.");
+            return;
+        }
+    
+        // Get the project details
+        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
+                .filter(p -> p.Details.ProjectName.equals(this.AppliedProject))
+                .findFirst()
+                .orElse(null);
+    
+        if (project == null) {
+            System.out.println("Project not found.");
+            return;
+        }
+    
+        System.out.println("Available flat types for project: " + project.Details.ProjectName);
+
+        // Show available flat types based on marital status
+        if (this.maritalStatus == MaritalStatus.SINGLE) {
+                System.out.println("1. 2-Room (" + project.Details.NoOfUnitsLeft_2Room + " units available)");
+        } else if (this.maritalStatus == MaritalStatus.MARRIED) {
+            if (project.Details.NoOfUnitsLeft_2Room > 0) {
+                System.out.println("1. 2-Room (" + project.Details.NoOfUnitsLeft_2Room + " units available)");
+            }
+            if (project.Details.NoOfUnitsLeft_3Room > 0) {
+                System.out.println("2. 3-Room (" + project.Details.NoOfUnitsLeft_3Room + " units available)");
+            }
+            }
+        
+    
+        System.out.println("Enter the number corresponding to the flat type you want to book:");
+        int choice = scanner.nextInt();
+        scanner.nextLine();
+    
+        if (choice == 1 && project.Details.NoOfUnitsLeft_2Room > 0) {
+            project.SellUnit(Request.FlatType.TWO_ROOM);
+            this.flatTypeBooked = "2-Room";
+            this.AppliedProjectStatus = ApplicantStatus.BOOKED;
+            System.out.println("You have successfully booked a 2-Room flat in project: " + project.Details.ProjectName);
+        } else if (choice == 2 && project.Details.NoOfUnitsLeft_3Room > 0 && this.maritalStatus == MaritalStatus.MARRIED) {
+            project.SellUnit(Request.FlatType.THREE_ROOM);
+            this.flatTypeBooked = "3-Room";
+            this.AppliedProjectStatus = ApplicantStatus.BOOKED;
+            System.out.println("You have successfully booked a 3-Room flat in project: " + project.Details.ProjectName);
+        } 
+    }
+
+
+
+
+
+
     public void CreateEnquiry() {
         System.out.println("Enter the title of the enquiry:");
         String title = scanner.nextLine();
@@ -80,7 +163,7 @@ public class Applicant extends SystemUser{
         System.out.println("Enter the description of the enquiry:");
         String description = scanner.nextLine();
         Enquiry newEnquiry = new Enquiry(title, projectName, description, this);
-        enquiryManager.addEnquiry(newEnquiry);
+        enquiryManager.AddNewEnquiry(newEnquiry);
         System.out.println("Enquiry created: " + newEnquiry.getEnquiryDetails());
     }
 
@@ -98,11 +181,12 @@ public class Applicant extends SystemUser{
     public void EditEnquiry() {
         System.out.println("Enter the title of the enquiry you want to edit:");
         String title = scanner.nextLine();
-        Enquiry enquiry = enquiryManager.getEnquiryByTitleAndApplicant(title, this);
+        Enquiry enquiry = enquiryManager.getEnquiryByTitleAndApplicant(title, this); 
         if (enquiry != null) {
             System.out.println("Enter the new description:");
             String newDescription = scanner.nextLine();
-            enquiry.Description = newDescription; 
+            enquiry.Description = newDescription;
+            enquiryManager.EditEnquiry(enquiry); 
             System.out.println("Enquiry updated: " + enquiry.getEnquiryDetails());
         } else {
             System.out.println("Enquiry not found or you are not the creator.");
@@ -114,14 +198,11 @@ public class Applicant extends SystemUser{
         String title = scanner.nextLine();
         Enquiry enquiry = enquiryManager.getEnquiryByTitleAndApplicant(title, this);
         if (enquiry != null) {
-            enquiryManager.removeEnquiry(enquiry);
+            enquiryManager.DeleteEnquiry(enquiry); 
             System.out.println("Enquiry deleted: " + title);
         } else {
             System.out.println("Enquiry not found or you are not the creator.");
         }
     }
 
-    public boolean BookFlat(HDB_Officer offr, Applicant_Application app) {
-        //to be completed
-    }
 }

@@ -3,7 +3,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import Entity.*;
+
+import InteractableAttributePackage.*;
 import User.*;
 
 //CSVReader is responsible for reading the data from the csv files and converting them into objects that can be used by the system

@@ -5,24 +5,17 @@ package Database;
 
 public class HDB_System {
 
-    private static final HDB_System instance = new HDB_System();
-
     public UserInfoDB users = UserInfoDB.getInstance();
     public EnquiryDB enquiries = EnquiryDB.getInstance();
     public ProjectListingDB projects = ProjectListingDB.getInstance();
     public RequestsDB requests = RequestsDB.getInstance();
 
-    private HDB_System() {}
-    public static HDB_System getInstance() {
-        return instance;
-    }
-
     public HDB_System(String ApplicantFilePath, String OfficerFilePath, String ManagerFilePath, 
     String EnquiriesFilePath, String ProjectFilePath, String RequestsFilePath) {
 
-        this.users = new UserInfoDB(ApplicantFilePath, OfficerFilePath, ManagerFilePath);
-        this.enquiries = new EnquiryDB(EnquiriesFilePath, users.ViewDB());
-        this.projects = new ProjectListingDB(ProjectFilePath, users.ViewDB());
-        this.requests = new RequestsDB(RequestsFilePath, users.ViewDB());
+        users.InitialiseDB(ApplicantFilePath, OfficerFilePath, ManagerFilePath);
+        enquiries.InitialiseDB(EnquiriesFilePath, users.getUserDB());
+        projects.InitialiseDB(ProjectFilePath, users.getUserDB());
+        requests.InitialiseDB(RequestsFilePath, users.getUserDB());
     }
 }
