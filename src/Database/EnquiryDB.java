@@ -137,4 +137,8 @@ public class EnquiryDB extends Database {
         }
     }
 
+    public Enquiry SearchDB(String projectName)
+    {
+        return enqList.stream().filter(pp -> projectName.equals(pp.Title)).findFirst().orElse(null);
+    }
 }
