@@ -4,7 +4,10 @@
 package Database;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import InteractableAttributePackage.Project;
 import Service.*;
 import User.*;
 import Filter.*;
@@ -31,7 +34,7 @@ public class UserInfoDB extends Database {
         return userList;
     }
 
-    public void ViewDB() {
+    public ArrayList<Project> ViewDB() {
         System.out.println("\nAll users in order by index: ");
         int index = 0;
         for (SystemUser u : userList) {
@@ -39,6 +42,7 @@ public class UserInfoDB extends Database {
             System.out.println(u.getUserDetails());
             index++;
         }
+        return null;
     }
 
     public void ViewDB(IFilter filter) {
@@ -144,5 +148,10 @@ public class UserInfoDB extends Database {
                 }
             }
         }
+    }
+
+    public SystemUser SearchDB(String projectName)
+    {
+        return userList.stream().filter(pp -> projectName.equals(pp.name)).findFirst().orElse(null);
     }
 }

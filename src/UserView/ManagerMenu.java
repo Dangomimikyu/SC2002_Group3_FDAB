@@ -1,7 +1,7 @@
 package UserView;
 
-import Entity.Project;
-import Entity.ProjectDetails;
+import InteractableAttributePackage.Project;
+import InteractableAttributePackage.ProjectDetails;
 import User.HDB_Manager;
 
 import javax.swing.text.View;
