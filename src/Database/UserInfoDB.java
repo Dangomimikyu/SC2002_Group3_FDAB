@@ -4,6 +4,7 @@
 package Database;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import InteractableAttributePackage.Project;
@@ -147,5 +148,10 @@ public class UserInfoDB extends Database {
                 }
             }
         }
+    }
+
+    public SystemUser SearchDB(String projectName)
+    {
+        return userList.stream().filter(pp -> projectName.equals(pp.name)).findFirst().orElse(null);
     }
 }

@@ -222,4 +222,8 @@ public class ProjectListingDB extends Database {
         }
     }
 
+    public Project SearchDB(String projectName)
+    {
+        return projList.stream().filter(pp -> projectName.equals(pp.Details.ProjectName)).findFirst().orElse(null);
+    }
 }

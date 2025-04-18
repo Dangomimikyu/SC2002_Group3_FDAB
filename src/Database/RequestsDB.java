@@ -136,4 +136,9 @@ public class RequestsDB extends Database {
             }
         }
     }
+
+    public Request SearchDB(String projectName)
+    {
+        return reqList.stream().filter(pp -> projectName.equals(pp.RegardingProject)).findFirst().orElse(null);
+    }
 }
