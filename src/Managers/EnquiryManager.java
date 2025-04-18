@@ -2,23 +2,19 @@ package Managers;
 
 import Database.Database;
 import Database.EnquiryDB;
-import Database.ProjectListingDB;
 import InteractableAttributePackage.Enquiry;
 import User.Applicant;
 import User.SystemUser;
 
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class EnquiryManager
 {
     private static EnquiryManager instance;
 
-    private EnquiryManager()
-    {
-
-    }
+    private EnquiryManager() {}
 
     public static EnquiryManager getInstance()
     {
@@ -33,17 +29,20 @@ public class EnquiryManager
     {
         if (s instanceof Applicant)
         {
-            // this should never happen but just in case
-            System.out.println("This user doesn't have the ability to see all enquiries");
-            return;
+            // show this applicant's own enquiries
+            System.out.println("Showing your enquiries:");
+            ArrayList<Enquiry> enqList = EnquiryDB.getInstance().getEnquiryDB();
+
+            for (Enquiry e : enqList)
+            {
+                if (Objects.equals(e.Enquirer.userID, s.userID)) {
+                    System.out.println(e.getEnquiryDetails());
+                }
+            }
+
         }
-
-        ArrayList<Enquiry> enqList = EnquiryDB.getInstance().ViewDB();
-
-        // maybe can replace when the DB has its own print function?
-        for (Enquiry e : enqList)
-        {
-            System.out.println(e.getEnquiryDetails());
+        else {
+            EnquiryDB.getInstance().ViewDB();
         }
     }
 
@@ -58,24 +57,30 @@ public class EnquiryManager
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Choose an enquiry to reply to:");
-        ViewEnquiries(s);
-
-        ArrayList<Enquiry> enqList = EnquiryDB.getInstance().ViewDB();
+        EnquiryDB.getInstance().ViewDB();
 
         System.out.print("Enter name of enquiry to reply to: ");
         String enqName = sc.nextLine();
 
-        Optional<Enquiry> enq = enqList.stream().filter(en -> enqName.equals(en.Title)).findFirst();
-        if (enq.isPresent())
+        Enquiry enq = EnquiryDB.getInstance().SearchDB(enqName);
+        if (enq != null)
         {
             System.out.print("Enter reply:");
             String reply = sc.nextLine();
-            enq.get().Reply = reply; // must replace this with the function
+            enq.Reply = reply; // must replace this with the function
         }
         else
         {
-            System.out.println("No enquiry by that name.");
+            System.out.println("No enquiry with a project by that name.");
         }
+    }
+
+    public Enquiry getEnquiryByTitleAndApplicant(String title, SystemUser s)
+    {
+        return EnquiryDB.getInstance().getEnquiryDB().stream()
+                .filter(enq -> Objects.equals(enq.Title, title) && Objects.equals(enq.Enquirer, s))
+                .findFirst()
+                .orElse(null);
     }
 
     public void AddNewEnquiry(Enquiry e)

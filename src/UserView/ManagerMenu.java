@@ -21,7 +21,7 @@ public class ManagerMenu extends Menu
     private static void Display()
     {
         int choice = -1;
-        while (choice != 7) {
+        while (choice != 10) {
             System.out.println("=====================================");
             System.out.println("|            Manager menu           |");
             System.out.println("| 1. Create project listing         |");
@@ -48,6 +48,7 @@ public class ManagerMenu extends Menu
             {
                 case 1: // make new project
                     MakeProject();
+//                    user.CreateBTOProject();
                     break;
 
                 case 2: // edit project
@@ -55,7 +56,8 @@ public class ManagerMenu extends Menu
                     break;
 
                 case 3: // delete project
-                    DeleteProject();
+                    System.out.print("Enter name of project to delete: ");
+                    user.DeleteBTOProject(sc.nextLine());
                     break;
 
                 case 4: // view other project
@@ -143,21 +145,56 @@ public class ManagerMenu extends Menu
         System.out.print("Is this project visible right now? (1 for yes, 0 for no): ");
         int vis = GetIntInput("Is this project visible right now? (1 for yes, 0 for no): ");
 
+        System.out.print("Enter number of project slots: ");
+        int slots = GetIntInput("Enter number of officer slots: ");
+
         System.out.print("Enter group (single, married, all): ");
         String group = sc.nextLine();
         group = group.toUpperCase();
 
-        Project p = new Project(name, neighbourhood, selling2, selling3, avail2, avail3, openDate, closeDate, user, offrSlots, null, (vis != 0), group);
+        user.CreateBTOProject(name, neighbourhood, selling2, selling3, avail2, avail3, openDate, closeDate, slots, (vis != 0), group);
     }
 
     private static void EditProject()
     {
+        System.out.print("Enter project name: ");
+        String name = sc.nextLine();
 
-    }
+        System.out.print("Enter neighbourhood: ");
+        String neighbourhood = sc.nextLine();
 
-    private static void DeleteProject()
-    {
+        System.out.print("Enter 2-room selling price: ");
+        int selling2 = GetIntInput("Enter 2-room selling price: ");
 
+        System.out.print("Enter number of available 2-room units: ");
+        int avail2 = GetIntInput("Enter number of available 2-room units: ");
+
+        System.out.print("Enter 3-room selling price: ");
+        int selling3 = GetIntInput("Enter 3-room selling price: ");
+
+        System.out.print("Enter number of available 3-room units: ");
+        int avail3 = GetIntInput("Enter 3-room selling price: ");
+
+        System.out.print("Enter opening date: ");
+        String openDate = sc.nextLine();
+
+        System.out.print("Enter closing date: ");
+        String closeDate = sc.nextLine();
+
+        System.out.print("Enter number of officer slots: ");
+        int offrSlots = GetIntInput("Enter number of officer slots: ");
+
+        System.out.print("Is this project visible right now? (1 for yes, 0 for no): ");
+        int vis = GetIntInput("Is this project visible right now? (1 for yes, 0 for no): ");
+
+        System.out.print("Enter number of project slots: ");
+        int slots = GetIntInput("Enter number of officer slots: ");
+
+        System.out.print("Enter group (single, married, all): ");
+        String group = sc.nextLine();
+        group = group.toUpperCase();
+
+        user.EditBTOProject(name, neighbourhood, selling2, selling3, avail2, avail3, openDate, closeDate, slots, (vis != 0), group);
     }
 
     private static void ViewOtherProject()
@@ -189,6 +226,4 @@ public class ManagerMenu extends Menu
     {
 
     }
-
-
 }

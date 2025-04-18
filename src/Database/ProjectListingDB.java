@@ -64,7 +64,7 @@ public class ProjectListingDB extends Database {
                     System.out.println(p.getProjectDetails());
                 }
                 index++;
-                }            
+            }
         }
     }
 
@@ -97,6 +97,7 @@ public class ProjectListingDB extends Database {
             }
         }
     }
+
 
     //prints the headers and information for which project will be filtered by
     private void displayFilterInformation(IFilter filter) {

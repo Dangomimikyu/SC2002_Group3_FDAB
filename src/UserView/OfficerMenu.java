@@ -11,7 +11,10 @@ public class OfficerMenu extends Menu
     {
         Display();
     }
-
+    public static void SetUser(HDB_Officer u)
+    {
+        user = u;
+    }
     private static void Display()
     {
         int choice = -1;
@@ -37,26 +40,32 @@ public class OfficerMenu extends Menu
 
             switch (choice)
             {
-                case 1:
+                case 1: // go to applicant view
+                    ApplicantMenu.start();
                     break;
 
-                case 2:
+                case 2: // apply to join a project
                     break;
 
-                case 3:
+                case 3: // check project status
+                    // show list of projects
+                    // then print project details
                     break;
 
-                case 4:
+                case 4: // show applicant list
                     break;
 
-                case 5:
+                case 5: // update applicant flat type
                     break;
 
-                case 6:
+                case 6: // get receipt
+                    // show applicant list again
+                    // use receiptgenerator
                     break;
 
-                case 7:
-                    break;
+                case 7: // log out
+                    System.out.println("Logging out");
+                    return;
 
                 default:
                     System.out.println("Invalid number");
@@ -64,10 +73,5 @@ public class OfficerMenu extends Menu
 
             }
         }
-    }
-
-    public static void SetUser(HDB_Officer u)
-    {
-        user = u;
     }
 }

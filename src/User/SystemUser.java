@@ -9,7 +9,7 @@ public class SystemUser{
 
     public usertype UserPerms;
     public final String userID;
-    public final String password;
+    public String password;
     public final String name;
 
     public SystemUser(String nric, String p, String n) {

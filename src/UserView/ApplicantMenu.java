@@ -2,15 +2,10 @@ package UserView;
 
 import Database.ProjectListingDB;
 import InteractableAttributePackage.Enquiry;
-import InteractableAttributePackage.Project;
 import Managers.EnquiryManager;
 import User.Applicant;
 
-import java.awt.print.Book;
-import java.util.ArrayList;
 import java.util.InputMismatchException;
-import java.util.Objects;
-import java.util.Optional;
 
 public class ApplicantMenu extends Menu
 {
@@ -54,31 +49,32 @@ public class ApplicantMenu extends Menu
             switch (choice)
             {
                 case 1: // view available projects based on the applicant's stats
-                    ViewProjects();
+                    ProjectListingDB.getInstance().ViewDB();
                     break;
 
                 case 2: // apply for project
-                    ApplyProject();
+                    System.out.print("Enter name of project to apply for: ");
+                    user.ApplyProject(sc.nextLine());
                     break;
 
                 case 3: // make a new enquiry
-                    MakeEnquiry();
+                    user.CreateEnquiry();
                     break;
 
                 case 4: // view applicant's own enquiries
-                    ViewEnquiries();
+                    user.ViewEnquiry();
                     break;
 
                 case 5: // edit applicant's own enquiries
-                    EditEnquiry();
+                    user.EditEnquiry();
                     break;
 
                 case 6: // delete an enquiry
-                    DeleteEnquiry();
+                    user.DeleteEnquiry();
                     break;
 
                 case 7: // book a flat
-                    BookFlat();
+                    user.BookFlat();
                     break;
 
                 case 8: // log out
@@ -90,106 +86,6 @@ public class ApplicantMenu extends Menu
                     break;
 
             }
-        }
-    }
-
-    private static void ViewProjects()
-    {
-        // filter by applicant's status and stuff
-         ProjectListingDB.getInstance().ViewDB();
-    }
-
-    private static void ApplyProject()
-    {
-        // use ApplicationManager to make a request
-        // request will be sent to RequestDB to be stored
-    }
-
-    private static void MakeEnquiry()
-    {
-        System.out.print("Enter name of project you're enquiring about: ");
-        String pName = sc.nextLine();
-        System.out.print("Enter title for the enquiry: ");
-        String pTitle = sc.nextLine();
-        System.out.print("Enter description");
-        String pDesc = sc.nextLine();
-
-        Enquiry e = new Enquiry(pName, pTitle, pDesc, user);
-        EnquiryManager.getInstance().AddNewEnquiry(e);
-    }
-
-    private static void ViewEnquiries()
-    {
-//        ArrayList<Enquiry> enqList = user.GetEnquiries();
-//        PrintEnquiries(enqList);
-    }
-
-    private static void EditEnquiry()
-    {
-//        ArrayList<Enquiry> enqList = user.GetEnquiries();
-//        PrintEnquiries(enqList);
-
-        System.out.print("Enter name of enquiry to edit: ");
-        String eName = sc.nextLine();
-//        Optional<Enquiry> enq = enqList.stream().filter(en -> eName.equals(en.Title)).findFirst();
-
-        System.out.print("Enter new description: ");
-        String desc = sc.nextLine();
-//        enq.Description = desc;
-
-//        EnquiryManager.getInstance().EditEnquiry(enq);
-    }
-
-    private static void DeleteEnquiry()
-    {
-        System.out.println("Your enquiries:");
-        ViewEnquiries();
-
-        System.out.print("Enter title of the enquiry to delete: ");
-        String name = sc.nextLine();
-
-        if (Objects.equals(name, ""))
-        {
-            System.out.println("Aborting delete");
-            return;
-        }
-
-//        ArrayList<Enquiry> enqList = user.GetEnquiries();
-//        Optional<Enquiry> enq = enqList.stream().filter(en -> enqName.equals(en.Title)).findFirst();
-//        if (enq.isPresent())
-//        {
-//        user.RemoveEnquiry(enq);
-//        }
-//        else {
-//            System.out.println("No enquiry with that name");
-//        }
-    }
-
-    private static void BookFlat()
-    {
-        if (user.AppliedProjectStatus == Applicant.ApplicantStatus.SUCCESSFUL)
-        {
-            // able to book
-            System.out.println("Choose a project to apply to:");
-            ArrayList<Project> pList = ProjectListingDB.getInstance().ViewDB();
-            PrintProjects(pList);
-
-            System.out.print("Enter name of project to apply to: ");
-            String projName = sc.nextLine();
-
-
-            Optional<Project> p = pList.stream().filter(pp -> pList.equals(pp.Details.ProjectName)).findFirst();
-            if (p.isPresent())
-            {
-//            ApplicationManager.CreateBookingRequest(p, user);
-            }
-            else {
-                System.out.println("No project with that name");
-            }
-        }
-        else
-        {
-            System.out.println("You are not able to book a flat yet");
         }
     }
 }
