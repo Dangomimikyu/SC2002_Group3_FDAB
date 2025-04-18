@@ -1,10 +1,6 @@
 package User;
 
-<<<<<<< Updated upstream
-import Database.ProjectListingDB;
-=======
 import Database.*;
->>>>>>> Stashed changes
 import InteractableAttributePackage.*;
 import Managers.EnquiryManager;
 
@@ -35,11 +31,7 @@ public class Applicant extends SystemUser{
     public String AppliedProject;
     public ApplicantStatus AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL;
     private EnquiryManager enquiryManager = EnquiryManager.getInstance();
-<<<<<<< Updated upstream
-    private String flatTypeBooked = "";   
-=======
     public String flatTypeBooked = "";   
->>>>>>> Stashed changes
 
     public Applicant(String nric, String p, String n, int a, String m) {
         super(nric, p, n);
@@ -89,15 +81,12 @@ public class Applicant extends SystemUser{
             return;
         }
 
-<<<<<<< Updated upstream
-=======
         // Check if the applicant is already an officer in the project
         if (pr.Details.OfficerList.stream().anyMatch(officer -> officer.userID.equals(this.userID))) {
             System.out.println("You cannot apply for a project where you are already an Officer.");
             return;
         }
 
->>>>>>> Stashed changes
         String applicantGroup = this.maritalStatus.name();
         String projectGroup = pr.Details.OpentoUserGroup.name();
 
@@ -114,14 +103,6 @@ public class Applicant extends SystemUser{
     }
 
 
-<<<<<<< Updated upstream
-
-
-
-
-    public void BookFlat() {
-        // Chekk if the applicant has applied for the project successfully
-=======
     public void RequestWithdrawal() {
         // Check if the applicant has applied for a project
         if (this.AppliedProjectStatus == ApplicantStatus.UNSUCCESSFUL) {
@@ -145,7 +126,6 @@ public class Applicant extends SystemUser{
 
     public void BookFlat() {
         // Check if the applicant has applied for the project successfully
->>>>>>> Stashed changes
         if (this.AppliedProjectStatus != ApplicantStatus.SUCCESSFUL) {
             System.out.println("You are not eligible to book a flat. Please ensure your application is approved.");
             return;
@@ -167,23 +147,15 @@ public class Applicant extends SystemUser{
         // Show available flat types based on marital status
         if (this.maritalStatus == MaritalStatus.SINGLE) {
                 System.out.println("1. 2-Room (" + project.Details.NoOfUnitsLeft_2Room + " units available)");
-<<<<<<< Updated upstream
-        } else if (this.maritalStatus == MaritalStatus.MARRIED) {
-=======
         } 
         else if (this.maritalStatus == MaritalStatus.MARRIED) {
->>>>>>> Stashed changes
             if (project.Details.NoOfUnitsLeft_2Room > 0) {
                 System.out.println("1. 2-Room (" + project.Details.NoOfUnitsLeft_2Room + " units available)");
             }
             if (project.Details.NoOfUnitsLeft_3Room > 0) {
                 System.out.println("2. 3-Room (" + project.Details.NoOfUnitsLeft_3Room + " units available)");
             }
-<<<<<<< Updated upstream
-            }
-=======
         }
->>>>>>> Stashed changes
         
     
         System.out.println("Enter the number corresponding to the flat type you want to book:");
@@ -207,11 +179,7 @@ public class Applicant extends SystemUser{
 
 
 
-<<<<<<< Updated upstream
-
-=======
     
->>>>>>> Stashed changes
     public void CreateEnquiry() {
         System.out.println("Enter the title of the enquiry:");
         String title = scanner.nextLine();

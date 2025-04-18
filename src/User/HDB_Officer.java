@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import InteractableAttributePackage.*;
-<<<<<<< Updated upstream
-=======
 import InteractableAttributePackage.Request.FlatType;
 import User.HDB_Officer.Enum_OfficerStatus;
 
->>>>>>> Stashed changes
 import javax.swing.text.html.parser.Entity;
 
 import Database.*;
