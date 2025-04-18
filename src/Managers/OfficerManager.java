@@ -13,7 +13,9 @@ public class OfficerManager {
     private static OfficerManager instance;
     private HashMap<HDB_Officer, String> officerRequestList;
 
-    private OfficerManager() {}
+    private OfficerManager() {
+        officerRequestList = new HashMap<>();
+    }
 
     public static OfficerManager getInstance() {
         if (instance == null) {
@@ -56,7 +58,8 @@ public class OfficerManager {
 
             Project p = ProjectListingDB.getInstance().SearchDB(projectName);
             p.AssignOfficer(entry.getKey());
-            // TODO: also update the HDB_Officer class's current project
+            s.projectassigned = p;
+
         } else {
             System.out.println("Not allowed to do this function");
         }
@@ -154,7 +157,7 @@ public class OfficerManager {
             return;
         }
 
-        // if reach here means all okay and can
+        // if reach here means all okay and can put the request in
         if (entry != null) {
             entry.setValue(projectName);
         }
@@ -162,28 +165,24 @@ public class OfficerManager {
             officerRequestList.put(((HDB_Officer) s), projectName);
         }
     }
-}
 
-    public void CheckProjectApplicationStatus()
-    {
+    public void CheckProjectApplicationStatus(SystemUser s) {
         // if their name is still in this class, pending
-        for (Map.Entry<HDB_Officer, String> e : officerRequestList.entrySet())
-        {
-            if (Objects.equals(e.getKey().name, s.name))
+        for (Map.Entry<HDB_Officer, String> e : officerRequestList.entrySet()) {
             {
-//                entry = e;
-                if (e.getValue().contains(projectName))
-                {
-                    System.out.println("Already applied to this project. Current status: Pending");
+                if (Objects.equals(e.getKey().name, s.name)) {
+                    System.out.print("Applied to project ");
+                    System.out.print(e.getValue());
+                    System.out.println(" | Status: Pending");
                     return;
                 }
-
             }
+            // TODO: if not here means it's either been approved or rejected, either way theres no status
+            // if they are an officer means approved
+            // if neither means rejected / not applied
         }
 
-        // if they are an officer means approved
-        // if neither means rejected / not applied
+        // End officer functions ============================================================
     }
 
-    // End officer functions ============================================================
 }
