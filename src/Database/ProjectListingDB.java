@@ -35,7 +35,7 @@ public class ProjectListingDB extends Database {
         return projList;
     }
 
-    public void ViewDB() {
+    public ArrayList<Project> ViewDB() {
         System.out.println("\nAll projects in order by index: ");
         int index = 0;
         for (Project p : projList) {
@@ -43,6 +43,7 @@ public class ProjectListingDB extends Database {
             System.out.println(p.getProjectDetails());
             index++;
         }
+        return null;
     }
 
     public void ViewDB(IFilter filter) {

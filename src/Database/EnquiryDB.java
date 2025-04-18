@@ -5,6 +5,7 @@ package Database;
 
 import java.util.ArrayList;
 import InteractableAttributePackage.Enquiry;
+import InteractableAttributePackage.Project;
 import Service.*;
 import User.SystemUser;
 import Filter.*;
@@ -31,7 +32,7 @@ public class EnquiryDB extends Database {
         return enqList;
     }
 
-    public void ViewDB() {
+    public ArrayList<Project> ViewDB() {
         System.out.println("\nAll enquiries in order by index: ");
         int index = 0;
         for (Enquiry e : enqList) {
@@ -39,6 +40,7 @@ public class EnquiryDB extends Database {
             System.out.println(e.getEnquiryDetails());
             index++;
         }
+        return null;
     }
 
     public void ViewDB(IFilter filter) {

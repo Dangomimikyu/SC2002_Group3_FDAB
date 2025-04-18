@@ -3,11 +3,10 @@ package Managers;
 import Database.Database;
 import Database.EnquiryDB;
 import Database.ProjectListingDB;
-import Entity.Enquiry;
+import InteractableAttributePackage.Enquiry;
 import User.Applicant;
 import User.SystemUser;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Scanner;

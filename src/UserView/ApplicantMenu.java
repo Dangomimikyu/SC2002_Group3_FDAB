@@ -1,8 +1,8 @@
 package UserView;
 
 import Database.ProjectListingDB;
-import Entity.Enquiry;
-import Entity.Project;
+import InteractableAttributePackage.Enquiry;
+import InteractableAttributePackage.Project;
 import Managers.EnquiryManager;
 import User.Applicant;
 
@@ -96,8 +96,7 @@ public class ApplicantMenu extends Menu
     private static void ViewProjects()
     {
         // filter by applicant's status and stuff
-         ArrayList<Project> pList = ProjectListingDB.getInstance().ViewDB();
-         PrintProjects(pList);
+         ProjectListingDB.getInstance().ViewDB();
     }
 
     private static void ApplyProject()

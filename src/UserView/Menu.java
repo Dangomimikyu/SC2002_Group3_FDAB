@@ -1,7 +1,7 @@
 package UserView;
 
-import Entity.Enquiry;
-import Entity.Project;
+import InteractableAttributePackage.Enquiry;
+import InteractableAttributePackage.Project;
 
 import java.util.ArrayList;
 import java.util.Scanner;

@@ -5,6 +5,7 @@ package Database;
 
 import java.util.ArrayList;
 
+import InteractableAttributePackage.Project;
 import InteractableAttributePackage.Request;
 import Service.*;
 import User.SystemUser;
@@ -32,7 +33,7 @@ public class RequestsDB extends Database {
         return reqList;
     }
 
-    public void ViewDB() {
+    public ArrayList<Project> ViewDB() {
         System.out.println("\nAll requests in order by index: ");
         int index = 0;
         for (Request r : reqList) {
@@ -40,6 +41,7 @@ public class RequestsDB extends Database {
             System.out.println(r.getRequestDetails());
             index++;
         }
+        return null;
     }
 
     public void ViewDB(IFilter filter) {
