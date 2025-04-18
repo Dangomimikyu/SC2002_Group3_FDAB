@@ -1,47 +1,49 @@
 package Service;
 
 
-import Entity.Applicant_Application;
-import Entity.Project;
-import Entity.ProjectDetails;
+import Database.ProjectListingDB;
+import Database.RequestsDB;
+import Database.UserInfoDB;
+import InteractableAttributePackage.Applicant_Application;
+import InteractableAttributePackage.Project;
 import InteractableAttributePackage.Receipt;
+import InteractableAttributePackage.Request;
 import User.Enum_FlatType;
 import User.HDB_Officer;
-import Database.HDB_System;
 import User.Applicant;
 
 public class ReceiptGenerator {
 
-    private HDB_System hdbSystem = HDB_System.getInstance();
-
     public Receipt generateReceipt(String applicantNRIC, String projectName, Enum_FlatType flatType, String officerID) {
-        Applicant applicant = (Applicant) hdbSystem.users.ViewDB().stream()
+        Applicant applicant = (Applicant) UserInfoDB.getInstance().getUserDB().stream()
                 .filter(user -> user.userID.equals(applicantNRIC) && user instanceof Applicant)
                 .findFirst()
                 .orElse(null);
 
-        Project project = hdbSystem.projects.ViewDB().stream()
-                .filter(proj -> Service.Details.ProjectName.equals(projectName))
+        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
+                .filter(proj -> proj.Details.ProjectName.equals(projectName))
                 .findFirst()
                 .orElse(null);
 
-        HDB_Officer officer = (HDB_Officer) hdbSystem.users.ViewDB().stream()
+        HDB_Officer officer = (HDB_Officer) UserInfoDB.getInstance().getUserDB().stream()
                 .filter(user -> user.userID.equals(officerID) && user instanceof HDB_Officer)
                 .findFirst()
                 .orElse(null);
 
         if (applicant != null && project != null && officer != null) {
             
-            Applicant_Application application = (Applicant_Application) hdbSystem.requests.ViewDB().stream()
+            Applicant_Application application = (Applicant_Application) RequestsDB.getInstance().getDB().stream()
                     .filter(request -> request instanceof Applicant_Application &&
-                                      request.initiator.userID.equals(applicantNRIC) &&
-                                      request.RegardingProject.equals(projectName) &&
-                                      request.status == Entity.Request.ApplicationStatus.APPROVED) 
+                                      ((Applicant_Application) request).initiator.userID.equals(applicantNRIC) &&
+                                      ((Applicant_Application) request).RegardingProject.equals(projectName) &&
+                                      ((Applicant_Application) request).status == Request.ApplicationStatus.APPROVED)
                     .findFirst()
                     .orElse(null);
 
             if (application != null) {
-                return officer.GenerateReceipt(application, flatType);
+//                return officer.GenerateReceipt(application, flatType);
+                officer.GenerateReceipt(applicantNRIC);
+                return null;
             } else {
                 System.out.println("Error: No approved application found for this applicant and project.");
                 return null;

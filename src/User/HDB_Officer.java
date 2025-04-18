@@ -5,12 +5,8 @@ import java.util.Map;
 
 import InteractableAttributePackage.*;
 import InteractableAttributePackage.Request.FlatType;
-import User.HDB_Officer.Enum_OfficerStatus;
-
-import javax.swing.text.html.parser.Entity;
 
 import Database.*;
-import Filter.*;
 
 //HDB Officer possess all applicant’s capabilities.
 public class HDB_Officer extends Applicant{
@@ -31,6 +27,17 @@ public class HDB_Officer extends Applicant{
         this.projectStatus = Enum_OfficerStatus.UNSUCCESSFUL;
     }
 
+    public HDB_Officer(String name, String nric, int age, String marital, String pass, String proj, String projStatus)
+    {
+        super(nric, pass, name, age, marital);
+        this.projectAssigned = ProjectListingDB.getInstance().SearchDB(proj);
+        this.projectStatus = switch(projStatus)
+        {
+            case "PENDING" -> Enum_OfficerStatus.PENDING;
+            case "SUCCESSFUL" -> Enum_OfficerStatus.SUCCESSFUL;
+            default -> Enum_OfficerStatus.UNSUCCESSFUL;
+        };
+    }
 
     public void viewProjectList() {
         ArrayList<Project> projectList = ProjectListingDB.getInstance().getProjectDB();
@@ -39,8 +46,6 @@ public class HDB_Officer extends Applicant{
             System.out.println(project.getProjectDetails());
         }
     }
-
-
 
     public boolean RegisterForProject(String projectName) {
         Project pr = ProjectListingDB.getInstance().getProjectDB().stream()
@@ -78,13 +83,11 @@ public class HDB_Officer extends Applicant{
         return true;
     }
 
-
     public void ViewApplicationStatus() {
         System.out.println("Applied Project: " + this.AppliedProject);
         System.out.println("Application Status: " + this.projectStatus);
         return;
     }
-
 
     public void ViewProjectDetails() {
         if (this.projectAssigned == null) {
@@ -94,10 +97,6 @@ public class HDB_Officer extends Applicant{
         System.out.println(this.projectAssigned.getProjectDetails());
         return;
     }
-
-
-
-
 
     public boolean UpdateFlatSelection(String applicantNRIC, Enum_FlatType flatType) {
         // Search for the project assigned to the officer
@@ -142,15 +141,14 @@ public class HDB_Officer extends Applicant{
 
         // Update the flat type booked by the applicant
         if (flatType == Enum_FlatType.TWO_ROOM) {
-            app.initiator.flatTypeBooked = "2-Room";
+            app.initiator.flatTypeBooked = Enum_FlatType.TWO_ROOM;
         } else if (flatType == Enum_FlatType.THREE_ROOM) {
-            app.initiator.flatTypeBooked = "3-Room";
+            app.initiator.flatTypeBooked = Enum_FlatType.THREE_ROOM;
         }
 
         System.out.println("Applicant's status updated to BOOKED and flat type recorded.");
         return true;
     }
-
 
     public void ViewEnquiries() {
         if (this.projectAssigned == null) {
@@ -174,7 +172,6 @@ public class HDB_Officer extends Applicant{
         }
     }
 
-
     public void ReplyToEnquiry(String enquiryTitle, String reply) {
         if (this.projectAssigned == null) {
             System.out.println("No project assigned. Cannot reply to enquiries.");
@@ -197,7 +194,6 @@ public class HDB_Officer extends Applicant{
         EnquiryDB.getInstance().ModifyDB(targetEnquiry, Database.DB_Action.EDIT);
         System.out.println("Reply sent successfully for enquiry: " + enquiryTitle);
     }
-
 
     public void GenerateReceipt(String applicantNRIC) {
         if (this.projectAssigned == null) {
@@ -223,11 +219,10 @@ public class HDB_Officer extends Applicant{
 
         Receipt receipt = new Receipt(
                 new Applicant_Application(applicant, this.projectAssigned.Details.ProjectName),
-                applicant.flatTypeBooked.equals("2-Room") ? Enum_FlatType.TWO_ROOM : Enum_FlatType.THREE_ROOM,
+                applicant.flatTypeBooked,
                 this.projectAssigned.Details
         );
 
         System.out.println(receipt.getReceiptDetails());
     }
-
 }

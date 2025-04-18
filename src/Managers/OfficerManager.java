@@ -58,7 +58,7 @@ public class OfficerManager {
 
             Project p = ProjectListingDB.getInstance().SearchDB(projectName);
             p.AssignOfficer(entry.getKey());
-            s.projectassigned = p;
+            entry.getKey().projectAssigned = p;
 
         } else {
             System.out.println("Not allowed to do this function");

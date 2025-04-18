@@ -1,18 +1,19 @@
 package InteractableAttributePackage;
 
 import User.Enum_FlatType;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Receipt {
-    private String applicantName;
-    private String applicantNRIC;
-    private int applicantAge;
-    private String applicantMaritalStatus;
-    private Enum_FlatType flatTypeBooked;
-    private String projectName;
-    private String projectNeighborhood;
-    private LocalDateTime bookingDate;
+    private final String applicantName;
+    private final String applicantNRIC;
+    private final int applicantAge;
+    private final String applicantMaritalStatus;
+    private final Enum_FlatType flatTypeBooked;
+    private final String projectName;
+    private final String projectNeighborhood;
+    private final LocalDateTime bookingDate;
 
     public Receipt(Applicant_Application application, Enum_FlatType flatType, ProjectDetails projectDetails) {
         this.applicantName = application.initiator.name;
@@ -21,11 +22,9 @@ public class Receipt {
         this.applicantMaritalStatus = application.initiator.maritalStatus.toString();
         this.flatTypeBooked = flatType;
         this.projectName = projectDetails.ProjectName;
-        this.projectNeighborhood = projectDetails.Neighborhood;
+        this.projectNeighborhood = projectDetails.Neighborhood.toString();
         this.bookingDate = LocalDateTime.now();
     }
-
-
 
     public String getReceiptDetails() {
         return "--- Booking Receipt ---" +
@@ -33,7 +32,7 @@ public class Receipt {
                "\nNRIC: " + applicantNRIC +
                "\nAge: " + applicantAge +
                "\nMarital Status: " + applicantMaritalStatus +
-               "\nFlat Type Booked: " + flatTypeBooked +
+               "\nFlat Type Booked: " + flatTypeBooked.toString() +
                "\nProject: " + projectName + " (" + projectNeighborhood + ")" +
                "\nBooking Date: " + bookingDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
     }

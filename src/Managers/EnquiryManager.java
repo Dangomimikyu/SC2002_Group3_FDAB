@@ -2,23 +2,19 @@ package Managers;
 
 import Database.Database;
 import Database.EnquiryDB;
-import Database.ProjectListingDB;
 import InteractableAttributePackage.Enquiry;
 import User.Applicant;
 import User.SystemUser;
 
 import java.util.ArrayList;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class EnquiryManager
 {
     private static EnquiryManager instance;
 
-    private EnquiryManager()
-    {
-
-    }
+    private EnquiryManager() {}
 
     public static EnquiryManager getInstance()
     {
@@ -33,12 +29,21 @@ public class EnquiryManager
     {
         if (s instanceof Applicant)
         {
-            // this should never happen but just in case
-            System.out.println("This user doesn't have the ability to see all enquiries");
-            return;
-        }
+            // show this applicant's own enquiries
+            System.out.println("Showing your enquiries:");
+            ArrayList<Enquiry> enqList = EnquiryDB.getInstance().getEnquiryDB();
 
-        EnquiryDB.getInstance().ViewDB();
+            for (Enquiry e : enqList)
+            {
+                if (Objects.equals(e.Enquirer.userID, s.userID)) {
+                    System.out.println(e.getEnquiryDetails());
+                }
+            }
+
+        }
+        else {
+            EnquiryDB.getInstance().ViewDB();
+        }
     }
 
     public void ReplyEnquiry(SystemUser s)
@@ -68,6 +73,14 @@ public class EnquiryManager
         {
             System.out.println("No enquiry with a project by that name.");
         }
+    }
+
+    public Enquiry getEnquiryByTitleAndApplicant(String title, SystemUser s)
+    {
+        return EnquiryDB.getInstance().getEnquiryDB().stream()
+                .filter(enq -> Objects.equals(enq.Title, title) && Objects.equals(enq.Enquirer, s))
+                .findFirst()
+                .orElse(null);
     }
 
     public void AddNewEnquiry(Enquiry e)
