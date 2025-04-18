@@ -21,7 +21,7 @@ public class ManagerMenu extends Menu
     private static void Display()
     {
         int choice = -1;
-        while (choice != 7) {
+        while (choice != 10) {
             System.out.println("=====================================");
             System.out.println("|            Manager menu           |");
             System.out.println("| 1. Create project listing         |");
