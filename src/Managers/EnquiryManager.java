@@ -38,13 +38,7 @@ public class EnquiryManager
             return;
         }
 
-        ArrayList<Enquiry> enqList = EnquiryDB.getInstance().ViewDB();
-
-        // maybe can replace when the DB has its own print function?
-        for (Enquiry e : enqList)
-        {
-            System.out.println(e.getEnquiryDetails());
-        }
+        EnquiryDB.getInstance().ViewDB();
     }
 
     public void ReplyEnquiry(SystemUser s)
@@ -58,23 +52,21 @@ public class EnquiryManager
         Scanner sc = new Scanner(System.in);
 
         System.out.println("Choose an enquiry to reply to:");
-        ViewEnquiries(s);
-
-        ArrayList<Enquiry> enqList = EnquiryDB.getInstance().ViewDB();
+        EnquiryDB.getInstance().ViewDB();
 
         System.out.print("Enter name of enquiry to reply to: ");
         String enqName = sc.nextLine();
 
-        Optional<Enquiry> enq = enqList.stream().filter(en -> enqName.equals(en.Title)).findFirst();
-        if (enq.isPresent())
+        Enquiry enq = EnquiryDB.getInstance().SearchDB(enqName);
+        if (enq != null)
         {
             System.out.print("Enter reply:");
             String reply = sc.nextLine();
-            enq.get().Reply = reply; // must replace this with the function
+            enq.Reply = reply; // must replace this with the function
         }
         else
         {
-            System.out.println("No enquiry by that name.");
+            System.out.println("No enquiry with a project by that name.");
         }
     }
 
