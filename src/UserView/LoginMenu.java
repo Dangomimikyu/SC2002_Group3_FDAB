@@ -20,7 +20,6 @@ public class LoginMenu extends Menu
             System.out.println("| 1. Log in as Applicant    |");
             System.out.println("| 2. Log in as HDB Manager  |");
             System.out.println("| 3. Log in as HDB Officer  |");
-            System.out.println("| 4. Exit system            |");
             System.out.println("=============================");
             System.out.print("Enter choice: ");
             try
@@ -47,10 +46,6 @@ public class LoginMenu extends Menu
 
                 case 3:
                     AuthMenu.Login(SystemUser.usertype.OFFICER);
-                    return;
-
-                case 4:
-                    System.out.println("Exiting system");
                     return;
 
                 default:

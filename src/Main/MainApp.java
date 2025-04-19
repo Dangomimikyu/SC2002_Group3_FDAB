@@ -18,13 +18,12 @@ public class MainApp {
 
     public static void main(String[] args) {
         Init();
+
         HDB_System HDB_system = new HDB_System(ApplicantFilePath, OfficerFilePath, ManagerFilePath, EnquiriesFilePath, ProjectsFilePath, RequestsFilePath);
 
         Login();
 
         UseSystem();
-
-        // save changes then log out the user
     }
 
     private static void Init()

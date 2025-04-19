@@ -1,6 +1,9 @@
 package UserView;
 import Main.MainApp;
 import Service.Authenticator;
+import User.Applicant;
+import User.HDB_Manager;
+import User.HDB_Officer;
 import User.SystemUser;
 
 public class AuthMenu extends Menu
@@ -20,7 +23,18 @@ public class AuthMenu extends Menu
             if (ret != null) {
                 System.out.print("Welcome ");
                 System.out.println(ret.name);
-                MainApp.SetUser(ret);
+                if (type == SystemUser.usertype.MANAGER) {
+                    ManagerMenu.SetUser((HDB_Manager)ret);
+                    ManagerMenu.start();
+                }
+                else if (type == SystemUser.usertype.OFFICER) {
+                    OfficerMenu.SetUser((HDB_Officer)ret);
+                    OfficerMenu.start();
+                }
+                else if (type == SystemUser.usertype.APPLICANT) {
+                    ApplicantMenu.SetUser((Applicant)ret);
+                    ApplicantMenu.start();
+                }
                 return;
             } else {
                 System.out.print("Wrong credentials. you have ");
