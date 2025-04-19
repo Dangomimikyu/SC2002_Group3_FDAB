@@ -1,8 +1,6 @@
 package InteractableAttributePackage;
 
 import java.util.ArrayList;
-
-import InteractableAttributePackage.Request.FlatType;
 import User.*;
 
 public class Project {
@@ -30,6 +28,10 @@ public class Project {
         } else {
             Details.activeStatus = true;
         }
+    }
+
+    public boolean notAcceptingOfficers() {
+        return Details.OfficerSlots == Details.OfficerList.size();
     }
 
     //set officer slots (only for manager)
@@ -69,14 +71,14 @@ public class Project {
     }
 
     //for selling units to applicants (for officers and managers)
-    public void SellUnit(FlatType type) {
-        if (type == FlatType.TWO_ROOM) {
+    public void SellUnit(Enum_FlatType type) {
+        if (type == Enum_FlatType.TWO_ROOM) {
             if (Details.NoOfUnitsLeft_2Room > 0) {
                 Details.NoOfUnitsLeft_2Room--;
             } else {
                 throw new IllegalArgumentException("No more 2-room units left to sell!");
             }
-        } else if (type == FlatType.THREE_ROOM) {
+        } else if (type == Enum_FlatType.THREE_ROOM) {
             if (Details.NoOfUnitsLeft_3Room > 0) {
                 Details.NoOfUnitsLeft_3Room--;
             } else {
@@ -88,10 +90,10 @@ public class Project {
     }
 
     //for unselling units (for officers and managers)
-    public void UnsellUnit(FlatType type) {
-        if (type == FlatType.TWO_ROOM) {
+    public void UnsellUnit(Enum_FlatType type) {
+        if (type == Enum_FlatType.TWO_ROOM) {
             Details.NoOfUnitsLeft_2Room++;
-        } else if (type == FlatType.THREE_ROOM) {
+        } else if (type == Enum_FlatType.THREE_ROOM) {
             Details.NoOfUnitsLeft_3Room++;
         } else {
             throw new IllegalArgumentException("Invalid flat type!");

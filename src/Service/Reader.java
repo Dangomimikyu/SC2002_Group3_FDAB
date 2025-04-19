@@ -212,12 +212,12 @@ public class Reader
                     r = new Officer_Application((HDB_Officer)initiator, project_name);
 
                 } else if (request_type.equals("Booking")) {
-                    r = new Booking((Applicant)initiator, project_name, Request.FlatType.valueOf(BookedFlatType));
+                    r = new Booking((Applicant)initiator, project_name, Enum_FlatType.valueOf(BookedFlatType));
 
                 } else if (request_type.equals("Withdrawal")) {
                     r = new Withdrawal((Applicant)initiator, project_name);
                     if (!BookedFlatType.equals("")) {
-                        ((Withdrawal)r).BookedFlatType = Request.FlatType.valueOf(BookedFlatType);
+                        ((Withdrawal)r).BookedFlatType = Enum_FlatType.valueOf(BookedFlatType);
                     }
                 }
 

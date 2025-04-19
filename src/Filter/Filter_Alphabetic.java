@@ -25,7 +25,8 @@ public class Filter_Alphabetic implements IFilter {
         else if (o instanceof SystemUser) { StartsWithChar((SystemUser)o); }
         else if (o instanceof Request) { StartsWithChar((Request)o); }
 
-        throw new UnsupportedOperationException("Filtering by Alphabetic is not supported for this object type!");
+        System.out.println("Error: Filtering by Alphabetic is not supported for this object type!");
+        return false;
     }
 
     //StartsWithChar checks if project's name start with the specificed character

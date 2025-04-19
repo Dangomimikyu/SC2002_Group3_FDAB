@@ -66,12 +66,12 @@ public class RequestsDB extends Database {
     //modify request by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> throw new UnsupportedOperationException("Adding Requests not supported with index method");
+            case ADD -> System.out.println("Error: Adding Requests not supported with index method");
             case DELETE -> {
                 writer.DeleteRequest(reqList.get(index));
                 reqList.remove(index);
             }
-            case EDIT -> throw new UnsupportedOperationException("Editing Requests not supported with index method");
+            case EDIT -> System.out.println("Error: Editing Requests not supported with index method");
         }
     }
 
@@ -106,7 +106,8 @@ public class RequestsDB extends Database {
             + "\nin " + ((Filter_Alphabetic)filter).order + " order");           
         }
         else {
-            throw new UnsupportedOperationException("This filter type is not supported for requests");
+            System.out.println("Error: This filter type is not supported for requests");
+            return;
         }
     }
 

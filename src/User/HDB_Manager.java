@@ -224,6 +224,11 @@ public class HDB_Manager extends SystemUser{
             return;
         }
 
+        if (!project.Details.Manager.userID.equals(userID)) {
+            System.out.println("Project is not managed by you");
+            return;
+        }
+
         // Get all officer applications for the project
         ArrayList<Officer_Application> officerApplications = RequestsDB.getInstance().getRequestDB().stream()
                 .filter(req -> req instanceof Officer_Application && req.RegardingProject.equals(projectName))
@@ -242,6 +247,40 @@ public class HDB_Manager extends SystemUser{
             System.out.println("Officer NRIC: " + application.initiator.userID);
             System.out.println("Status: " + application.status);
             System.out.println("-----------------------------");
+        }
+    }
+
+    public void ViewApplicantApplications(String projectName) {
+        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
+                .filter(p -> p.Details.ProjectName.equals(projectName))
+                .findFirst()
+                .orElse(null);
+
+        if (project == null) {
+            System.out.println("Project not found.");
+            return;
+        }
+
+        if (!project.Details.Manager.userID.equals(userID)) {
+            System.out.println("Project is not managed by you");
+            return;
+        }
+
+        // Get all applicant applications and withdrawals of a project
+        ArrayList<Request> requests = RequestsDB.getInstance().getRequestDB().stream()
+                .filter(req -> req instanceof Applicant_Application || req instanceof Withdrawal && req.RegardingProject.equals(projectName))
+                .map(req -> req)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        if (requests.isEmpty()) {
+            System.out.println("No officer applications found for the project: " + projectName);
+            return;
+        }
+
+        // Display officer applications
+        System.out.println("Officer Applications for project: " + projectName);
+        for (Request request : requests) {
+            System.out.println(request.getRequestDetails());
         }
     }
 
@@ -327,11 +366,11 @@ public class HDB_Manager extends SystemUser{
 
         if (approve) {
             // Check if there are available units for the selected flat type
-            if ("2-Room".equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_2Room > 0) {
-                project.SellUnit(Request.FlatType.TWO_ROOM);
+            if (Enum_FlatType.TWO_ROOM.equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_2Room > 0) {
+                project.SellUnit(Enum_FlatType.TWO_ROOM);
             }
-            else if ("3-Room".equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_3Room > 0) {
-                project.SellUnit(Request.FlatType.THREE_ROOM);
+            else if (Enum_FlatType.THREE_ROOM.equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_3Room > 0) {
+                project.SellUnit(Enum_FlatType.THREE_ROOM);
             }
             else {
                 System.out.println("Not enough units available for the selected flat type. Application rejected.");
@@ -382,7 +421,7 @@ public class HDB_Manager extends SystemUser{
 
         if (approve) {
             // If applicant has already booked a flat, release the flat
-            if (withdrawalRequest.BookedFlatType != Request.FlatType.NULL) {
+            if (withdrawalRequest.BookedFlatType != Enum_FlatType.DEFAULT) {
                 project.UnsellUnit(withdrawalRequest.BookedFlatType);
             }
 

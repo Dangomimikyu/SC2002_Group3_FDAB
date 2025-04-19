@@ -65,12 +65,12 @@ public class EnquiryDB extends Database {
     //modify enquiry by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> throw new UnsupportedOperationException("Adding Enquiries not supported with index method");
+            case ADD -> System.out.println("Error: Adding Enquiries not supported with index method");
             case DELETE -> {
                 writer.DeleteEnquiry(enqList.get(index));
                 enqList.remove(index);
             }
-            case EDIT -> throw new UnsupportedOperationException("Editing Enquiries not supported with index method");
+            case EDIT -> System.out.println("Error: Editing Enquiries not supported with index method");
         }
     }
 
@@ -105,7 +105,8 @@ public class EnquiryDB extends Database {
              + "\nin " + ((Filter_Alphabetic)filter).order + " order");
         }
         else  { 
-            throw new UnsupportedOperationException("This filter type is not supported for enquiries");
+            System.out.println("Error: This filter type is not supported for enquiries");
+            return;
         }
     }
 

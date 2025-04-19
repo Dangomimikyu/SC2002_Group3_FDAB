@@ -2,10 +2,10 @@ package User;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import InteractableAttributePackage.*;
-import InteractableAttributePackage.Request.FlatType;
-
+import Service.ReceiptGenerator;
 import Database.*;
 
 //HDB Officer possess all applicant’s capabilities.
@@ -20,6 +20,7 @@ public class HDB_Officer extends Applicant{
     private ArrayList<Applicant> applicantList;
     private Map<String, Integer> flatAvailability;
     private String officerID;
+    private ReceiptGenerator receiptGenerator = new ReceiptGenerator();
 
     public HDB_Officer(String nric, String p, String n, int a, String m) {
         super(nric, p, n, a, m);
@@ -41,9 +42,12 @@ public class HDB_Officer extends Applicant{
 
     public void viewProjectList() {
         ArrayList<Project> projectList = ProjectListingDB.getInstance().getProjectDB();
-        System.out.println("Projects:");
+        System.out.println("Projects open for officer positions:");
         for (Project project : projectList) {
-            System.out.println(project.getProjectDetails());
+            //if project is active and has yet to reach max officer slots
+            if (project.isOpenForApplication() && project.Details.activeStatus && !project.notAcceptingOfficers()) {
+                System.out.println(project.getProjectDetails());
+            }
         }
     }
 
@@ -98,8 +102,20 @@ public class HDB_Officer extends Applicant{
         return;
     }
 
+    public void viewAllHandledRequests() {
+        ArrayList<Request> handled_reqs = RequestsDB.getInstance().getRequestDB().stream()
+        .filter(req -> (req instanceof Booking) &&
+                       req.RegardingProject.equals(this.projectAssigned.Details.ProjectName) &&
+                       req.status == Request.ApplicationStatus.PENDING).map(req -> req)
+                       .collect(Collectors.toCollection(ArrayList::new));
+        for (Request req : handled_reqs) {
+            System.out.println(req.getRequestDetails());
+        }
+    }
+
     public boolean UpdateFlatSelection(String applicantNRIC, Enum_FlatType flatType) {
         // Search for the project assigned to the officer
+        //TODO: Maybe instead of searching for the application request (since it might be deleted or replaced), just see if the applicant's status itself is SUCCESSFUL?
         Applicant_Application app = (Applicant_Application) RequestsDB.getInstance().getRequestDB().stream()
                 .filter(req -> req instanceof Applicant_Application &&
                         req.initiator.userID.equals(applicantNRIC) &&
@@ -122,10 +138,10 @@ public class HDB_Officer extends Applicant{
         // Update the flat selection based on availability
         try {
             if (flatType == Enum_FlatType.TWO_ROOM && this.projectAssigned.Details.NoOfUnitsLeft_2Room > 0) {
-                this.projectAssigned.SellUnit(FlatType.TWO_ROOM);
+                this.projectAssigned.SellUnit(Enum_FlatType.TWO_ROOM);
                 System.out.println("Updated flat selection to Two-room flat for applicant: " + app.initiator.name);
             } else if (flatType == Enum_FlatType.THREE_ROOM && this.projectAssigned.Details.NoOfUnitsLeft_3Room > 0) {
-                this.projectAssigned.SellUnit(FlatType.THREE_ROOM);
+                this.projectAssigned.SellUnit(Enum_FlatType.THREE_ROOM);
                 System.out.println("Updated flat selection to Three-room flat for applicant: " + app.initiator.name);
             } else {
                 System.out.println("No units available for the selected flat type.");

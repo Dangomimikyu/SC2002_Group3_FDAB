@@ -14,7 +14,8 @@ public class Filter_Visibility implements IFilter {
 
         if (o instanceof Project) { isVisible((Project)o); }
 
-        throw new UnsupportedOperationException("Filtering by visibility is not supported for this object type!");
+        System.out.println("Error: Filtering by visibility is not supported for this object type!");
+        return false;
     }
 
     //isVisible checks if the project's active status is on or off
