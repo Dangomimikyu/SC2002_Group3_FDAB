@@ -24,7 +24,8 @@ public class Filter_SellingPrice implements IFilter{
 
         if (o instanceof Project) {isWithinPriceRange((Project)o); }
 
-        throw new UnsupportedOperationException("Filtering by price is not supported for this object type!");
+        System.out.println("Error: Filtering by price is not supported for this object type!");
+        return false;
     }
 
     //isWithinPriceRange checks if project's specified flat types are within the price ranges

@@ -24,7 +24,8 @@ public class Filter_FlatType implements IFilter {
         //applicant and officer application request classes don't have flat type attributes hence will return false
         else if (o instanceof Applicant_Application || o instanceof Officer_Application) {return false;}
 
-        throw new UnsupportedOperationException("Filtering by Flat Types is not supported for this object type!");
+        System.out.println("Error: Filtering by Flat Types is not supported for this object type!");
+        return false;
     }
 
     //hasAvailableFlatTypes checks if project's specified flat types are still available for booking

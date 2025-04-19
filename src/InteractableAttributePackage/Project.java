@@ -32,6 +32,10 @@ public class Project {
         }
     }
 
+    public boolean notAcceptingOfficers() {
+        return Details.OfficerSlots == Details.OfficerList.size();
+    }
+
     //set officer slots (only for manager)
     public void setOfficerSlots(int OS) {
         if (OS > 10) {

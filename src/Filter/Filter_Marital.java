@@ -23,7 +23,8 @@ public class Filter_Marital implements IFilter {
         //HDB_Managers don't have marital status as an attributes, hence will return false
         else if (o instanceof HDB_Manager) { return false; }
 
-        throw new IllegalArgumentException("Filtering by marital status is not supported for this object type!");
+        System.out.println("Error: Filtering by marital status is not supported for this object type!");
+        return false;
         
     }
 

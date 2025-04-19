@@ -2,9 +2,18 @@ package UserView;
 
 import InteractableAttributePackage.Project;
 import InteractableAttributePackage.ProjectDetails;
+import InteractableAttributePackage.ProjectDetails.Location;
+import InteractableAttributePackage.Request.FlatType;
 import User.HDB_Manager;
+import User.Applicant.MaritalStatus;
+import Filter.*;
+import Filter.IFilter.orderBy;
 
 import javax.swing.text.View;
+
+import Database.ProjectListingDB;
+
+import java.time.LocalDate;
 import java.util.InputMismatchException;
 
 public class ManagerMenu extends Menu
@@ -21,7 +30,7 @@ public class ManagerMenu extends Menu
     private static void Display()
     {
         int choice = -1;
-        while (choice != 10) {
+        while (choice != 12) {
             System.out.println("=====================================");
             System.out.println("|            Manager menu           |");
             System.out.println("| 1. Create project listing         |");
@@ -29,11 +38,13 @@ public class ManagerMenu extends Menu
             System.out.println("| 3. Delete project listing         |");
             System.out.println("| 4. View other projects            |");
             System.out.println("| 5. Handle officer registration    |");
-            System.out.println("| 6. Handle applicant requests      |");
+            System.out.println("| 6. Handle applicant applications  |");
             System.out.println("| 7. Generate report                |");
             System.out.println("| 8. View enquiries                 |");
             System.out.println("| 9. Reply to an enquiry            |");
-            System.out.println("| 10. Log out                        |");
+            System.out.println("| 10. View unresolved requests      |");
+            System.out.println("| 11. Handle withdrawals            |");
+            System.out.println("| 12. Log out                       |");
             System.out.println("=====================================");
             System.out.print("Enter choice: ");
             try {
@@ -69,7 +80,7 @@ public class ManagerMenu extends Menu
                     break;
 
                 case 6: // handle applicant requests (apply and withdrawal)
-                    HandleApplicantRequests();
+                    HandleApplicantRequest();
                     break;
 
                 case 7: // generate report
@@ -84,7 +95,15 @@ public class ManagerMenu extends Menu
                     ReplyEnquiry();
                     break;
 
-                case 10: // log out
+                case 10:
+                    ViewHandledRequests();
+                    return;
+
+                case 11:
+                    HandleWithdrawal();
+                    return;
+
+                case 12: // log out
                     System.out.println("Logging out");
                     return;
 
@@ -199,31 +218,206 @@ public class ManagerMenu extends Menu
 
     private static void ViewOtherProject()
     {
-        // ask how to filter then show the filtered stuff
+        int choice = -1;
+        while (choice < 1 || choice > 7) {
+            // ask how to filter then show the filtered stuff
+            System.out.println("Choose which filter to use: ");
+            System.out.println("1. Filter by Alphabetic Order");
+            System.out.println("2. Filter by Age");
+            System.out.println("3. Filter by Flat Type Availability");
+            System.out.println("4. Filter by Location");
+            System.out.println("5. Filter by Marital Status");
+            System.out.println("6. Filter by Selling Price");
+            System.out.println("7. Filter by Visibility");
+            System.out.print("\nEnter your choice of filter: ");
+            try {
+                choice = sc.nextInt();
+            } catch (final InputMismatchException e) {
+                System.out.println("Invalid character");
+                sc.nextLine(); // ignore and move the cursor to next line
+                continue;
+            }
+
+            int order = -1;
+            switch (choice) {
+                case 1: 
+                    String starting_char = "";
+                    while (!starting_char.matches("[a-zA-Z]+") && starting_char.length() != 1 || starting_char.length() != 0) {
+                        System.out.print("Enter a alphabetic character to filter projects with such starting character (enter nothing for no filtering based on starting char): ");
+                        starting_char = sc.nextLine();
+                    }
+                    order = -1;
+                    while (order != 1 || order != 2) {
+                        System.out.print("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
+                        order = GetIntInput("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
+                    }
+                    if (starting_char.equals("")) {starting_char = null;}
+                    if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_Alphabetic(starting_char,orderBy.ASCENDING)); }
+                    else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_Alphabetic(starting_char,orderBy.DESCENDING)); }
+
+                case 2: 
+                    int minAge = -99;
+                    while (minAge != -1 || minAge < 0) {
+                        System.out.print("Enter min Age in years of filtered projects (enter -1 if you would like no min age): ");
+                        minAge = sc.nextInt();
+                    }
+                    int maxAge = -99;
+                    while (maxAge != -1 || maxAge < 0) {
+                        System.out.print("Enter min Age in years of filtered projects (enter -1 if you would like no min age): ");
+                        maxAge = sc.nextInt();
+                    }
+                    order = -1;
+                    while (order != 1 || order != 2) {
+                        System.out.print("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
+                        order = GetIntInput("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
+                    }
+                    if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_Age(minAge,maxAge,orderBy.ASCENDING)); }
+                    else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_Age(minAge,maxAge,orderBy.DESCENDING)); }
+
+                    case 3: 
+                        int flat_type_choice = -1;
+                        while (flat_type_choice < 1 || flat_type_choice > 3) {
+                            System.out.println("Choose which flat type to filter by (BOTH if you want to see availability of both flat types): ");
+                            System.out.println("1. TWO_ROOM\n2. THREE_ROOM\n3. BOTH");
+                            flat_type_choice = GetIntInput("Enter your choice: ");
+                        }
+                        order = -1;
+                        while (order != 1 || order != 2) {
+                            System.out.print("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
+                            order = GetIntInput("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
+                        }
+                        FlatType flatType = FlatType.NULL;
+                        if (flat_type_choice == 1) {flatType = FlatType.TWO_ROOM; } 
+                        else if (flat_type_choice == 2) {flatType = FlatType.THREE_ROOM; } 
+                        if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_FlatType(flatType,orderBy.ASCENDING)); }
+                        else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_FlatType(flatType,orderBy.DESCENDING)); }
+
+                    case 4: 
+                        System.out.print("Enter location/neighbourhood of project to filter from: ");
+                        String location = sc.nextLine();
+                        ProjectListingDB.getInstance().ViewDB(new Filter_Location(Location.valueOf(location)));
+
+                    case 5: 
+                        int marital_choice = -1;
+                        while (marital_choice < 1 || marital_choice > 2) {
+                            System.out.println("Choose which marital status to filter projects that are open to that group: ");
+                            System.out.println("1. SINGLE\n2. MARRIED");
+                            marital_choice = GetIntInput("Enter your choice: ");
+                        }
+                        if (marital_choice == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_Marital(MaritalStatus.SINGLE)); }
+                        else if (marital_choice == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_Marital(MaritalStatus.MARRIED)); }
+
+                    case 6: 
+                        int minPrice = -99;
+                        while (minPrice != -1 || minPrice < 0) {
+                            System.out.print("Enter min selling price of units in filtered projects (enter -1 if you would like no min price): ");
+                            minPrice = sc.nextInt();
+                        }
+                        int maxPrice = -99;
+                        while (maxPrice != -1 || maxPrice < 0) {
+                            System.out.print("Enter max selling price of units in filtered projects (enter -1 if you would like no max price): ");
+                            maxPrice = sc.nextInt();
+                        }
+                        flat_type_choice = -1;
+                        while (flat_type_choice < 1 || flat_type_choice > 3) {
+                            System.out.println("Choose which flat type to filter by (BOTH if you want to see availability of both flat types): ");
+                            System.out.println("1. TWO_ROOM\n2. THREE_ROOM\n3. BOTH");
+                            flat_type_choice = GetIntInput("Enter your choice: ");
+                        }
+                        order = -1;
+                        while (order != 1 || order != 2) {
+                            System.out.print("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
+                            order = GetIntInput("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
+                        }
+                        flatType = FlatType.NULL;
+                        if (flat_type_choice == 1) {flatType = FlatType.TWO_ROOM; } 
+                        else if (flat_type_choice == 2) {flatType = FlatType.THREE_ROOM; } 
+                        if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_SellingPrice(minPrice,maxPrice,orderBy.ASCENDING,flatType)); }
+                        else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_SellingPrice(minPrice,maxPrice,orderBy.DESCENDING,flatType)); }
+
+                    case 7: 
+                        ProjectListingDB.getInstance().ViewDB(new Filter_Visibility());
+
+                    default:
+                        System.out.println("Invalid number");
+                        break;
+            }
+        }
+    }
+
+    private static void ViewHandledRequests()
+    {
+        // for officer applying to be a part of this manager's projects
+        System.out.print("Enter one of your projects name to see all applicant and officer applications: ");
+        String projname = sc.nextLine();
+        user.ViewApplicantApplications(projname);
+        user.ViewOfficerApplications(projname);
+    }
+
+    private static void HandleApplicantRequest()
+    {
+        System.out.print("Enter userID of the applicant's application you wish to resolve: ");
+        String appID = sc.nextLine();
+        System.out.print("Enter the project name to which applicant is trying to apply to: ");
+        String projname = sc.nextLine();
+        int status_choice = -1;
+        while (status_choice != 1 || status_choice != 2) {
+            status_choice = GetIntInput("Would you like to approve or reject it? (1 for yes and 2 for no): ");
+        }
+        boolean status = false;
+        if (status_choice == 1) {status = true;}
+        user.ApproveOrRejectApplication(appID, projname, status);
     }
 
     private static void HandleOfficerRegistration()
     {
-        // for officer applying to be a part of this manager's projects
+        System.out.print("Enter userID of the officer's application you wish to resolve: ");
+        String officerID = sc.nextLine();
+        System.out.print("Enter the project name to which officer is trying to apply to: ");
+        String projname = sc.nextLine();
+        int status_choice = -1;
+        while (status_choice != 1 || status_choice != 2) {
+            status_choice = GetIntInput("Would you like to approve or reject it? (1 for yes and 2 for no): ");
+        }
+        boolean status = false;
+        if (status_choice == 1) {status = true;}
+        user.ApproveOfficerApplication(officerID, projname, status);
     }
 
-    private static void HandleApplicantRequests()
+    private static void HandleWithdrawal()
     {
-
+        System.out.print("Enter userID of the applicant's withdrawal you wish to resolve: ");
+        String appID = sc.nextLine();
+        System.out.print("Enter the project name to which applicant is trying to apply to: ");
+        String projname = sc.nextLine();
+        int status_choice = -1;
+        while (status_choice != 1 || status_choice != 2) {
+            status_choice = GetIntInput("Would you like to approve or reject it? (1 for yes and 2 for no): ");
+        }
+        boolean status = false;
+        if (status_choice == 1) {status = true;}
+        user.ApproveOrRejectWithdrawal(appID, projname, status);
     }
 
     private static void MakeReport()
     {
-//        ReportGenerator.getInstance
+        //ReportGenerator.getInstance
     }
 
     private static void ViewEnquiries()
     {
-
+        System.out.print("Enter the project name you wish to view all enquiries for: ");
+        user.ViewProjectEnquiries(sc.nextLine());
     }
 
     private static void ReplyEnquiry()
     {
-
+        System.out.print("Enter the project name of the enquiry you wish to reply to: ");
+        String projname = sc.nextLine();
+        System.out.print("Enter the title of the enquiry you wish to reply to: ");
+        String enqTitle = sc.nextLine();
+        System.out.print("Enter your reply: ");
+        String reply = sc.nextLine();
+        user.ReplyToProjectEnquiry(projname,enqTitle,reply);
     }
 }

@@ -27,7 +27,8 @@ public class Filter_Age implements IFilter {
         if (o instanceof Project) { return isWithinAgeRange((Project)o); }
         else if (o instanceof Applicant) { return isWithinAgeRange((Applicant)o); }
 
-        throw new UnsupportedOperationException("Filtering by Age is not supported for this object type!");
+        System.out.println("Error: Filtering by Age is not supported for this object type!");
+        return false;
 
     }
 

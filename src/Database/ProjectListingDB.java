@@ -71,12 +71,12 @@ public class ProjectListingDB extends Database {
     //modify project by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> throw new UnsupportedOperationException("Adding Projects not supported with index method");
+            case ADD -> System.out.println("Error: Adding Projects not supported with index method");
             case DELETE -> {
                 writer.DeleteProject(projList.get(index));
                 projList.remove(index);
             }
-            case EDIT -> throw new UnsupportedOperationException("Editing Projects not supported with index method");
+            case EDIT -> System.out.println("Error: Editing Projects not supported with index method");
         }
     }
 

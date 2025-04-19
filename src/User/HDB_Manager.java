@@ -224,6 +224,11 @@ public class HDB_Manager extends SystemUser{
             return;
         }
 
+        if (!project.Details.Manager.userID.equals(userID)) {
+            System.out.println("Project is not managed by you");
+            return;
+        }
+
         // Get all officer applications for the project
         ArrayList<Officer_Application> officerApplications = RequestsDB.getInstance().getRequestDB().stream()
                 .filter(req -> req instanceof Officer_Application && req.RegardingProject.equals(projectName))
@@ -242,6 +247,40 @@ public class HDB_Manager extends SystemUser{
             System.out.println("Officer NRIC: " + application.initiator.userID);
             System.out.println("Status: " + application.status);
             System.out.println("-----------------------------");
+        }
+    }
+
+    public void ViewApplicantApplications(String projectName) {
+        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
+                .filter(p -> p.Details.ProjectName.equals(projectName))
+                .findFirst()
+                .orElse(null);
+
+        if (project == null) {
+            System.out.println("Project not found.");
+            return;
+        }
+
+        if (!project.Details.Manager.userID.equals(userID)) {
+            System.out.println("Project is not managed by you");
+            return;
+        }
+
+        // Get all applicant applications and withdrawals of a project
+        ArrayList<Request> requests = RequestsDB.getInstance().getRequestDB().stream()
+                .filter(req -> req instanceof Applicant_Application || req instanceof Withdrawal && req.RegardingProject.equals(projectName))
+                .map(req -> req)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        if (requests.isEmpty()) {
+            System.out.println("No officer applications found for the project: " + projectName);
+            return;
+        }
+
+        // Display officer applications
+        System.out.println("Officer Applications for project: " + projectName);
+        for (Request request : requests) {
+            System.out.println(request.getRequestDetails());
         }
     }
 
