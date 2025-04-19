@@ -71,7 +71,6 @@ public class OfficerManager {
             System.out.print("Enter name of officer to deny: ");
             String name = sc.nextLine();
             Map.Entry<HDB_Officer, String> entry = null;
-            String projectName = "";
 
             for (Map.Entry<HDB_Officer, String> e : officerRequestList.entrySet()) {
                 if (Objects.equals(e.getKey().name, name)) {

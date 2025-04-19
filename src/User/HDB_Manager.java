@@ -366,11 +366,11 @@ public class HDB_Manager extends SystemUser{
 
         if (approve) {
             // Check if there are available units for the selected flat type
-            if ("2-Room".equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_2Room > 0) {
-                project.SellUnit(Request.FlatType.TWO_ROOM);
+            if (Enum_FlatType.TWO_ROOM.equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_2Room > 0) {
+                project.SellUnit(Enum_FlatType.TWO_ROOM);
             }
-            else if ("3-Room".equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_3Room > 0) {
-                project.SellUnit(Request.FlatType.THREE_ROOM);
+            else if (Enum_FlatType.THREE_ROOM.equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_3Room > 0) {
+                project.SellUnit(Enum_FlatType.THREE_ROOM);
             }
             else {
                 System.out.println("Not enough units available for the selected flat type. Application rejected.");
@@ -421,7 +421,7 @@ public class HDB_Manager extends SystemUser{
 
         if (approve) {
             // If applicant has already booked a flat, release the flat
-            if (withdrawalRequest.BookedFlatType != Request.FlatType.NULL) {
+            if (withdrawalRequest.BookedFlatType != Enum_FlatType.DEFAULT) {
                 project.UnsellUnit(withdrawalRequest.BookedFlatType);
             }
 

@@ -2,15 +2,15 @@
 
 package Filter;
 import InteractableAttributePackage.*;
-import InteractableAttributePackage.Request.FlatType;
+import User.Enum_FlatType;
 import java.util.List;
 
 public class Filter_FlatType implements IFilter {
     
-    public FlatType flatType = FlatType.NULL; //null signifies ignore if two or three-room
+    public Enum_FlatType flatType = Enum_FlatType.DEFAULT; //DEFAULT signifies ignore if two or three-room
     public orderBy order = orderBy.ASCENDING; //this attribute will only be used when filtering projects
 
-    public Filter_FlatType(FlatType type, orderBy ord) {
+    public Filter_FlatType(Enum_FlatType type, orderBy ord) {
         this.flatType = type;
         this.order = ord;
     }
@@ -30,9 +30,9 @@ public class Filter_FlatType implements IFilter {
 
     //hasAvailableFlatTypes checks if project's specified flat types are still available for booking
     private boolean hasAvailableFlatTypes(Project p) {
-        if (flatType == FlatType.NULL) {return true; }
-        else if (flatType == FlatType.TWO_ROOM) { return p.Details.NoOfUnitsLeft_2Room > 0; } 
-        else if (flatType == FlatType.THREE_ROOM) { return p.Details.NoOfUnitsLeft_3Room > 0; } 
+        if (flatType == Enum_FlatType.DEFAULT) {return true; }
+        else if (flatType == Enum_FlatType.TWO_ROOM) { return p.Details.NoOfUnitsLeft_2Room > 0; } 
+        else if (flatType == Enum_FlatType.THREE_ROOM) { return p.Details.NoOfUnitsLeft_3Room > 0; } 
         return false; 
     }
 
@@ -41,14 +41,14 @@ public class Filter_FlatType implements IFilter {
         List<String> two_room_keywords = List.of("2 room","2-room","2room","two room","two-room","tworoom");
         List<String> three_room_keywords = List.of("3 room","3-room","3room","three room","three-room","threeroom");
         
-        if (flatType == FlatType.NULL) {
+        if (flatType == Enum_FlatType.DEFAULT) {
             return (two_room_keywords.stream().anyMatch((e.Description+e.Title+e.Reply).toLowerCase()::contains) ||
                     three_room_keywords.stream().anyMatch((e.Description+e.Title+e.Reply).toLowerCase()::contains));
 
-        } else if (flatType == FlatType.TWO_ROOM) {
+        } else if (flatType == Enum_FlatType.TWO_ROOM) {
             return (two_room_keywords.stream().anyMatch((e.Description+e.Title+e.Reply).toLowerCase()::contains));
 
-        } else if (flatType == FlatType.THREE_ROOM) {
+        } else if (flatType == Enum_FlatType.THREE_ROOM) {
             return (two_room_keywords.stream().anyMatch((e.Description+e.Title+e.Reply).toLowerCase()::contains));
         }
         return false;
@@ -56,13 +56,13 @@ public class Filter_FlatType implements IFilter {
 
     //isRegardingFlatType checks if the withdrawal is withdrawing from specified booked flat type
     private boolean isRegardingFlatType(Withdrawal w) {
-        if (flatType == FlatType.NULL) {return true;}
+        if (flatType == Enum_FlatType.DEFAULT) {return true;}
         return w.BookedFlatType == flatType;
     }
 
     //isRegardingFlatType checks if the booking is trying to book the specified flat type
     private boolean isRegardingFlatType(Booking b) {
-        if (flatType == FlatType.NULL) {return true;}
+        if (flatType == Enum_FlatType.DEFAULT) {return true;}
         return b.flatTypeToBook == flatType;
     }
 

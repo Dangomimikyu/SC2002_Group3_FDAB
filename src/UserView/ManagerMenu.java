@@ -1,19 +1,12 @@
 package UserView;
 
-import InteractableAttributePackage.Project;
-import InteractableAttributePackage.ProjectDetails;
 import InteractableAttributePackage.ProjectDetails.Location;
-import InteractableAttributePackage.Request.FlatType;
 import User.HDB_Manager;
 import User.Applicant.MaritalStatus;
+import User.Enum_FlatType;
 import Filter.*;
 import Filter.IFilter.orderBy;
-
-import javax.swing.text.View;
-
 import Database.ProjectListingDB;
-
-import java.time.LocalDate;
 import java.util.InputMismatchException;
 
 public class ManagerMenu extends Menu
@@ -164,14 +157,11 @@ public class ManagerMenu extends Menu
         System.out.print("Is this project visible right now? (1 for yes, 0 for no): ");
         int vis = GetIntInput("Is this project visible right now? (1 for yes, 0 for no): ");
 
-        System.out.print("Enter number of project slots: ");
-        int slots = GetIntInput("Enter number of officer slots: ");
-
         System.out.print("Enter group (single, married, all): ");
         String group = sc.nextLine();
         group = group.toUpperCase();
 
-        user.CreateBTOProject(name, neighbourhood, selling2, selling3, avail2, avail3, openDate, closeDate, slots, (vis != 0), group);
+        user.CreateBTOProject(name, neighbourhood, selling2, selling3, avail2, avail3, openDate, closeDate, offrSlots, (vis != 0), group);
     }
 
     private static void EditProject()
@@ -206,14 +196,11 @@ public class ManagerMenu extends Menu
         System.out.print("Is this project visible right now? (1 for yes, 0 for no): ");
         int vis = GetIntInput("Is this project visible right now? (1 for yes, 0 for no): ");
 
-        System.out.print("Enter number of project slots: ");
-        int slots = GetIntInput("Enter number of officer slots: ");
-
         System.out.print("Enter group (single, married, all): ");
         String group = sc.nextLine();
         group = group.toUpperCase();
 
-        user.EditBTOProject(name, neighbourhood, selling2, selling3, avail2, avail3, openDate, closeDate, slots, (vis != 0), group);
+        user.EditBTOProject(name, neighbourhood, selling2, selling3, avail2, avail3, openDate, closeDate, offrSlots, (vis != 0), group);
     }
 
     private static void ViewOtherProject()
@@ -286,9 +273,9 @@ public class ManagerMenu extends Menu
                             System.out.print("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
                             order = GetIntInput("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
                         }
-                        FlatType flatType = FlatType.NULL;
-                        if (flat_type_choice == 1) {flatType = FlatType.TWO_ROOM; } 
-                        else if (flat_type_choice == 2) {flatType = FlatType.THREE_ROOM; } 
+                        Enum_FlatType flatType = Enum_FlatType.DEFAULT;
+                        if (flat_type_choice == 1) {flatType = Enum_FlatType.TWO_ROOM; } 
+                        else if (flat_type_choice == 2) {flatType = Enum_FlatType.THREE_ROOM; } 
                         if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_FlatType(flatType,orderBy.ASCENDING)); }
                         else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_FlatType(flatType,orderBy.DESCENDING)); }
 
@@ -329,9 +316,9 @@ public class ManagerMenu extends Menu
                             System.out.print("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
                             order = GetIntInput("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
                         }
-                        flatType = FlatType.NULL;
-                        if (flat_type_choice == 1) {flatType = FlatType.TWO_ROOM; } 
-                        else if (flat_type_choice == 2) {flatType = FlatType.THREE_ROOM; } 
+                        flatType = Enum_FlatType.DEFAULT;
+                        if (flat_type_choice == 1) {flatType = Enum_FlatType.TWO_ROOM; } 
+                        else if (flat_type_choice == 2) {flatType = Enum_FlatType.THREE_ROOM; } 
                         if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_SellingPrice(minPrice,maxPrice,orderBy.ASCENDING,flatType)); }
                         else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_SellingPrice(minPrice,maxPrice,orderBy.DESCENDING,flatType)); }
 

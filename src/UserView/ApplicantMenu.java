@@ -1,8 +1,6 @@
 package UserView;
 
 import Database.ProjectListingDB;
-import InteractableAttributePackage.Enquiry;
-import Managers.EnquiryManager;
 import User.Applicant;
 
 import java.util.InputMismatchException;

@@ -4,9 +4,6 @@ import User.HDB_Officer;
 import User.Enum_FlatType;
 import java.util.InputMismatchException;
 
-import InteractableAttributePackage.Request.FlatType;
-import Service.ReceiptGenerator;
-
 public class OfficerMenu extends Menu
 {
     private static HDB_Officer user;

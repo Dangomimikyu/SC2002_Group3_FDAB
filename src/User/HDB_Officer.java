@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import InteractableAttributePackage.*;
-import InteractableAttributePackage.Request.FlatType;
 import Service.ReceiptGenerator;
 import Database.*;
 
@@ -139,10 +138,10 @@ public class HDB_Officer extends Applicant{
         // Update the flat selection based on availability
         try {
             if (flatType == Enum_FlatType.TWO_ROOM && this.projectAssigned.Details.NoOfUnitsLeft_2Room > 0) {
-                this.projectAssigned.SellUnit(FlatType.TWO_ROOM);
+                this.projectAssigned.SellUnit(Enum_FlatType.TWO_ROOM);
                 System.out.println("Updated flat selection to Two-room flat for applicant: " + app.initiator.name);
             } else if (flatType == Enum_FlatType.THREE_ROOM && this.projectAssigned.Details.NoOfUnitsLeft_3Room > 0) {
-                this.projectAssigned.SellUnit(FlatType.THREE_ROOM);
+                this.projectAssigned.SellUnit(Enum_FlatType.THREE_ROOM);
                 System.out.println("Updated flat selection to Three-room flat for applicant: " + app.initiator.name);
             } else {
                 System.out.println("No units available for the selected flat type.");

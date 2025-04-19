@@ -27,12 +27,6 @@ public abstract class Request {
         REJECTED
     }
 
-    public enum FlatType {
-        TWO_ROOM,
-        THREE_ROOM,
-        NULL
-    }
-
     public final Applicant initiator;
     public final String RegardingProject;
     public SystemUser handler = null;

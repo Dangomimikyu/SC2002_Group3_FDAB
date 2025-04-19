@@ -6,8 +6,8 @@ package Database;
 import java.util.ArrayList;
 
 import InteractableAttributePackage.Project;
-import InteractableAttributePackage.Request.FlatType;
 import Service.*;
+import User.Enum_FlatType;
 import User.SystemUser;
 import Filter.*;
 import java.time.LocalDate;
@@ -142,23 +142,23 @@ public class ProjectListingDB extends Database {
         ArrayList<Project> SortedProjects = new ArrayList<>(projList);
         SortedProjects.removeIf(p -> !filter.FilterBy(p));
 
-        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == FlatType.TWO_ROOM) {
+        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == Enum_FlatType.TWO_ROOM) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p1.Details.SellingPrice_2Room,p2.Details.SellingPrice_2Room));
         }
-        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == FlatType.TWO_ROOM) {
+        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == Enum_FlatType.TWO_ROOM) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p2.Details.SellingPrice_2Room,p1.Details.SellingPrice_2Room));
         }
-        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == FlatType.THREE_ROOM) {
+        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == Enum_FlatType.THREE_ROOM) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p1.Details.SellingPrice_3Room,p2.Details.SellingPrice_3Room));
         }
-        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == FlatType.THREE_ROOM) {
+        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == Enum_FlatType.THREE_ROOM) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p2.Details.SellingPrice_3Room,p1.Details.SellingPrice_3Room));
         }
-        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == FlatType.NULL) {
+        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == Enum_FlatType.DEFAULT) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p1.Details.SellingPrice_2Room + p1.Details.SellingPrice_3Room
                                                          ,p2.Details.SellingPrice_2Room + p2.Details.SellingPrice_3Room));
         }
-        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == FlatType.NULL) {
+        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == Enum_FlatType.DEFAULT) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p2.Details.SellingPrice_2Room + p2.Details.SellingPrice_3Room
                                                          ,p1.Details.SellingPrice_2Room + p1.Details.SellingPrice_3Room));
         }
@@ -170,23 +170,23 @@ public class ProjectListingDB extends Database {
         ArrayList<Project> SortedProjects = new ArrayList<>(projList);
         SortedProjects.removeIf(p -> !filter.FilterBy(p));
 
-        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == FlatType.TWO_ROOM) {
+        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == Enum_FlatType.TWO_ROOM) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p1.Details.NoOfUnitsLeft_2Room,p2.Details.NoOfUnitsLeft_2Room));
         }
-        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == FlatType.TWO_ROOM) {
+        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == Enum_FlatType.TWO_ROOM) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p2.Details.NoOfUnitsLeft_2Room,p1.Details.NoOfUnitsLeft_2Room));
         }
-        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == FlatType.THREE_ROOM) {
+        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == Enum_FlatType.THREE_ROOM) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p1.Details.NoOfUnitsLeft_3Room,p2.Details.NoOfUnitsLeft_3Room));
         }
-        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == FlatType.THREE_ROOM) {
+        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == Enum_FlatType.THREE_ROOM) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p2.Details.NoOfUnitsLeft_3Room,p1.Details.NoOfUnitsLeft_3Room));
         }
-        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == FlatType.NULL) {
+        if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == Enum_FlatType.DEFAULT) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p1.Details.NoOfUnitsLeft_2Room + p1.Details.NoOfUnitsLeft_3Room
                                                          ,p2.Details.NoOfUnitsLeft_2Room + p2.Details.NoOfUnitsLeft_3Room));
         }
-        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == FlatType.NULL) {
+        else if (filter.order == IFilter.orderBy.DESCENDING && filter.flatType == Enum_FlatType.DEFAULT) {
             SortedProjects.sort((p1, p2) -> Integer.compare(p2.Details.NoOfUnitsLeft_2Room + p2.Details.NoOfUnitsLeft_3Room
                                                          ,p1.Details.NoOfUnitsLeft_2Room + p1.Details.NoOfUnitsLeft_3Room));
         }
