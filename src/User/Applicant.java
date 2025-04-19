@@ -5,7 +5,6 @@ import InteractableAttributePackage.*;
 import Managers.EnquiryManager;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 public class Applicant extends SystemUser{
@@ -123,10 +122,10 @@ public class Applicant extends SystemUser{
 
         // Create a withdrawal request
         Withdrawal withdrawalRequest = new Withdrawal(this, this.AppliedProject);
-        if (this.flatTypeBooked.equals("2-Room")) {
-            withdrawalRequest.BookedFlatType = Request.FlatType.TWO_ROOM;
+        if (this.flatTypeBooked.equals(Enum_FlatType.TWO_ROOM)) {
+            withdrawalRequest.BookedFlatType = Enum_FlatType.TWO_ROOM;
         } else {
-            withdrawalRequest.BookedFlatType = Request.FlatType.THREE_ROOM;
+            withdrawalRequest.BookedFlatType = Enum_FlatType.THREE_ROOM;
         }
 
         // Add the request to the RequestsDB
@@ -174,12 +173,12 @@ public class Applicant extends SystemUser{
         scanner.nextLine();
 
         if (choice == 1 && project.Details.NoOfUnitsLeft_2Room > 0) {
-            project.SellUnit(Request.FlatType.TWO_ROOM);
+            project.SellUnit(Enum_FlatType.TWO_ROOM);
             this.flatTypeBooked = Enum_FlatType.TWO_ROOM;
             this.AppliedProjectStatus = ApplicantStatus.BOOKED;
             System.out.println("You have successfully booked a 2-Room flat in project: " + project.Details.ProjectName);
         } else if (choice == 2 && project.Details.NoOfUnitsLeft_3Room > 0 && this.maritalStatus == MaritalStatus.MARRIED) {
-            project.SellUnit(Request.FlatType.THREE_ROOM);
+            project.SellUnit(Enum_FlatType.THREE_ROOM);
             this.flatTypeBooked = Enum_FlatType.THREE_ROOM;
             this.AppliedProjectStatus = ApplicantStatus.BOOKED;
             System.out.println("You have successfully booked a 3-Room flat in project: " + project.Details.ProjectName);

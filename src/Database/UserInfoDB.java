@@ -4,7 +4,6 @@
 package Database;
 
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import InteractableAttributePackage.Project;
@@ -74,7 +73,7 @@ public class UserInfoDB extends Database {
                 writer.WriteNewUser(user);
                 userList.add(user);
             }
-            case DELETE -> throw new UnsupportedOperationException("Deleting Users not supported");
+            case DELETE -> System.out.println("Error: Deleting Users not supported");
             case EDIT -> {
                 writer.RewriteUser(user);
                 userList.set(userList.indexOf(user), user);
@@ -96,7 +95,8 @@ public class UserInfoDB extends Database {
             + "\nin " + ((Filter_Alphabetic)filter).order + " order");
         }
         else {
-            throw new UnsupportedOperationException("This filter method is not supported for users");
+            System.out.println("Error: This filter method is not supported for users");
+            return;
         }
     }
 
