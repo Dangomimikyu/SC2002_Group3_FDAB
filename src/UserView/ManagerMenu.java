@@ -1,11 +1,16 @@
 package UserView;
 
+import Filter.*;
 import InteractableAttributePackage.Project;
 import InteractableAttributePackage.ProjectDetails;
+import InteractableAttributePackage.Request;
+import Service.ReportGenerator;
+import User.Applicant;
 import User.HDB_Manager;
 
 import javax.swing.text.View;
 import java.util.InputMismatchException;
+import java.util.Objects;
 
 public class ManagerMenu extends Menu
 {
@@ -214,7 +219,109 @@ public class ManagerMenu extends Menu
 
     private static void MakeReport()
     {
-//        ReportGenerator.getInstance
+        String projName = "";
+        IFilter filterType = null;
+        int filterChoice = -1;
+
+        System.out.print("Enter name of project for report (leave blank to see all projects): ");
+        projName = sc.nextLine();
+
+        while (filterChoice < 0 || filterChoice > 7) {
+
+            System.out.println("========================");
+            System.out.println(" 0. No filter");
+            System.out.println(" 1. Age");
+            System.out.println(" 2. Alphabet");
+            System.out.println(" 3. Flat type");
+            System.out.println(" 4. Location");
+            System.out.println(" 5. Marital status");
+            System.out.println(" 6. Selling price");
+            System.out.println(" 7. Visibility");
+            System.out.println("========================");
+            System.out.print("Enter choice of filter: ");
+            try {
+                filterChoice = sc.nextInt();
+            } catch (final InputMismatchException e) {
+                System.out.println("Invalid character");
+                sc.nextLine(); // ignore and move the cursor to next line
+            }
+        }
+        
+        if (filterChoice == 0)
+        {
+            if (Objects.equals(projName, ""))
+            {
+                ReportGenerator.getInstance().GenerateReport();
+            }
+            else {
+                ReportGenerator.getInstance().GenerateReport(projName);
+            }
+        }
+        
+        switch (filterChoice)
+        {
+            case 1:
+                System.out.print("Order by (0 for ascending, 1 for descending): ");
+                int temp1 = GetIntInput("Order by (0 for ascending, 1 for descending): ");
+                while (temp1 < 0 || temp1 > 1)
+                {
+                    temp1 = GetIntInput("Order by (0 for ascending, 1 for descending): ");
+                }
+
+                if (temp1 == 0)
+                {
+                    filterType = new Filter_Age(-1, -1, IFilter.orderBy.ASCENDING);
+                }
+                else {
+                    filterType = new Filter_Age(-1, -1, IFilter.orderBy.DESCENDING);
+                }
+                break;
+
+            case 2:
+                System.out.print("Order by (0 for ascending, 1 for descending): ");
+                int temp2 = GetIntInput("Order by (0 for ascending, 1 for descending): ");
+                while (temp2 < 0 || temp2 > 1)
+                {
+                    temp2 = GetIntInput("Order by (0 for ascending, 1 for descending): ");
+                }
+
+                if (temp2 == 0)
+                {
+                    filterType = new Filter_Alphabetic("a", IFilter.orderBy.ASCENDING);
+                }
+                else {
+                    filterType = new Filter_Alphabetic("z", IFilter.orderBy.DESCENDING);
+                }
+                break;
+
+            case 3:
+                filterType = new Filter_FlatType(Request.FlatType.NULL, IFilter.orderBy.ASCENDING);
+                break;
+
+            case 4:
+                filterType = new Filter_Location(ProjectDetails.Location.ANG_MO_KIO);
+                break;
+
+            case 5:
+                filterType = new Filter_Marital(Applicant.MaritalStatus.ALL);
+                break;
+
+            case 6:
+                filterType = new Filter_SellingPrice(-1, -1, IFilter.orderBy.ASCENDING, Request.FlatType.NULL);
+                break;
+
+            case 7:
+                filterType = new Filter_Visibility();
+                break;
+
+        }
+
+        if (Objects.equals(projName, "")) {
+            ReportGenerator.getInstance().GenerateReport(filterType);
+        }
+        else {
+            ReportGenerator.getInstance().GenerateReport(projName, filterType);
+        }
     }
 
     private static void ViewEnquiries()
