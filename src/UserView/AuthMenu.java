@@ -1,12 +1,12 @@
 package UserView;
+import Main.MainApp;
+import Service.Authenticator;
 import User.SystemUser;
 
 public class AuthMenu extends Menu
 {
-    public static void Login(SystemUser.usertype type)
-    {
-        for (int i = 0; i < 3; ++i)
-        {
+    public static void Login(SystemUser.usertype type) {
+        for (int i = 2; i >= 0; --i) {
             String id = "", pass = "";
 
             System.out.print("Enter ID: ");
@@ -14,9 +14,20 @@ public class AuthMenu extends Menu
             System.out.print("Enter Password: ");
             pass = sc.nextLine();
 
-            // SystemUser ret = authenticator.Authenticate(id, pass)
-            // if (ret != null) print (welcome, "name"); MainApp.SetUser(ret);
-            // else print "invalid details, you have 3 - i attempts left
+            Authenticator auth = new Authenticator();
+            SystemUser ret = auth.login(id, pass);
+
+            if (ret != null) {
+                System.out.print("Welcome ");
+                System.out.println(ret.name);
+                MainApp.SetUser(ret);
+                return;
+            } else {
+                System.out.print("Wrong credentials. you have ");
+                System.out.print(i);
+                System.out.print(" attempts left");
+                System.out.println();
+            }
         }
     }
 }

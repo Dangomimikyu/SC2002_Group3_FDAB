@@ -8,7 +8,6 @@ public class LoginMenu extends Menu
     public static void start()
     {
         Display();
-
     }
 
     private static void Display()
@@ -35,6 +34,7 @@ public class LoginMenu extends Menu
                 continue;
             }
 
+            sc.nextLine();
             switch(choice)
             {
                 case 1:
