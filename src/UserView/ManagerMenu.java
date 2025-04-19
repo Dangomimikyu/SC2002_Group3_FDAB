@@ -1,9 +1,8 @@
 package UserView;
 
 import Filter.*;
-import InteractableAttributePackage.Project;
+import Filter.IFilter.*;
 import InteractableAttributePackage.ProjectDetails;
-import InteractableAttributePackage.Request;
 import InteractableAttributePackage.ProjectDetails.Location;
 import Service.ReportGenerator;
 import User.Applicant;
@@ -244,8 +243,8 @@ public class ManagerMenu extends Menu
                         order = GetIntInput("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
                     }
                     if (starting_char.equals("")) {starting_char = null;}
-                    if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_Alphabetic(starting_char,orderBy.ASCENDING)); }
-                    else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_Alphabetic(starting_char,orderBy.DESCENDING)); }
+                    if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_Alphabetic(starting_char, orderBy.ASCENDING)); }
+                    else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_Alphabetic(starting_char, orderBy.DESCENDING)); }
 
                 case 2: 
                     int minAge = -99;
@@ -263,8 +262,8 @@ public class ManagerMenu extends Menu
                         System.out.print("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
                         order = GetIntInput("Enter 1 if you want it in ASCENDING order and 2 if you want it in DESCENDING order: ");
                     }
-                    if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_Age(minAge,maxAge,orderBy.ASCENDING)); }
-                    else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_Age(minAge,maxAge,orderBy.DESCENDING)); }
+                    if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_Age(minAge,maxAge, orderBy.ASCENDING)); }
+                    else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_Age(minAge,maxAge, orderBy.DESCENDING)); }
 
                     case 3: 
                         int flat_type_choice = -1;
@@ -281,8 +280,8 @@ public class ManagerMenu extends Menu
                         Enum_FlatType flatType = Enum_FlatType.DEFAULT;
                         if (flat_type_choice == 1) {flatType = Enum_FlatType.TWO_ROOM; } 
                         else if (flat_type_choice == 2) {flatType = Enum_FlatType.THREE_ROOM; } 
-                        if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_FlatType(flatType,orderBy.ASCENDING)); }
-                        else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_FlatType(flatType,orderBy.DESCENDING)); }
+                        if (order == 1) { ProjectListingDB.getInstance().ViewDB(new Filter_FlatType(flatType, orderBy.ASCENDING)); }
+                        else if (order == 2) { ProjectListingDB.getInstance().ViewDB(new Filter_FlatType(flatType, orderBy.DESCENDING)); }
 
                     case 4: 
                         System.out.print("Enter location/neighbourhood of project to filter from: ");
@@ -469,7 +468,7 @@ public class ManagerMenu extends Menu
                 break;
 
             case 3:
-                filterType = new Filter_FlatType(Request.FlatType.NULL, IFilter.orderBy.ASCENDING);
+                filterType = new Filter_FlatType(Enum_FlatType.DEFAULT, IFilter.orderBy.ASCENDING);
                 break;
 
             case 4:
@@ -481,7 +480,7 @@ public class ManagerMenu extends Menu
                 break;
 
             case 6:
-                filterType = new Filter_SellingPrice(-1, -1, IFilter.orderBy.ASCENDING, Request.FlatType.NULL);
+                filterType = new Filter_SellingPrice(-1, -1, IFilter.orderBy.ASCENDING, Enum_FlatType.DEFAULT);
                 break;
 
             case 7:
