@@ -16,23 +16,24 @@ public class HDB_Officer extends Applicant{
     }
 
     public Project projectAssigned;
-    public Enum_OfficerStatus projectStatus;
-    private ArrayList<Applicant> applicantList;
-    private Map<String, Integer> flatAvailability;
-    private String officerID;
-    private ReceiptGenerator receiptGenerator = new ReceiptGenerator();
+    public Enum_OfficerStatus officerStatus;
+    //private ArrayList<Applicant> applicantList;
+    //private Map<String, Integer> flatAvailability;
+    //private String officerID;
+    //private ReceiptGenerator receiptGenerator = new ReceiptGenerator();
 
     public HDB_Officer(String nric, String p, String n, int a, String m) {
         super(nric, p, n, a, m);
         this.projectAssigned = null;
-        this.projectStatus = Enum_OfficerStatus.UNSUCCESSFUL;
+        this.officerStatus = Enum_OfficerStatus.UNSUCCESSFUL;
     }
 
-    public HDB_Officer(String name, String nric, int age, String marital, String pass, String proj, String projStatus)
+    public HDB_Officer(String name, String nric, int age, String marital, String pass, 
+    String applied_proj, String appStatus, String managed_proj, String offStatus)
     {
-        super(nric, pass, name, age, marital);
-        this.projectAssigned = ProjectListingDB.getInstance().SearchDB(proj);
-        this.projectStatus = switch(projStatus)
+        super(name, nric, age, marital, pass, applied_proj, appStatus);
+        this.projectAssigned = ProjectListingDB.getInstance().SearchDB(managed_proj);
+        this.officerStatus = switch(offStatus)
         {
             case "PENDING" -> Enum_OfficerStatus.PENDING;
             case "SUCCESSFUL" -> Enum_OfficerStatus.SUCCESSFUL;
@@ -61,7 +62,7 @@ public class HDB_Officer extends Applicant{
             return false;
         }
 
-        // Chek if already applied for the project as an applicant
+        // Check if already applied for the project as an applicant
         if (this.AppliedProject != null && this.AppliedProject.equals(projectName)) {
             System.out.println("You cannot register as an officer for a project you have applied for as an applicant.");
             return false;
@@ -81,15 +82,15 @@ public class HDB_Officer extends Applicant{
 
         //Submit officer application to the project
         Officer_Application officerApplication = new Officer_Application(this, projectName);
-        this.projectStatus = Enum_OfficerStatus.PENDING;
+        this.officerStatus = Enum_OfficerStatus.PENDING;
         RequestsDB.getInstance().ModifyDB(officerApplication, Database.DB_Action.ADD);
         System.out.println("Officer application submitted successfully. Waiting for manager approval.");
         return true;
     }
 
     public void ViewApplicationStatus() {
-        System.out.println("Applied Project: " + this.AppliedProject);
-        System.out.println("Application Status: " + this.projectStatus);
+        System.out.println("Applied Project: " + this.projectAssigned.Details.ProjectName);
+        System.out.println("Application Status: " + this.officerStatus);
         return;
     }
 
@@ -103,6 +104,9 @@ public class HDB_Officer extends Applicant{
     }
 
     public void viewAllHandledRequests() {
+        if (projectAssigned == null) {
+            System.out.println("You are not managing any project! ");
+        }
         ArrayList<Request> handled_reqs = RequestsDB.getInstance().getRequestDB().stream()
         .filter(req -> (req instanceof Booking) &&
                        req.RegardingProject.equals(this.projectAssigned.Details.ProjectName) &&

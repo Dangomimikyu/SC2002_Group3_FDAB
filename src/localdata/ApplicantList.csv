@@ -1,4 +1,4 @@
-Name,NRIC,Age,MaritalStatus,Password,AppliedProject,AppliedProjectStatus
+Name,NRIC,Age,MaritalStatus,Password,AppliedProject,ApplicantStatus
 John,S1234567A,35,SINGLE,password,,UNSUCCESSFUL
 Sarah,T7654321B,40,MARRIED,password,,UNSUCCESSFUL
 Grace,S9876543C,37,MARRIED,password,,UNSUCCESSFUL

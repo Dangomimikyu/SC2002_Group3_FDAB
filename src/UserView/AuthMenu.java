@@ -1,11 +1,16 @@
 package UserView;
-import User.SystemUser;
+import Service.*;
+import User.*;
 
 public class AuthMenu extends Menu
 {
+
     public static void Login(SystemUser.usertype type)
     {
-        for (int i = 0; i < 3; ++i)
+        Authenticator authenticator = new Authenticator();
+        SystemUser user = null;
+        sc.nextLine();
+        while (user == null)
         {
             String id = "", pass = "";
 
@@ -14,9 +19,19 @@ public class AuthMenu extends Menu
             System.out.print("Enter Password: ");
             pass = sc.nextLine();
 
-            // SystemUser ret = authenticator.Authenticate(id, pass)
-            // if (ret != null) print (welcome, "name"); MainApp.SetUser(ret);
-            // else print "invalid details, you have 3 - i attempts left
+            user = authenticator.login(id,pass);
+        }
+        if (type == SystemUser.usertype.MANAGER) {
+            ManagerMenu.SetUser((HDB_Manager)user);
+            ManagerMenu.start();
+        }
+        else if (type == SystemUser.usertype.OFFICER) {
+            OfficerMenu.SetUser((HDB_Officer)user);
+            OfficerMenu.start();
+        }
+        else if (type == SystemUser.usertype.APPLICANT) {
+            ApplicantMenu.SetUser((Applicant)user);
+            ApplicantMenu.start();
         }
     }
 }

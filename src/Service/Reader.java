@@ -53,8 +53,10 @@ public class Reader
                 String password = data[4];
                 String applied_project = data[5];
                 String applied_project_status = data[6];
+                String managed_project = data[7];
+                String officer_status = data[8];
                 
-                userList.add(new HDB_Officer(name, NRIC, age, marital_status, password, applied_project, applied_project_status));
+                userList.add(new HDB_Officer(name, NRIC, age, marital_status, password, applied_project, applied_project_status, managed_project, officer_status));
             }
         } 
         catch (IOException | NumberFormatException e) {}

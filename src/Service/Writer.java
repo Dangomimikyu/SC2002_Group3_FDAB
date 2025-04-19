@@ -41,7 +41,14 @@ public class Writer
         {
             bw.newLine();
             String user_info = "";
-            if (user instanceof Applicant) 
+            if (user instanceof HDB_Officer) 
+            {
+                HDB_Officer off = (HDB_Officer)user;
+                user_info = String.join(",",off.name,off.userID,String.valueOf(off.age)
+                ,String.valueOf(off.maritalStatus),off.password,off.AppliedProject,String.valueOf(off.AppliedProjectStatus)
+                ,off.projectAssigned.Details.ProjectName,String.valueOf(off.officerStatus));
+            } 
+            else if (user instanceof Applicant) 
             {
                 Applicant app = (Applicant)user;
                 user_info = String.join(",",app.name,app.userID,String.valueOf(app.age)
@@ -94,9 +101,17 @@ public class Writer
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
             String user_info ="";
-            if (user instanceof Applicant) 
+            if (user instanceof HDB_Officer) 
             {
-                bw.write("Name,NRIC,Age,MaritalStatus,Password,AppliedProject,AppliedProjectStatus");
+                bw.write("Name,NRIC,Age,MaritalStatus,Password,AppliedProject,ApplicantStatus,ManagedProject,OfficerStatus");
+                HDB_Officer off = (HDB_Officer)user;
+                user_info = String.join(",",off.name,off.userID,String.valueOf(off.age)
+                ,String.valueOf(off.maritalStatus),off.password,off.AppliedProject,String.valueOf(off.AppliedProjectStatus)
+                ,off.projectAssigned.Details.ProjectName,String.valueOf(off.officerStatus));
+            } 
+            else if (user instanceof Applicant) 
+            {
+                bw.write("Name,NRIC,Age,MaritalStatus,Password,AppliedProject,ApplicantStatus");
                 Applicant app = (Applicant)user;
                 user_info = String.join(",",app.name,app.userID,String.valueOf(app.age)
                 ,String.valueOf(app.maritalStatus),app.password,app.AppliedProject,String.valueOf(app.AppliedProjectStatus));

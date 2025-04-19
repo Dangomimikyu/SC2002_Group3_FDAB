@@ -19,7 +19,6 @@ public class MainApp {
     public static void main(String[] args) {
         Init();
         HDB_System HDB_system = new HDB_System(ApplicantFilePath, OfficerFilePath, ManagerFilePath, EnquiriesFilePath, ProjectsFilePath, RequestsFilePath);
-
         Login();
 
         UseSystem();
@@ -35,6 +34,7 @@ public class MainApp {
         ProjectsFilePath = "src/localdata/ProjectList.csv";
         EnquiriesFilePath = "src/localdata/Enquiries.csv";
         RequestsFilePath = "src/localdata/Requests.csv";
+
     }
 
     private static void Login()

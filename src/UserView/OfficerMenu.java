@@ -40,6 +40,7 @@ public class OfficerMenu extends Menu
                 continue;
             }
 
+            sc.nextLine();
             switch (choice)
             {
                 case 1: // go to applicant view
@@ -49,7 +50,8 @@ public class OfficerMenu extends Menu
 
                 case 2: // apply to join a project as an officer
                     System.out.print("Enter name of project to apply for: ");
-                    user.RegisterForProject(sc.nextLine());
+                    String projname = sc.nextLine();
+                    user.RegisterForProject(projname);
                     break;
 
                 case 3: // show all projects open to officer for management position
@@ -78,7 +80,8 @@ public class OfficerMenu extends Menu
 
                 case 8: //generate receipt with applicant userID
                     System.out.print("Enter the userID of the applicant you wish to generate a receipt for: ");
-                    user.GenerateReceipt(sc.nextLine());
+                    String userid = sc.nextLine();
+                    user.GenerateReceipt(userid);
                     break;
 
                 case 9:// log out
