@@ -20,10 +20,10 @@ public class Filter_Alphabetic implements IFilter {
         //if first_char is null, return true (no filtering of first_char)
         if (first_char == null) { return true; }
 
-        if (o instanceof Project) { StartsWithChar((Project)o); } 
-        else if (o instanceof Enquiry) { StartsWithChar((Enquiry)o); } 
-        else if (o instanceof SystemUser) { StartsWithChar((SystemUser)o); }
-        else if (o instanceof Request) { StartsWithChar((Request)o); }
+        if (o instanceof Project) { return StartsWithChar((Project)o); } 
+        else if (o instanceof Enquiry) { return StartsWithChar((Enquiry)o); } 
+        else if (o instanceof SystemUser) { return StartsWithChar((SystemUser)o); }
+        else if (o instanceof Request) { return StartsWithChar((Request)o); }
 
         System.out.println("Error: Filtering by Alphabetic is not supported for this object type!");
         return false;

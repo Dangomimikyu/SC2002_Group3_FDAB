@@ -4,10 +4,7 @@
 package Database;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 import InteractableAttributePackage.Project;
-import Service.*;
 import User.*;
 import Filter.*;
 
@@ -16,8 +13,6 @@ public class UserInfoDB extends Database {
     private static UserInfoDB instance;
 
     private ArrayList<SystemUser> userList = new ArrayList<SystemUser>();
-    Reader reader = new Reader();
-    Writer writer = new Writer();
 
     private UserInfoDB() {}
     public static UserInfoDB getInstance() {
@@ -44,25 +39,28 @@ public class UserInfoDB extends Database {
         return null;
     }
 
-    public void ViewDB(IFilter filter) {
+    ///////////////////////////////////////////////////////////////////////
+    /////////////////// VIEW DB WITH FILTERS //////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
-        displayFilterInformation(filter);
+    public void ViewDB(ArrayList<IFilter> filters) {
 
-        if (filter instanceof Filter_Alphabetic) { SortInOrder((Filter_Alphabetic)filter); }
-        else if (filter instanceof Filter_Age) { SortInOrder((Filter_Age)filter); }
+        for ( IFilter filter : filters) { displayFilterInformation(filter); }
 
-        //for filters with no orderBy attribute
-        else {
-            int index = 0;
-            for (SystemUser u : userList) {
-                if (filter.FilterBy(u)) {
-                    System.out.println("================ " + index + " ================");
-                    System.out.println(u.getUserDetails());
-                }
-                index++;
-            }            
+        ArrayList<SystemUser> sortedUsers = new ArrayList<>(userList);
+
+        for (IFilter filter : filters) {
+            if (filter instanceof Filter_Alphabetic) { SortInOrder(sortedUsers, (Filter_Alphabetic)filter); }
+            else if (filter instanceof Filter_Age) { SortInOrder(sortedUsers, (Filter_Age)filter); }
+            else { sortedUsers.removeIf(u -> !filter.FilterBy(u)); }
         }
+
+        displaySortedWithOriginalIndex(sortedUsers);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////// MODIFYING DB METHODS ////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
 
     //modifying user by index not supported as other people should not be able to indiscreetly modify user information
 
@@ -81,18 +79,25 @@ public class UserInfoDB extends Database {
         }
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////// SORTING ALGORTIHMS + HELPER FUNCTIONS////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     //prints the headers and information for which users will be filtered by
     private void displayFilterInformation(IFilter filter) {
         if (filter instanceof Filter_Marital) {
             System.out.println("Filter by users with marital status: " + ((Filter_Marital)filter).maritalStatus);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Age) {
             System.out.println("Filter users if is in the age group between: " + 
-            ((Filter_Age)filter).minAge + " and " + ((Filter_Age)filter).maxAge + "\nin " + ((Filter_Age)filter).order + " order");
+            ((Filter_Age)filter).minAge + " and " + ((Filter_Age)filter).maxAge + " in " + ((Filter_Age)filter).order + " order");
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Alphabetic) {
             System.out.println("Filter by user's name starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
-            + "\nin " + ((Filter_Alphabetic)filter).order + " order");
+            + " in " + ((Filter_Alphabetic)filter).order + " order");
+            System.out.println("============================================================================");
         }
         else {
             System.out.println("Error: This filter method is not supported for users");
@@ -101,8 +106,7 @@ public class UserInfoDB extends Database {
     }
 
     //Sorts lexicographically in specified order
-    private void SortInOrder(Filter_Alphabetic filter) {
-        ArrayList<SystemUser> sortedUsers = new ArrayList<>(userList);
+    private ArrayList<SystemUser> SortInOrder(ArrayList<SystemUser> sortedUsers, Filter_Alphabetic filter) {
         sortedUsers.removeIf(u -> !filter.FilterBy(u));
         if (filter.order == IFilter.orderBy.ASCENDING) {
             sortedUsers.sort((u1, u2) -> u1.name.compareToIgnoreCase(u2.name));
@@ -110,35 +114,32 @@ public class UserInfoDB extends Database {
         else if (filter.order == IFilter.orderBy.DESCENDING) {
             sortedUsers.sort((u1, u2) -> u2.name.compareToIgnoreCase(u1.name));
         }
-            displaySortedWithOriginalIndex(sortedUsers);
+        return sortedUsers;
     }
 
     //Sorts age in specified order
-    private void SortInOrder(Filter_Age filter) {
-        ArrayList<Applicant> sortedUsers = userList.stream()
-        .filter(obj -> obj instanceof Applicant)
-        .map(obj -> (Applicant) obj)
-        .collect(Collectors.toCollection(ArrayList::new));
+    private ArrayList<SystemUser> SortInOrder(ArrayList<SystemUser> sortedUsers, Filter_Age filter) {
+        // ArrayList<Applicant> sortedUsers = userList.stream()
+        // .filter(obj -> obj instanceof Applicant)
+        // .map(obj -> (Applicant) obj)
+        // .collect(Collectors.toCollection(ArrayList::new));
         sortedUsers.removeIf(u -> !filter.FilterBy(u));
         if (filter.order == IFilter.orderBy.ASCENDING) {
-            sortedUsers.sort((u1, u2) -> Double.compare(u1.age, u2.age));
+            sortedUsers.sort((u1, u2) -> Double.compare(((Applicant)u1).age, ((Applicant)u2).age));
         } else {
-            sortedUsers.sort((u1, u2) -> Double.compare(u2.age, u1.age));
+            sortedUsers.sort((u1, u2) -> Double.compare(((Applicant)u2).age, ((Applicant)u1).age));
         }
-        for (SystemUser u : sortedUsers) {
-            for (int i = 0; i < userList.size(); i++) {
-                if (userList.get(i).userID.equals(u.userID)) {
-                    System.out.println("================ " + i + " ================");
-                    System.out.println(u.getUserDetails());
-                    break;
-                }
-            }
-        }
+        return sortedUsers;
     }
 
     //print the users in sorted order, as well as its original index in the original list
     //this is to show the user the original index of that users in the original list, so that they can modify it if needed
     private void displaySortedWithOriginalIndex(ArrayList<SystemUser> sortedUsers) {
+
+        if (sortedUsers.size() == 0) {
+            System.out.println("\nNo Users found!");
+        }
+
         for (SystemUser u : sortedUsers) {
             for (int i = 0; i < userList.size(); i++) {
                 if (userList.get(i).userID.equals(u.userID)) {

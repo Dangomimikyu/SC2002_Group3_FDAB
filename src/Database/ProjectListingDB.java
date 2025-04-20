@@ -4,9 +4,7 @@
 package Database;
 
 import java.util.ArrayList;
-
 import InteractableAttributePackage.Project;
-import Service.*;
 import User.Enum_FlatType;
 import User.SystemUser;
 import Filter.*;
@@ -18,8 +16,6 @@ public class ProjectListingDB extends Database {
     private static ProjectListingDB instance;
 
     private ArrayList<Project> projList = new ArrayList<Project>();
-    Reader reader = new Reader();
-    Writer writer = new Writer();
 
     private ProjectListingDB() {}
     public static ProjectListingDB getInstance() {
@@ -46,28 +42,30 @@ public class ProjectListingDB extends Database {
         return null;
     }
 
-    public void ViewDB(IFilter filter) {
+    ///////////////////////////////////////////////////////////////////////
+    /////////////////// VIEW DB WITH FILTERS //////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
-        displayFilterInformation(filter);
+    public void ViewDB(ArrayList<IFilter> filters) {
 
-        if (filter instanceof Filter_Alphabetic) { SortInOrder((Filter_Alphabetic)filter); }
-        else if (filter instanceof Filter_SellingPrice) { SortInOrder((Filter_SellingPrice)filter); }
-        else if (filter instanceof Filter_FlatType) { SortInOrder((Filter_FlatType)filter); }
-        else if (filter instanceof Filter_Age) { SortInOrder((Filter_Age)filter); }
+        for ( IFilter filter : filters) { displayFilterInformation(filter); }
 
-        //for filters with no orderBy attribute
-        else {
-            int index = 0;
-            for (Project p : projList) {
-                if (filter.FilterBy(p)) {
-                    System.out.println("================ " + index + " ================");
-                    System.out.println(p.getProjectDetails());
-                }
-                index++;
-            }
+        ArrayList<Project> SortedProjects = new ArrayList<>(projList);
+        for (IFilter filter : filters) {
+            if (filter instanceof Filter_Alphabetic) { SortedProjects = SortInOrder(SortedProjects, (Filter_Alphabetic)filter); }
+            else if (filter instanceof Filter_SellingPrice) { SortedProjects = SortInOrder(SortedProjects, (Filter_SellingPrice)filter); }
+            else if (filter instanceof Filter_FlatType) { SortedProjects = SortInOrder(SortedProjects, (Filter_FlatType)filter); }
+            else if (filter instanceof Filter_Age) { SortedProjects = SortInOrder(SortedProjects, (Filter_Age)filter); }
+            else { SortedProjects.removeIf(p -> !filter.FilterBy(p)); }
         }
+
+        displaySortedWithOriginalIndex(SortedProjects);
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////// MODIFYING DB METHODS ////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
+    
     //modify project by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
         switch (action) {
@@ -99,33 +97,42 @@ public class ProjectListingDB extends Database {
     }
 
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////// SORTING ALGORTIHMS + HELPER FUNCTIONS////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     //prints the headers and information for which project will be filtered by
     private void displayFilterInformation(IFilter filter) {
         if (filter instanceof Filter_FlatType) {
             System.out.println("Filter by project's availability of units of flat type: " + ((Filter_FlatType)filter).flatType);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Marital) {
             System.out.println("Filter by project's open to user group of marital status: " + ((Filter_Marital)filter).maritalStatus);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Visibility) {
             System.out.println("Filter by project if active status/visibility is: " + ((Filter_Visibility)filter).isVisible);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Location) {
             System.out.println("Filter by project if is in neighbourhood: " + ((Filter_Location)filter).location);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Age) {
             System.out.println("Filter by project if it's age(years) is between: " + 
-            ((Filter_Age)filter).minAge + " and " + ((Filter_Age)filter).maxAge + "\nin " + ((Filter_Age)filter).order + " order");
+            ((Filter_Age)filter).minAge + " and " + ((Filter_Age)filter).maxAge + " in " + ((Filter_Age)filter).order + " order");
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Alphabetic) {
             System.out.println("Filter by project name starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
-             + "\nin " + ((Filter_Alphabetic)filter).order + " order");
+             + " in " + ((Filter_Alphabetic)filter).order + " order");
+             System.out.println("============================================================================");
         }
     }
 
     //Sorts lexicographyically in specified order
-    private void SortInOrder(Filter_Alphabetic filter) {
-        ArrayList<Project> SortedProjects = new ArrayList<>(projList);
+    private ArrayList<Project> SortInOrder(ArrayList<Project> SortedProjects, Filter_Alphabetic filter) {
         SortedProjects.removeIf(p -> !filter.FilterBy(p));
         
         if (filter.order == IFilter.orderBy.ASCENDING) {
@@ -134,12 +141,11 @@ public class ProjectListingDB extends Database {
         else if (filter.order == IFilter.orderBy.DESCENDING) {
             SortedProjects.sort((p1, p2) -> p2.Details.ProjectName.compareToIgnoreCase(p1.Details.ProjectName));
         }
-        displaySortedWithOriginalIndex(SortedProjects);
+        return SortedProjects;
     }
 
     //Sorts selling price in specified order
-    private void SortInOrder(Filter_SellingPrice filter) {
-        ArrayList<Project> SortedProjects = new ArrayList<>(projList);
+    private ArrayList<Project> SortInOrder(ArrayList<Project> SortedProjects, Filter_SellingPrice filter) {
         SortedProjects.removeIf(p -> !filter.FilterBy(p));
 
         if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == Enum_FlatType.TWO_ROOM) {
@@ -162,12 +168,11 @@ public class ProjectListingDB extends Database {
             SortedProjects.sort((p1, p2) -> Integer.compare(p2.Details.SellingPrice_2Room + p2.Details.SellingPrice_3Room
                                                          ,p1.Details.SellingPrice_2Room + p1.Details.SellingPrice_3Room));
         }
-        displaySortedWithOriginalIndex(SortedProjects);
+        return SortedProjects;
     }
 
     //Sorts selling price in specified order
-    private void SortInOrder(Filter_FlatType filter) {
-        ArrayList<Project> SortedProjects = new ArrayList<>(projList);
+    private ArrayList<Project> SortInOrder(ArrayList<Project> SortedProjects, Filter_FlatType filter) {
         SortedProjects.removeIf(p -> !filter.FilterBy(p));
 
         if (filter.order == IFilter.orderBy.ASCENDING && filter.flatType == Enum_FlatType.TWO_ROOM) {
@@ -190,12 +195,11 @@ public class ProjectListingDB extends Database {
             SortedProjects.sort((p1, p2) -> Integer.compare(p2.Details.NoOfUnitsLeft_2Room + p2.Details.NoOfUnitsLeft_3Room
                                                          ,p1.Details.NoOfUnitsLeft_2Room + p1.Details.NoOfUnitsLeft_3Room));
         }
-        displaySortedWithOriginalIndex(SortedProjects);
+        return SortedProjects;
     }
 
     //Sorts age in specified order
-    private void SortInOrder(Filter_Age filter) {
-        ArrayList<Project> SortedProjects = new ArrayList<>(projList);
+    private ArrayList<Project> SortInOrder(ArrayList<Project> SortedProjects, Filter_Age filter) {
         SortedProjects.removeIf(p -> !filter.FilterBy(p));
 
         if (filter.order == IFilter.orderBy.ASCENDING) {
@@ -206,12 +210,17 @@ public class ProjectListingDB extends Database {
             SortedProjects.sort((p1, p2) -> Double.compare(ChronoUnit.DAYS.between(p2.Details.OpenDate, LocalDate.now()) / 365.0, 
             ChronoUnit.DAYS.between(p1.Details.OpenDate, LocalDate.now()) / 365.0));
         }
-        displaySortedWithOriginalIndex(SortedProjects);
+        return SortedProjects;
     }
 
     //print the projects in sorted order, as well as its original index in the original list
     //this is to show the user the original index of that project in the original list, so that they can modify it if needed
     private void displaySortedWithOriginalIndex(ArrayList<Project> SortedProjects) {
+
+        if (SortedProjects.size() == 0) {
+            System.out.println("\nNo Projects found!");
+        }
+
         for (Project p : SortedProjects) {
             for (int i = 0; i < projList.size(); i++) {
                 if (projList.get(i).Details.ProjectName.equals(p.Details.ProjectName)) {
@@ -225,6 +234,6 @@ public class ProjectListingDB extends Database {
 
     public Project SearchDB(String projectName)
     {
-        return projList.stream().filter(pp -> projectName.equals(pp.Details.ProjectName)).findFirst().orElse(null);
+        return projList.stream().filter(p -> projectName.equals(p.Details.ProjectName)).findFirst().orElse(null);
     }
 }

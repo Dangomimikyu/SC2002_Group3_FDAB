@@ -1,11 +1,15 @@
 //Database is the superclass of all the database classes
 //it will be used to store all the data of the system
 package Database;
-import InteractableAttributePackage.Project;
 
+import Service.*;
+import InteractableAttributePackage.Project;
 import java.util.ArrayList;
 
 public abstract class Database {
+
+    protected Reader reader = new Reader();
+    protected Writer writer = new Writer();
 
     public enum DB_Action {
         ADD, DELETE, EDIT

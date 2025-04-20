@@ -5,6 +5,8 @@ import User.SystemUser;
 
 public class Authenticator {
 
+    public Authenticator() {}
+    
     public SystemUser login(String userID, String password) {
         return UserInfoDB.getInstance().AuthenticateUser(userID, password);
     }

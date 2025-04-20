@@ -31,8 +31,9 @@ public class Reader
                 String password = data[4];
                 String applied_project = data[5];
                 String applied_project_status = data[6];
+                String booked_flat_type = data[7];
                 
-                userList.add(new Applicant(name, NRIC, age, marital_status, password, applied_project, applied_project_status));
+                userList.add(new Applicant(name, NRIC, age, marital_status, password, applied_project, applied_project_status, booked_flat_type));
 
             }
         } 
@@ -53,8 +54,11 @@ public class Reader
                 String password = data[4];
                 String applied_project = data[5];
                 String applied_project_status = data[6];
+                String booked_flat_type = data[7];
+                String managed_project = data[8];
+                String officer_status = data[9];
                 
-                userList.add(new HDB_Officer(name, NRIC, age, marital_status, password, applied_project, applied_project_status));
+                userList.add(new HDB_Officer(name, NRIC, age, marital_status, password, applied_project, applied_project_status, booked_flat_type, managed_project, officer_status));
             }
         } 
         catch (IOException | NumberFormatException e) {}
@@ -228,8 +232,8 @@ public class Reader
                         .findFirst()
                         .orElse(null);
                     r.handler = handler;
-                    r.status = Request.ApplicationStatus.valueOf(status);
                 }
+                r.status = Request.ApplicationStatus.valueOf(status);
 
                 reqList.add(r);
             }

@@ -319,7 +319,7 @@ public class HDB_Manager extends SystemUser{
             application.status = Request.ApplicationStatus.APPROVED;
             project.Details.OfficerList.add((HDB_Officer) application.initiator);
             ((HDB_Officer) application.initiator).projectAssigned = project;
-            ((HDB_Officer) application.initiator).projectStatus = HDB_Officer.Enum_OfficerStatus.SUCCESSFUL;
+            ((HDB_Officer) application.initiator).officerStatus = HDB_Officer.Enum_OfficerStatus.SUCCESSFUL;
 
 
             RequestsDB.getInstance().ModifyDB(application, Database.DB_Action.EDIT);
