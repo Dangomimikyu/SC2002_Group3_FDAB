@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 import InteractableAttributePackage.Project;
 import InteractableAttributePackage.Request;
-import Service.*;
 import User.SystemUser;
 import Filter.*;
 
@@ -16,8 +15,6 @@ public class RequestsDB extends Database {
     private static RequestsDB instance;
 
     private ArrayList<Request> reqList = new ArrayList<Request>();
-    Reader reader = new Reader();
-    Writer writer = new Writer();
     
     private RequestsDB() {}
     public static RequestsDB getInstance() {
@@ -44,24 +41,27 @@ public class RequestsDB extends Database {
         return null;
     }
 
-    public void ViewDB(IFilter filter) {
+    ///////////////////////////////////////////////////////////////////////
+    /////////////////// VIEW DB WITH FILTERS //////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
-        displayFilterInformation(filter);
+    public void ViewDB(ArrayList<IFilter> filters) {
 
-        if (filter instanceof Filter_Alphabetic) { SortInOrder((Filter_Alphabetic)filter); }
+        for ( IFilter filter : filters) { displayFilterInformation(filter); }
 
-        //for filters with no orderBy attributes
-        else {
-            int index = 0;
-            for (Request r : reqList) {
-                if (filter.FilterBy(r)) {
-                    System.out.println("================ " + index + " ================");
-                    System.out.println(r.getRequestDetails());
-                }
-                index++;
-            }            
+        ArrayList<Request> sortedRequests = new ArrayList<>(reqList);
+        
+        for (IFilter filter : filters) {
+            if (filter instanceof Filter_Alphabetic) { sortedRequests = SortInOrder(sortedRequests, (Filter_Alphabetic)filter); }
+            else { sortedRequests.removeIf(r -> !filter.FilterBy(r)); }
         }
+
+        displaySortedWithOriginalIndex(sortedRequests);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////// MODIFYING DB METHODS ////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
 
     //modify request by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
@@ -93,17 +93,24 @@ public class RequestsDB extends Database {
         }
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////// SORTING ALGORTIHMS + HELPER FUNCTIONS////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     //prints the headers and information for which requests will be filtered by
     private void displayFilterInformation(IFilter filter) {
         if (filter instanceof Filter_FlatType) {
             System.out.println("Filter by bookings and withdrawals that are booked/trying to book flat type: " + ((Filter_FlatType)filter).flatType);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Marital) {
             System.out.println("Filter by requests with initiators that are of marital status: " + ((Filter_Marital)filter).maritalStatus);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Alphabetic) {
             System.out.println("Filter by request initiator's name starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
-            + "\nin " + ((Filter_Alphabetic)filter).order + " order");           
+            + " in " + ((Filter_Alphabetic)filter).order + " order");           
+            System.out.println("============================================================================");
         }
         else {
             System.out.println("Error: This filter type is not supported for requests");
@@ -112,8 +119,7 @@ public class RequestsDB extends Database {
     }
 
     //Sorts lexicographically in specified order
-    private void SortInOrder(Filter_Alphabetic filter) {
-        ArrayList<Request> sortedRequests = new ArrayList<>(reqList);
+    private ArrayList<Request> SortInOrder(ArrayList<Request> sortedRequests, Filter_Alphabetic filter) {
         sortedRequests.removeIf(r -> !filter.FilterBy(r));
         if (filter.order == IFilter.orderBy.ASCENDING) {
             sortedRequests.sort((r1, r2) -> r1.initiator.name.compareToIgnoreCase(r2.initiator.name));
@@ -121,12 +127,17 @@ public class RequestsDB extends Database {
         else if (filter.order == IFilter.orderBy.DESCENDING) {
             sortedRequests.sort((r1, r2) -> r2.initiator.name.compareToIgnoreCase(r1.initiator.name));
         }
-        displaySortedWithOriginalIndex(sortedRequests);
+        return sortedRequests;
     }
 
     //print the requests in sorted order, as well as its original index in the original list
     //this is to show the user the original index of that request in the original list, so that they can modify it if needed
     private void displaySortedWithOriginalIndex(ArrayList<Request> sortedRequests) {
+
+        if (sortedRequests.size() == 0) {
+            System.out.println("\nNo Requests found!");
+        }
+
         for (Request r : sortedRequests) {
             for (int i = 0; i < reqList.size(); i++) {
                 if (reqList.get(i).initiator.userID.equals(r.initiator.userID)) {

@@ -16,10 +16,10 @@ public class Filter_Marital implements IFilter {
 
     public boolean FilterBy(Object o) {
 
-        if (o instanceof Project) { isOpenToUserGroup((Project)o); }
-        else if (o instanceof Enquiry) { hasMaritalStatusKeyword((Enquiry)o); }
-        else if (o instanceof Request) { hasMaritalStatusKeyword((Request)o); }
-        else if (o instanceof Applicant) { isOfMaritalStatus((Applicant)o); }
+        if (o instanceof Project) { return isOpenToUserGroup((Project)o); }
+        else if (o instanceof Enquiry) { return hasMaritalStatusKeyword((Enquiry)o); }
+        else if (o instanceof Request) { return hasMaritalStatusKeyword((Request)o); }
+        else if (o instanceof Applicant) { return isOfMaritalStatus((Applicant)o); }
         //HDB_Managers don't have marital status as an attributes, hence will return false
         else if (o instanceof HDB_Manager) { return false; }
 

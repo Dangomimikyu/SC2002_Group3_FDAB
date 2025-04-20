@@ -45,7 +45,7 @@ public abstract class Request {
     public String getRequestDetails() {
         return "Request Type: " + getRequestType() + "\n" +
                "Initiator: " + initiator.name + "\n" +
-               "Initiator NRIC" + initiator.userID + "\n" +
+               "Initiator NRIC: " + initiator.userID + "\n" +
                "Regarding Project: " + RegardingProject + "\n" +
                "Handler: " + (handler != null ? handler.name : "Not Assigned") + "\n" +
                "Status: " + status + "\n";

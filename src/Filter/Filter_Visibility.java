@@ -12,7 +12,7 @@ public class Filter_Visibility implements IFilter {
 
     public boolean FilterBy(Object o) {
 
-        if (o instanceof Project) { isVisible((Project)o); }
+        if (o instanceof Project) { return isVisible((Project)o); }
 
         System.out.println("Error: Filtering by visibility is not supported for this object type!");
         return false;

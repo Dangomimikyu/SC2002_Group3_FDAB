@@ -22,7 +22,7 @@ public class Filter_SellingPrice implements IFilter{
 
     public boolean FilterBy(Object o) {
 
-        if (o instanceof Project) {isWithinPriceRange((Project)o); }
+        if (o instanceof Project) { return isWithinPriceRange((Project)o); }
 
         System.out.println("Error: Filtering by price is not supported for this object type!");
         return false;

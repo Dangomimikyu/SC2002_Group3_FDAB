@@ -1,44 +1,70 @@
 package UserView;
 
-import InteractableAttributePackage.Enquiry;
-import InteractableAttributePackage.Project;
-
-import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Menu
+public abstract class Menu
 {
     protected static Scanner sc = new Scanner(System.in);
 
-    public Menu()
+    public Menu() { sc = new Scanner(System.in);}
+    public static void start() {}
+    private static void Display() {}
+
+    //helper function to get repeated until valid int choice user repeat message
+    public static int GetIntInput(String repeat)
     {
-        sc = new Scanner(System.in);
-    }
+        int choice = -1;
 
-    public static void start()
-    {
-
-    }
-
-    private static void Display()
-    {
-
-    }
-
-    // chose to separate because they don't share a super class
-    protected static void PrintProjects(ArrayList<Project> list)
-    {
-        for (Project p : list)
-        {
-            System.out.println(p.getProjectDetails());
+        while (choice < 0) {
+            try {
+                System.out.println(repeat);
+                choice = sc.nextInt();
+            } catch (final InputMismatchException e) {
+                System.out.println("\nError: Invalid character");
+                sc.nextLine(); // ignore and move the cursor to next line
+            }
         }
+
+        return choice;
     }
 
-    protected static void PrintEnquiries(ArrayList<Enquiry> list)
+    //helper function to get repeated until valid int choice user repeat message (with the exception of -1)
+    public static int GetIntInput2(String repeat)
     {
-        for (Enquiry e : list)
-        {
-            System.out.println(e.getEnquiryDetails());
+        int choice = -99;
+
+        while (choice < 0) {
+            try {
+                System.out.println(repeat);
+                choice = sc.nextInt();
+                if (choice == -1) { return choice; }
+            } catch (final InputMismatchException e) {
+                System.out.println("\nError: Invalid character");
+                sc.nextLine(); // ignore and move the cursor to next line
+            }
         }
+
+        return choice;
     }
+
+    //helper function to get repeated until valid double choice user repeat message (with the exception of -1)
+    public static double GetDoubleInput(String repeat)
+    {
+        double choice = -99;
+
+        while (choice < 0) {
+            try {
+                System.out.println(repeat);
+                choice = sc.nextDouble();
+                if (choice == -1) { return choice; }
+            } catch (final InputMismatchException e) {
+                System.out.println("\nError: Invalid character");
+                sc.nextLine(); // ignore and move the cursor to next line
+            }
+        }
+
+        return choice;
+    }
+
 }

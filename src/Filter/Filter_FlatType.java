@@ -17,10 +17,10 @@ public class Filter_FlatType implements IFilter {
 
     public boolean FilterBy(Object o) {
 
-        if (o instanceof Project) { hasAvailableFlatTypes((Project)o); }
-        else if (o instanceof Enquiry) { hasFlatTypeKeyword((Enquiry)o); }
-        else if (o instanceof Withdrawal) { isRegardingFlatType((Withdrawal)o); }
-        else if (o instanceof Booking) { isRegardingFlatType((Booking)o); }
+        if (o instanceof Project) { return hasAvailableFlatTypes((Project)o); }
+        else if (o instanceof Enquiry) { return hasFlatTypeKeyword((Enquiry)o); }
+        else if (o instanceof Withdrawal) { return isRegardingFlatType((Withdrawal)o); }
+        else if (o instanceof Booking) { return isRegardingFlatType((Booking)o); }
         //applicant and officer application request classes don't have flat type attributes hence will return false
         else if (o instanceof Applicant_Application || o instanceof Officer_Application) {return false;}
 

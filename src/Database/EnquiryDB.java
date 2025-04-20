@@ -6,7 +6,6 @@ package Database;
 import java.util.ArrayList;
 import InteractableAttributePackage.Enquiry;
 import InteractableAttributePackage.Project;
-import Service.*;
 import User.SystemUser;
 import Filter.*;
 
@@ -15,8 +14,6 @@ public class EnquiryDB extends Database {
     private static EnquiryDB instance;
 
     private ArrayList<Enquiry> enqList = new ArrayList<Enquiry>();
-    Reader reader = new Reader();
-    Writer writer = new Writer();
 
     private EnquiryDB() {}
     public static EnquiryDB getInstance() {
@@ -43,24 +40,27 @@ public class EnquiryDB extends Database {
         return null;
     }
 
-    public void ViewDB(IFilter filter) {
-        
-        displayFilterInformation(filter);
-        
-        if (filter instanceof Filter_Alphabetic) { SortInOrder((Filter_Alphabetic)filter); }
+    ///////////////////////////////////////////////////////////////////////
+    /////////////////// VIEW DB WITH FILTERS //////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
-        //for filters with no orderBy attribute
-        else {
-            int index = 0;
-            for (Enquiry e : enqList) {
-                if (filter.FilterBy(e)) {
-                    System.out.println("================ " + index + " ================");
-                    System.out.println(e.getEnquiryDetails());
-                }
-                index++;
-                }
-            }
+    public void ViewDB(ArrayList<IFilter> filters) {
+        
+        for ( IFilter filter : filters) { displayFilterInformation(filter); }
+
+        ArrayList<Enquiry> sortedEnquiries = new ArrayList<>(enqList);
+        
+        for (IFilter filter : filters) {
+            if (filter instanceof Filter_Alphabetic) { sortedEnquiries = SortInOrder(sortedEnquiries, (Filter_Alphabetic)filter); }
+            else { sortedEnquiries.removeIf(e -> !filter.FilterBy(e)); }
+        }
+
+        displaySortedWithOriginalIndex(sortedEnquiries);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////// MODIFYING DB METHODS ////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
 
     //modify enquiry by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
@@ -92,17 +92,24 @@ public class EnquiryDB extends Database {
         }
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    //////////////// SORTING ALGORTIHMS + HELPER FUNCTIONS////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     //prints the headers and information for which enquiries will be filtered by
     private void displayFilterInformation(IFilter filter) {
         if (filter instanceof Filter_FlatType) {
             System.out.println("Filter by enquiries containing flat type keyword: " + ((Filter_FlatType)filter).flatType);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Marital) {
             System.out.println("Filter by enquiries containing marital status keyword: " + ((Filter_Marital)filter).maritalStatus);
+            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Alphabetic) {
             System.out.println("Filter by enquiries title starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
-             + "\nin " + ((Filter_Alphabetic)filter).order + " order");
+             + " in " + ((Filter_Alphabetic)filter).order + " order");
+             System.out.println("============================================================================");
         }
         else  { 
             System.out.println("Error: This filter type is not supported for enquiries");
@@ -111,8 +118,7 @@ public class EnquiryDB extends Database {
     }
 
     //Sorts lexicographically in specified order
-    private void SortInOrder(Filter_Alphabetic filter) {
-        ArrayList<Enquiry> sortedEnquiries = new ArrayList<>(enqList);
+    private ArrayList<Enquiry> SortInOrder(ArrayList<Enquiry> sortedEnquiries, Filter_Alphabetic filter) {
             sortedEnquiries.removeIf(e -> !filter.FilterBy(e));
             if (filter.order == IFilter.orderBy.ASCENDING) {
                 sortedEnquiries.sort((e1, e2) -> e1.Title.compareToIgnoreCase(e2.Title));
@@ -120,12 +126,17 @@ public class EnquiryDB extends Database {
             else if (filter.order == IFilter.orderBy.DESCENDING) {
                 sortedEnquiries.sort((e1, e2) -> e2.Title.compareToIgnoreCase(e1.Title));
             }
-            displaySortedWithOriginalIndex(sortedEnquiries);
+            return sortedEnquiries;
     }
 
     //print the enquiries in sorted order, as well as its original index in the original list
     //this is to show the user the original index of that enquiry in the original list, so that they can modify it if needed
     private void displaySortedWithOriginalIndex(ArrayList<Enquiry> SortedEnquiries) {
+
+        if (SortedEnquiries.size() == 0) {
+            System.out.println("\nNo Enquiries found!");
+        }
+
         for (Enquiry e : SortedEnquiries) {
             for (int i = 0; i < enqList.size(); i++) {
                 if (enqList.get(i).Title.equals(e.Title) && enqList.get(i).RegardingProject.equals(e.RegardingProject) 

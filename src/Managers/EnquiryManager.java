@@ -30,13 +30,13 @@ public class EnquiryManager
         if (s instanceof Applicant)
         {
             // show this applicant's own enquiries
-            System.out.println("Showing your enquiries:");
+            System.out.println("\nShowing your enquiries:" + "\n====================================");
             ArrayList<Enquiry> enqList = EnquiryDB.getInstance().getEnquiryDB();
 
             for (Enquiry e : enqList)
             {
                 if (Objects.equals(e.Enquirer.userID, s.userID)) {
-                    System.out.println(e.getEnquiryDetails());
+                    System.out.println(e.getEnquiryDetails() + "\n====================================");
                 }
             }
 
@@ -75,12 +75,22 @@ public class EnquiryManager
         }
     }
 
-    public Enquiry getEnquiryByTitleAndApplicant(String title, SystemUser s)
+    public Enquiry getEnquiryWithDetails(String title, SystemUser s, String projname)
     {
         return EnquiryDB.getInstance().getEnquiryDB().stream()
-                .filter(enq -> Objects.equals(enq.Title, title) && Objects.equals(enq.Enquirer, s))
+                .filter(enq -> Objects.equals(enq.Title, title) 
+                && Objects.equals(enq.Enquirer.userID, s.userID) 
+                && Objects.equals(enq.RegardingProject, projname))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public boolean isNotUniqueEnquiry(String title, SystemUser s, String projname)
+    {
+        return EnquiryDB.getInstance().getEnquiryDB().stream()
+                .anyMatch(enq -> Objects.equals(enq.Title, title) 
+                && Objects.equals(enq.Enquirer.userID, s.userID) 
+                && Objects.equals(enq.RegardingProject, projname));
     }
 
     public void AddNewEnquiry(Enquiry e)
