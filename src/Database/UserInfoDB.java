@@ -151,9 +151,9 @@ public class UserInfoDB extends Database {
         }
     }
 
-    public SystemUser SearchDB(String userName)
+    public SystemUser SearchDB(String userID)
     {
-        return userList.stream().filter(pp -> userName.equals(pp.name)).findFirst().orElse(null);
+        return userList.stream().filter(u -> userID.equals(u.userID)).findFirst().orElse(null);
     }
 
     public SystemUser AuthenticateUser(String id, String password)

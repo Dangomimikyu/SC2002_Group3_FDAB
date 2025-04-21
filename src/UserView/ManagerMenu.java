@@ -13,6 +13,7 @@ import Filter.*;
 import Filter.IFilter.orderBy;
 import java.util.InputMismatchException;
 import java.util.regex.Pattern;
+import java.util.Objects;
 
 public class ManagerMenu extends Menu
 {
@@ -27,22 +28,22 @@ public class ManagerMenu extends Menu
         System.out.println("\nWelcome " + user.name + " !\nWhat would you like to do today?");
         int choice = -1;
         while (choice != 12) {
-            System.out.println("\n=====================================");
-            System.out.println("|            Manager menu           |");
-            System.out.println("\n=====================================");
-            System.out.println("| 1. Create project listing         |");
-            System.out.println("| 2. Edit project listing           |");
-            System.out.println("| 3. Delete project listing         |");
-            System.out.println("| 4. View other projects            |");
-            System.out.println("| 5. Handle officer registration    |");
-            System.out.println("| 6. Handle applicant applications  |");
-            System.out.println("| 7. Generate report                |");
-            System.out.println("| 8. View enquiries                 |");
-            System.out.println("| 9. Reply to an enquiry            |");
-            System.out.println("| 10. View unresolved requests      |");
-            System.out.println("| 11. Handle withdrawals            |");
-            System.out.println("| 12. Log out                       |");
-            System.out.println("=====================================");
+            System.out.println("\n======================================");
+            System.out.println("|            Manager menu            |");
+            System.out.println("\n====================================");
+            System.out.println("| 1.  Create project listing         |");
+            System.out.println("| 2.  Edit project listing           |");
+            System.out.println("| 3.  Delete project listing         |");
+            System.out.println("| 4.  View other projects            |");
+            System.out.println("| 5.  Handle officer registration    |");
+            System.out.println("| 6.  Handle applicant applications  |");
+            System.out.println("| 7.  Generate report                |");
+            System.out.println("| 8.  View enquiries                 |");
+            System.out.println("| 9.  Reply to an enquiry            |");
+            System.out.println("| 10. View unresolved requests       |");
+            System.out.println("| 11. Handle withdrawals             |");
+            System.out.println("| 12. Log out                        |");
+            System.out.println("======================================");
             System.out.print("Enter choice: ");
             try {
                 choice = sc.nextInt();

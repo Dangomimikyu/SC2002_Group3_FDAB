@@ -2,47 +2,66 @@
 
 package UserView;
 
+import java.util.regex.Pattern;
+
+import Database.UserInfoDB;
 import Service.*;
 import User.*;
+import User.SystemUser.usertype;
 
 public class AuthMenu extends Menu
 {
 
-    public static void Login(SystemUser.usertype type)
+    public static void Login(usertype type)
     {
         Authenticator authenticator = new Authenticator();
         SystemUser user = null;
+        int attempts = 0;
         sc.nextLine();
-        while (true)
+
+        while (attempts < 3)
         {
-            String id = "", pass = "";
+            try {
 
-            System.out.print("\nEnter ID: ");
-            id = sc.nextLine();
-            System.out.print("Enter Password: ");
-            pass = sc.nextLine();
+                String id = "", pass = "";
 
-            user = authenticator.login(id,pass);
-            if (user == null) { System.out.println("\nError: Could not find user! Please re-enter your id and password."); }
-            if ((!(user instanceof HDB_Manager) && type == SystemUser.usertype.MANAGER) ||
-                (!(user instanceof HDB_Officer) && type == SystemUser.usertype.OFFICER) ||
-                (!(user instanceof Applicant) && type == SystemUser.usertype.APPLICANT)) {
-                System.out.println("\nError: User credentials are correct but wrong user type was picked!");
-                continue;
+                System.out.print("\nEnter ID: ");
+                id = sc.nextLine();
+
+                //if nric is in wrong format
+                if (!Pattern.compile("^[STFG]\\d{7}[A-Z]$").matcher(id).matches()) 
+                { throw new Error("\nError: NRIC is in wrong format!"); }
+
+                System.out.print("Enter Password: ");
+                pass = sc.nextLine();
+
+                //if account with given id exists in database but corresponding password is wrong
+                if (UserInfoDB.getInstance().SearchDB(id) != null && authenticator.login(id,pass) == null) 
+                { attempts++; throw new Error("\nError: Wrong password entered! You have "+(3-attempts)+" left."); }
+
+                user = authenticator.login(id,pass);
+
+                //could not find account with given id and password
+                if (user == null) { throw new Error("\nError: Could not find user"); }
+
+                //can find account but the perm type to log in as does not correspond with actual account user perms
+                else if ((!(user instanceof HDB_Manager) && type == usertype.MANAGER) ||
+                    ( !(user instanceof HDB_Officer) && type == usertype.OFFICER) ||
+                    ( !(user instanceof Applicant) && type == usertype.APPLICANT) ||
+                    (   user instanceof HDB_Officer && type == usertype.APPLICANT)) {
+                    throw new Error("\nError: Chosen user type to access does not match searched user type!"); }
+                    
+                break;
             }
-            break;
+            catch (Error e) { System.out.println(e.getMessage()); }
         }
-        if (type == SystemUser.usertype.MANAGER) {
-            ManagerMenu.SetUser((HDB_Manager)user);
-            ManagerMenu.start();
+        if (attempts == 3) { System.out.println("\nToo many password attempts! Returning to Login Menu..."); return; }
+        
+        switch (type) {
+            case MANAGER -> { ManagerMenu.SetUser((HDB_Manager)user); ManagerMenu.start(); }
+            case OFFICER -> { OfficerMenu.SetUser((HDB_Officer)user); OfficerMenu.start(); }
+            case APPLICANT -> { ApplicantMenu.SetUser((Applicant)user); ApplicantMenu.start(); }
         }
-        else if (type == SystemUser.usertype.OFFICER) {
-            OfficerMenu.SetUser((HDB_Officer)user);
-            OfficerMenu.start();
-        }
-        else if (type == SystemUser.usertype.APPLICANT) {
-            ApplicantMenu.SetUser((Applicant)user);
-            ApplicantMenu.start();
-        }
+
     }
 }

@@ -3,6 +3,7 @@ package UserView;
 import Filter.*;
 import User.Applicant;
 import User.Enum_FlatType;
+import User.HDB_Officer;
 import InteractableAttributePackage.ProjectDetails.Location;
 import Filter.IFilter.orderBy;
 import java.util.InputMismatchException;
@@ -22,21 +23,23 @@ public class ApplicantMenu extends Menu
         System.out.println("\nWelcome " + user.name + " !\nWhat would you like to do today?");
         int choice = -1;
         while (choice != 12) {
-            System.out.println("\n=====================================");
+            System.out.println("\n=======================================");
             System.out.println("|            Applicant menu           |");
             System.out.println("=======================================");
-            System.out.println("|  1. View available projects         |");
-            System.out.println("|  2. Apply for a project             |");
-            System.out.println("|  3. Check Applied Project Details   |");
-            System.out.println("|  4. Create an enquiry               |");
-            System.out.println("|  5. View your enquiries             |");
-            System.out.println("|  6. Edit your enquiries             |");
-            System.out.println("|  7. Delete your enquiries           |");
-            System.out.println("|  8. Book a flat                     |");
-            System.out.println("|  9. Withdraw from project           |");
+            System.out.println("|  1.  View available projects        |");
+            System.out.println("|  2.  Apply for a project            |");
+            System.out.println("|  3.  Check Applied Project Details  |");
+            System.out.println("|  4.  Create an enquiry              |");
+            System.out.println("|  5.  View your enquiries            |");
+            System.out.println("|  6.  Edit your enquiries            |");
+            System.out.println("|  7.  Delete your enquiries          |");
+            System.out.println("|  8.  Book a flat                    |");
+            System.out.println("|  9.  Withdraw from project          |");
             System.out.println("|  10. Choose Filter                  |");
             System.out.println("|  11. Check Request Status           |");
-            System.out.println("|  12. Log out                        |");
+            System.out.println(user instanceof HDB_Officer ? 
+                                 "|  12. Return to Officer Menu         |" : 
+                                 "|  12. Log out                        |");
             System.out.println("=======================================");
             System.out.print("Enter choice: ");
             try

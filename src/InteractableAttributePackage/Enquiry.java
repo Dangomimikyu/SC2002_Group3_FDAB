@@ -28,6 +28,7 @@ public class Enquiry {
                "Regarding Project: " + RegardingProject + "\n" +
                "Description: " + Description + "\n" +
                "Enquirer: " + Enquirer.name + "\n" +
+               "Enquirer ID: " + Enquirer.userID + "\n" +
                (isUnreplied() ? "YET TO BE REPLIED" : "Reply: " + Reply + "\nReplier: " + Replier.name + "\n");
     }
 

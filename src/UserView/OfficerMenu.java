@@ -24,18 +24,18 @@ public class OfficerMenu extends Menu
         System.out.println("\nWelcome " + user.name + " !\nWhat would you like to do today?");
         int choice = -1;
         while (choice != 12) {
-            System.out.println("\n==================================");
+            System.out.println("\n====================================");
             System.out.println("|            Officer menu          |");
             System.out.println("====================================");
-            System.out.println("| 1. Go to Applicant Menu          |");
-            System.out.println("| 2. Join a project as an Officer  |");
-            System.out.println("| 3. View Joinable Projects        |");
-            System.out.println("| 4. View Joined Project Details   |");
-            System.out.println("| 5. Check Request Status          |");
-            System.out.println("| 6. View handled bookings         |");
-            System.out.println("| 7. Resolve a Booking             |");
-            System.out.println("| 8. Update Flat Selection         |");
-            System.out.println("| 9. Generate flat receipt         |");
+            System.out.println("| 1.  Go to Applicant Menu         |");
+            System.out.println("| 2.  Join a project as an Officer |");
+            System.out.println("| 3.  View Joinable Projects       |");
+            System.out.println("| 4.  View Joined Project Details  |");
+            System.out.println("| 5.  Check Request Status         |");
+            System.out.println("| 6.  View handled bookings        |");
+            System.out.println("| 7.  Resolve a Booking            |");
+            System.out.println("| 8.  Update Flat Selection        |");
+            System.out.println("| 9.  Generate flat receipt        |");
             System.out.println("| 10. View Handled Enquiries       |");
             System.out.println("| 11. Reply to handled Enquiry     |");
             System.out.println("| 12. Log out                      |");
@@ -53,7 +53,6 @@ public class OfficerMenu extends Menu
             switch (choice)
             {
                 case 1 -> { // go to applicant view
-                    System.out.println("\nNOTE: to get back to applicant menu, simply log out from that menu");
                     ApplicantMenu.start();
                 }
 
