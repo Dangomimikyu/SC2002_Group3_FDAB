@@ -17,7 +17,7 @@ public class ProjectDetails {
         CLEMENTI, BUKIT_TIMAH, HILLVIEW, BUKIT_BATOK, HOLLAND_VILLAGE, BUONA_VISTA,JURONG ,CHOA_CHU_KANG , JURONG_WEST, JURONG_EAST
     }
 
-    public boolean activeStatus = true;
+    public boolean visibility = true;
     public MaritalStatus OpentoUserGroup;
     //regarding editing project name: since it's a unique identifier, should it be allowed to be changed? might mess up how enquires/requests are identified
     public String ProjectName;
@@ -51,7 +51,7 @@ public class ProjectDetails {
         //if there are any leftover requests/enquiries that haven't been handled yet.
         this.OfficerSlots = OS;
         this.OfficerList = OIC;
-        this.activeStatus = v;
+        this.visibility = v;
         //maybe include a check to automatically set visibility if past closing date?
         this.OpentoUserGroup = MaritalStatus.valueOf(group.toUpperCase());
 

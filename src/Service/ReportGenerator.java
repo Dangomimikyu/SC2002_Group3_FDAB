@@ -303,7 +303,7 @@ public class ReportGenerator
                         continue;
                     }
                     Project p = ProjectListingDB.getInstance().SearchDB(projectName);
-                    if (Objects.equals(((Applicant) s).AppliedProject, projectName) && p.Details.activeStatus) {
+                    if (Objects.equals(((Applicant) s).AppliedProject, projectName) && p.Details.visibility) {
                         visible.add((Applicant) s);
                     } else {
                         notVisible.add((Applicant) s);
@@ -532,7 +532,7 @@ public class ReportGenerator
                         continue;
                     }
                     Project p = ProjectListingDB.getInstance().SearchDB(((Applicant) s).AppliedProject);
-                    if (p.Details.activeStatus) {
+                    if (p.Details.visibility) {
                         visible.add((Applicant) s);
                     } else {
                         notVisible.add((Applicant) s);

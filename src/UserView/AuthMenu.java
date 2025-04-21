@@ -3,7 +3,6 @@
 package UserView;
 
 import java.util.regex.Pattern;
-
 import Database.UserInfoDB;
 import Service.*;
 import User.*;
@@ -39,6 +38,9 @@ public class AuthMenu extends Menu
                 if (UserInfoDB.getInstance().SearchDB(id) != null && authenticator.login(id,pass) == null) 
                 { attempts++; throw new Error("\nError: Wrong password entered! You have "+(3-attempts)+" left."); }
 
+                // testing
+                // id = "T8765432F";
+                // pass = "password";
                 user = authenticator.login(id,pass);
 
                 //could not find account with given id and password

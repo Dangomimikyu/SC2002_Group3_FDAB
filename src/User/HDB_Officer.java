@@ -17,7 +17,7 @@ public class HDB_Officer extends Applicant{
     }
 
     public Project projectAssigned;
-    public String project_name;
+    public String project_name; //Managed Project Name
     public Enum_OfficerStatus officerStatus;
     //private ArrayList<Applicant> applicantList;
     //private Map<String, Integer> flatAvailability;
@@ -50,7 +50,7 @@ public class HDB_Officer extends Applicant{
         System.out.println("Projects open for officer positions:\n===================================");
         for (Project project : projectList) {
             //if project is active and has yet to reach max officer slots
-            if (project.isOpenForApplication() && project.Details.activeStatus && !project.notAcceptingOfficers()) {
+            if (project.isOpenForApplication() && project.Details.visibility && !project.notAcceptingOfficers()) {
                 System.out.println(project.getProjectDetails());
             }
         }

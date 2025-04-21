@@ -46,7 +46,7 @@ public class Writer
                 HDB_Officer off = (HDB_Officer)user;
                 user_info = String.join(",",off.name,off.userID,String.valueOf(off.age)
                 ,String.valueOf(off.maritalStatus),off.password,off.AppliedProject,String.valueOf(off.AppliedProjectStatus)
-                ,String.valueOf(off.flatTypeBooked),off.projectAssigned.Details.ProjectName,String.valueOf(off.officerStatus));
+                ,String.valueOf(off.flatTypeBooked),off.project_name,String.valueOf(off.officerStatus));
             } 
             else if (user instanceof Applicant) 
             {
@@ -108,7 +108,7 @@ public class Writer
                 HDB_Officer off = (HDB_Officer)user;
                 user_info = String.join(",",off.name,off.userID,String.valueOf(off.age)
                 ,String.valueOf(off.maritalStatus),off.password,off.AppliedProject,String.valueOf(off.AppliedProjectStatus)
-                ,String.valueOf(off.flatTypeBooked),off.projectAssigned.Details.ProjectName,String.valueOf(off.officerStatus));
+                ,String.valueOf(off.flatTypeBooked),off.project_name,String.valueOf(off.officerStatus));
             } 
             else if (user instanceof Applicant) 
             {
@@ -254,7 +254,7 @@ public class Writer
             p.Details.CloseDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")),
             p.Details.Manager.userID, String.valueOf(p.Details.OfficerSlots),
             String.join("-",p.Details.OfficerList.stream().map(o -> o.userID).toArray(String[]::new)),
-            String.valueOf(p.Details.activeStatus), String.valueOf(p.Details.OpentoUserGroup));
+            String.valueOf(p.Details.visibility), String.valueOf(p.Details.OpentoUserGroup));
 
             bw.write(project_info);
         } 
@@ -329,7 +329,7 @@ public class Writer
             p.Details.CloseDate.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")),
             p.Details.Manager.userID, String.valueOf(p.Details.OfficerSlots),
             String.join("-",p.Details.OfficerList.stream().map(o -> o.userID).toArray(String[]::new)),
-            String.valueOf(p.Details.activeStatus), String.valueOf(p.Details.OpentoUserGroup));
+            String.valueOf(p.Details.visibility), String.valueOf(p.Details.OpentoUserGroup));
 
             bw.write(project_info);
         } 

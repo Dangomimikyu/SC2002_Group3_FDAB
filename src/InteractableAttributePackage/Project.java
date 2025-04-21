@@ -21,12 +21,17 @@ public class Project {
         }
     }
 
+    //checks if Project is Active (Visibility ON + within Application Period)
+    public boolean isActive() {
+        return isOpenForApplication() && Details.visibility;
+    }
+    
     //toggle visibility of project (only for manager)
-    public void ToggleActiveStatus() {
-        if (Details.activeStatus) {
-            Details.activeStatus = false;
+    public void ToggleVisibility() {
+        if (Details.visibility) {
+            Details.visibility = false;
         } else {
-            Details.activeStatus = true;
+            Details.visibility = true;
         }
     }
 
@@ -113,7 +118,7 @@ public class Project {
                "Manager: " + Details.Manager.name + "\n" +
                "Officer Slots: " + Details.OfficerSlots + "\n" +
                "Officers in Charge: " + (Details.OfficerList.size() > 0 ? Details.OfficerList.stream().map(o -> o.name).reduce("", (a, b) -> a + "," + b).substring(1) : "None") + "\n" +
-               "Visible: " + (Details.activeStatus ? "True" : "False") + "\n";
+               "Visible: " + (Details.visibility ? "True" : "False") + "\n";
     }
 
 }

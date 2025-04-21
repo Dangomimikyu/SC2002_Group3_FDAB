@@ -6,14 +6,17 @@ import User.Enum_FlatType;
 import User.HDB_Officer;
 import InteractableAttributePackage.ProjectDetails.Location;
 import Filter.IFilter.orderBy;
+
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.regex.Pattern;
 
 public class ApplicantMenu extends Menu
 {
     private static Applicant user;
-    //default filter is in alphabetic ascending order
-    private static IFilter filter = new Filter_Alphabetic(null, orderBy.ASCENDING);
+    private static ArrayList<IFilter> activeFilters = new ArrayList<>(); 
+    //default filter is in alphabetic ascending order (executed only once)
+    static { activeFilters.add(new Filter_Alphabetic(null, orderBy.ASCENDING)); }
 
     public static void start() { Display();}
     public static void SetUser(Applicant a) { user = a; }
@@ -56,7 +59,7 @@ public class ApplicantMenu extends Menu
             sc.nextLine();
             switch (choice)
             {
-                case 1 -> user.viewProjectList(filter);
+                case 1 -> user.viewProjectList(activeFilters);
                 case 2 -> {
                     System.out.print("Enter name of project to apply for: ");
                     user.ApplyProject(sc.nextLine());
@@ -87,16 +90,17 @@ public class ApplicantMenu extends Menu
 
     private static void SetFilterMenu() {
         int choice = -1;
-        while (choice != 6) {
+        while (choice != 7) {
             System.out.println("\n=========================================");
             System.out.println("|               Filters                 |");
             System.out.println("=========================================");
-            System.out.println("|1. Filter by Alphabetic Order (Default)|");
-            System.out.println("|2. Filter by Age                       |");
-            System.out.println("|3. Filter by Flat Type Availability    |");
-            System.out.println("|4. Filter by Location                  |");
-            System.out.println("|5. Filter by Selling Price             |");
-            System.out.println("|6. Exit                                |");
+            System.out.println("|1. Add Filter by Alphabetic Order      |");
+            System.out.println("|2. Add Filter by Age                   |");
+            System.out.println("|3. Add Filter by Flat Type Availability|");
+            System.out.println("|4. Add Filter by Location              |");
+            System.out.println("|5. Add Filter by Selling Price         |");
+            System.out.println("|6. Remove active filters               |");
+            System.out.println("|7. Exit                                |");
             System.out.println("=========================================");
             System.out.print("Enter your choice of filter: ");
             try {
@@ -110,6 +114,7 @@ public class ApplicantMenu extends Menu
             sc.nextLine();
             switch (choice) {
                 case 1: 
+                    activeFilters.removeIf(f -> f instanceof Filter_Alphabetic);
                     String starting_char = "nil";
                     while (!Pattern.matches("[a-zA-Z]+",starting_char) || starting_char.length() != 1) {
                         System.out.println("\nEnter an alphabetic character for which all filtered project's name must start with(enter nil if null): ");
@@ -124,11 +129,12 @@ public class ApplicantMenu extends Menu
                         order = GetIntInput("\nWould you like it in ASCENDING(1) order or in DESCENDING(2) order? : ");
                     }
                     if (starting_char.equals("nil")) {starting_char = null;}
-                    if (order == 1) { filter = new Filter_Alphabetic(starting_char,orderBy.ASCENDING); }
-                    else if (order == 2) { filter = new Filter_Alphabetic(starting_char,orderBy.DESCENDING); }
-                    return;
+                    if (order == 1) { activeFilters.add(new Filter_Alphabetic(starting_char,orderBy.ASCENDING)); }
+                    else if (order == 2) { activeFilters.add(new Filter_Alphabetic(starting_char,orderBy.DESCENDING)); }
+                    break;
 
                 case 2: 
+                    activeFilters.removeIf(f -> f instanceof Filter_Age);
                     double minAge = -99;
                     double maxAge = -99;
                     while (true) {
@@ -145,11 +151,12 @@ public class ApplicantMenu extends Menu
                     while (order != 1 && order != 2) {
                         order = GetIntInput("\nWould you like it in ASCENDING(1) order or in DESCENDING(2) order? : ");
                     }
-                    if (order == 1) { filter = new Filter_Age(minAge,maxAge,orderBy.ASCENDING); }
-                    else if (order == 2) { filter = new Filter_Age(minAge,maxAge,orderBy.DESCENDING); }
-                    return;
+                    if (order == 1) { activeFilters.add(new Filter_Age(minAge,maxAge,orderBy.ASCENDING)); }
+                    else if (order == 2) { activeFilters.add(new Filter_Age(minAge,maxAge,orderBy.DESCENDING)); }
+                    break;
 
                 case 3: 
+                    activeFilters.removeIf(f -> f instanceof Filter_FlatType);
                     int flat_type_choice = -1;
                     while (flat_type_choice < 1 || flat_type_choice > 3) {
                         System.out.println("\nChoose which flat type to filter by (BOTH if you want to see availability of both flat types): ");
@@ -163,11 +170,12 @@ public class ApplicantMenu extends Menu
                     Enum_FlatType flatType = Enum_FlatType.DEFAULT;
                     if (flat_type_choice == 1) {flatType = Enum_FlatType.TWO_ROOM; } 
                     else if (flat_type_choice == 2) {flatType = Enum_FlatType.THREE_ROOM; } 
-                    if (order == 1) { filter = new Filter_FlatType(flatType,orderBy.ASCENDING); }
-                    else if (order == 2) { filter = new Filter_FlatType(flatType,orderBy.DESCENDING); }
-                    return;
+                    if (order == 1) { activeFilters.add( new Filter_FlatType(flatType,orderBy.ASCENDING)); }
+                    else if (order == 2) { activeFilters.add(new Filter_FlatType(flatType,orderBy.DESCENDING)); }
+                    break;
 
                 case 4: 
+                    activeFilters.removeIf(f -> f instanceof Filter_Location);
                     String location = null;
                     boolean valid_location = false;
                     while (!valid_location) {
@@ -180,10 +188,11 @@ public class ApplicantMenu extends Menu
                             }
                             if (!valid_location) { System.out.println("\nError: location is not valid"); }
                         }
-                    filter = new Filter_Location(Location.valueOf(location.toUpperCase().replace(" ","_")));
-                    return;
+                    activeFilters.add(new Filter_Location(Location.valueOf(location.toUpperCase().replace(" ","_"))));
+                    break;
 
                 case 5: 
+                    activeFilters.removeIf(f -> f instanceof Filter_SellingPrice);
                     int minPrice = -99;
                     int maxPrice = -99;
                     while (true) {
@@ -209,11 +218,27 @@ public class ApplicantMenu extends Menu
                     flatType = Enum_FlatType.DEFAULT;
                     if (flat_type_choice == 1) {flatType = Enum_FlatType.TWO_ROOM; } 
                     else if (flat_type_choice == 2) {flatType = Enum_FlatType.THREE_ROOM; } 
-                    if (order == 1) { filter = new Filter_SellingPrice(minPrice,maxPrice,orderBy.ASCENDING,flatType); }
-                    else if (order == 2) { filter = new Filter_SellingPrice(minPrice,maxPrice,orderBy.DESCENDING,flatType); }
-                    return;
+                    if (order == 1) {activeFilters.add(new Filter_SellingPrice(minPrice,maxPrice,orderBy.ASCENDING,flatType)); }
+                    else if (order == 2) {activeFilters.add(new Filter_SellingPrice(minPrice,maxPrice,orderBy.DESCENDING,flatType)); }
+                    break;
 
                 case 6:
+                    if (activeFilters.size() == 0) {System.out.println("\nError: No Filters currently active."); break; }
+                    choice = -1;
+                    int index = 0;
+                    System.out.println("\nAll current filters active: ");
+                    for (IFilter f : activeFilters) {
+                        System.out.println(index +". "+f.getClass().getSimpleName());
+                        index++;
+                    }
+                    while (choice < 0 || choice > activeFilters.size()-1) 
+                    {
+                        choice = GetIntInput("Enter the index of the filter you wish to remove: ");
+                    }
+                    activeFilters.remove(choice);
+                    break;
+
+                case 7:
                     return;
 
                 default:

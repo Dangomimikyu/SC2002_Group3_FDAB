@@ -19,7 +19,7 @@ public class Filter_Visibility implements IFilter {
     }
 
     //isVisible checks if the project's active status is on or off
-    private boolean isVisible(Project p) { return p.Details.activeStatus == isVisible; }
+    private boolean isVisible(Project p) { return p.Details.visibility == isVisible; }
         
     
 }

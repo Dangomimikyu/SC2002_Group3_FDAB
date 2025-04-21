@@ -3,10 +3,17 @@ package User;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.stream.Collectors;
 
 import Database.*;
+import Database.Database.DB_Action;
+import Filter.IFilter;
 import InteractableAttributePackage.*;
+import InteractableAttributePackage.ProjectDetails.Location;
+import User.Applicant.ApplicantStatus;
+import User.Applicant.MaritalStatus;
+import User.HDB_Officer.Enum_OfficerStatus;
 
 public class HDB_Manager extends SystemUser{
 
@@ -15,107 +22,267 @@ public class HDB_Manager extends SystemUser{
         this.UserPerms = usertype.MANAGER;
     }
 
-    private boolean hasOverlappingProject(String projectName, LocalDate newOpenDate, LocalDate newCloseDate) {
-        return ProjectListingDB.getInstance().getProjectDB().stream()
-                .anyMatch(p -> p.Details.Manager.userID.equals(this.userID) &&
-                        !p.Details.ProjectName.equals(projectName) && // 排除当前项目（编辑时）
-                        !(newCloseDate.isBefore(p.Details.OpenDate) || newOpenDate.isAfter(p.Details.CloseDate)));
-    }
+    //*** */ this is a very complex check, 
+    // instead just make it so that editing projects can only be done if has NO ACTIVE PROJECTS, or if editted project is active
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // If manager will have an active project during a certain period and the current project's current visibility is ON
+    // Cannot create/edit project such that new application dates overlaps the active one (otherwise will cause 2 active projects at the same time) 
+    // private boolean hasOverlappingActiveProject(String projectName, LocalDate newOpenDate, LocalDate newCloseDate) {
+    //     return ProjectListingDB.getInstance().getProjectDB().stream()
+    //             .anyMatch(p -> p.Details.Manager.userID.equals(this.userID) &&
+    //                     !p.Details.ProjectName.equals(projectName) &&
+    //                     p.Details.visibility &&
+    //                     !(newCloseDate.isBefore(p.Details.OpenDate) || newOpenDate.isAfter(p.Details.CloseDate)));
+    // }
+
+    //////////////////////////////////////////////////////////////////////////////
+    ////////////////// MANAGER CREATES PROJECT ///////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
 
     public void CreateBTOProject(String projectName, String neighborhood, int sell2room, int sell3room, int twoRoomUnits, int threeRoomUnits,
                                  String openDate, String closeDate, int officerSlots, boolean vis, String grp) {
-        if (officerSlots > 10) {
-            System.out.println("Officer slots cannot exceed 10.");
-            return;
+       
+        try {
+
+            if (officerSlots > 10) { throw new Exception("\nError: Officer slots cannot exceed 10."); }
+
+            //Check if dates are valid
+            try {
+                LocalDate newOpenDate = LocalDate.parse(openDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                LocalDate newCloseDate = LocalDate.parse(closeDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            }
+            catch (Exception e) {System.out.println("\nError: Open Date or Closing Date inputted is invalid"); return; }
+
+
+            //Cannot create a project if currently has an active one
+            if (ProjectListingDB.getInstance().getProjectDB().stream().anyMatch(p -> p.isActive() && p.Details.Manager.userID.equals(userID))) {
+                throw new Exception("\nError: You are currently managing an active project"); }
+
+            // Check if project name is valid
+            boolean projectExists = ProjectListingDB.getInstance().getProjectDB().stream()
+                    .anyMatch(p -> p.Details.ProjectName.equals(projectName));
+            if (projectExists) {
+                throw new Exception("\nError: A project with this name already exists."); }
+            
+            // Check if location is valid
+            boolean valid_location = false;
+            for (Location l : Location.values()) {
+                if (l.toString().equals(neighborhood.toUpperCase().replace(" ","_"))) {
+                    valid_location = true;
+                }
+            }
+            if (!valid_location) { throw new Exception("\nError: Invalid Location inputted"); }
+
+            //check if group inputted is valid
+            if (grp == null) {throw new Exception("\nError: user group input is invalid"); }
+
+            // Create new project
+            Project newProject = new Project(projectName, neighborhood, sell2room, sell3room, twoRoomUnits, threeRoomUnits,
+                    openDate, closeDate, this, officerSlots, new ArrayList<>(), vis, grp);
+            ProjectListingDB.getInstance().ModifyDB(newProject, Database.DB_Action.ADD);
+            System.out.println("\nBTO project created successfully: " + projectName);
         }
-
-        //Check if there is an overlapping project
-        LocalDate newOpenDate = LocalDate.parse(openDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        LocalDate newCloseDate = LocalDate.parse(closeDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
-
-        if (hasOverlappingProject("", newOpenDate, newCloseDate)) {
-            System.out.println("You are already managing another project within the same application period.");
-            return;
-        }
-
-        // Check if project name is valid
-        boolean projectExists = ProjectListingDB.getInstance().getProjectDB().stream()
-                .anyMatch(p -> p.Details.ProjectName.equals(projectName));
-        if (projectExists) {
-            System.out.println("A project with this name already exists.");
-            return;
-        }
-
-        // Create new project
-        Project newProject = new Project(projectName, neighborhood, sell2room, sell3room, twoRoomUnits, threeRoomUnits,
-                openDate, closeDate, this, officerSlots, new ArrayList<>(), vis, grp);
-        ProjectListingDB.getInstance().ModifyDB(newProject, Database.DB_Action.ADD);
-        System.out.println("BTO project created successfully: " + projectName);
+        catch (Exception e) { System.out.println( e.getMessage()); }
     }
+
+    //////////////////////////////////////////////////////////////////////////////
+    ////////////////// MANAGER EDITS PROJECT /////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
 
     public void EditBTOProject(String projectName, String newNeighborhood, int sell2room, int sell3room, int newTwoRoomUnits, int newThreeRoomUnits,
-                               String newOpenDate, String newCloseDate, int newOfficerSlots, boolean vis, String grp) {
-        // Get project
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
+                               String newOpenDate, String newCloseDate, int newOfficerSlots, String grp) {
 
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
+        
+        try {
+
+            Project project = ProjectListingDB.getInstance().SearchDB(projectName);
+
+            if (project == null) { throw new Exception("\nError: Project not found."); }
+
+            // Check if the manager is the creator of the project
+            if (!project.Details.Manager.userID.equals(this.userID)) { 
+                throw new Exception("\nError: You can only edit projects you have created."); }
+
+            if (newOfficerSlots > 10) { throw new Exception("\nError: Officer slots cannot exceed 10."); }
+            if (project.Details.OfficerList.size() > newOfficerSlots) { throw new Exception("\nError: New Officer Slots cannot be less than existing number of officers in Project."); }
+
+            LocalDate newOpenDateParsed;
+            LocalDate newCloseDateParsed;
+            //Check if dates are valid
+            try {
+                newOpenDateParsed = LocalDate.parse(newOpenDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                newCloseDateParsed = LocalDate.parse(newCloseDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            }
+            catch (Exception e) {System.out.println("\nError: Open Date or Closing Date inputted is invalid"); return; }
+
+            //Cannot edit a project if currently has an active one
+            // but can edit if the edited project is the active one
+            if (ProjectListingDB.getInstance().getProjectDB().stream()
+            .anyMatch(p -> p.isActive() && p.Details.Manager.userID.equals(userID) && !p.Details.ProjectName.equals(projectName))) {
+                throw new Exception("\nError: You are currently managing another active project.");
+            }
+
+            // Check if location is valid
+            boolean valid_location = false;
+            for (Location l : Location.values()) {
+                if (l.toString().equals(newNeighborhood.toUpperCase().replace(" ","_"))) {
+                    valid_location = true;
+                }
+            }
+            if (!valid_location) { throw new Exception("\nError: Invalid Location inputted"); }
+
+            //check if group inputted is valid
+            if (grp == null) {throw new Exception("\nError: user group input is invalid"); }
+
+            // Update project details
+            project.Details.Neighborhood = Location.valueOf(newNeighborhood.toUpperCase().replace(" ","_"));
+            project.Details.SellingPrice_2Room = sell2room;
+            project.Details.SellingPrice_3Room = sell3room;
+            project.Details.NoOfUnitsLeft_2Room = newTwoRoomUnits;
+            project.Details.NoOfUnitsLeft_3Room = newThreeRoomUnits;
+            project.Details.OpenDate = newOpenDateParsed;
+            project.Details.CloseDate = newCloseDateParsed;
+            project.Details.OfficerSlots = newOfficerSlots;
+            project.Details.OpentoUserGroup = MaritalStatus.valueOf(grp);
+            ProjectListingDB.getInstance().ModifyDB(project, Database.DB_Action.EDIT);
+            System.out.println("\nBTO project updated successfully: " + projectName);
         }
-
-        if (newOfficerSlots > 10) {
-            System.out.println("Officer slots cannot exceed 10.");
-            return;
-        }
-
-        LocalDate newOpenDateParsed = LocalDate.parse(newOpenDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        LocalDate newCloseDateParsed = LocalDate.parse(newCloseDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
-        if (hasOverlappingProject(projectName, newOpenDateParsed, newCloseDateParsed)) {
-            System.out.println("You are already managing another project within the same application period.");
-            return;
-        }
-
-        // Update project details
-        project.Details.Neighborhood = ProjectDetails.Location.valueOf(newNeighborhood.toUpperCase());
-        project.Details.SellingPrice_2Room = sell2room;
-        project.Details.SellingPrice_3Room = sell3room;
-        project.Details.NoOfUnitsLeft_2Room = newTwoRoomUnits;
-        project.Details.NoOfUnitsLeft_3Room = newThreeRoomUnits;
-        project.Details.OpenDate = LocalDate.parse(newOpenDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        project.Details.CloseDate = LocalDate.parse(newCloseDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        project.Details.OfficerSlots = newOfficerSlots;
-        project.Details.activeStatus = vis;
-        project.Details.OpentoUserGroup = switch(grp) {
-            case "SINGLE" -> Applicant.MaritalStatus.SINGLE;
-            case "MARRIED" -> Applicant.MaritalStatus.MARRIED;
-            default -> Applicant.MaritalStatus.ALL;
-        };
-        ProjectListingDB.getInstance().ModifyDB(project, Database.DB_Action.EDIT);
-        System.out.println("BTO project updated successfully: " + projectName);
+        catch (Exception e) { System.out.println( e.getMessage()); }
     }
 
+    //////////////////////////////////////////////////////////////////////////////
+    ////////////////// MANAGER DELETES PROJECT ///////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
 
     public void DeleteBTOProject(String projectName) {
-        // Get project
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
 
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
-        }
+        try {
+            Project project = ProjectListingDB.getInstance().SearchDB(projectName);
 
-        // Delete project
-        ProjectListingDB.getInstance().ModifyDB(project, Database.DB_Action.DELETE);
-        System.out.println("BTO project deleted successfully: " + projectName);
+            //check if project is found
+            if (project == null) { throw new Exception("\nError: Project not found."); }
+
+            // Check if the manager is the creator of the project
+            if (!project.Details.Manager.userID.equals(this.userID)) { 
+                throw new Exception("\nError: You can only delete projects you have created."); }
+
+            // Delete project
+            ProjectListingDB.getInstance().ModifyDB(project, Database.DB_Action.DELETE);
+            System.out.println("\nBTO project deleted successfully: " + projectName);
+
+            // Delete ALL EXISTING RECORDS OF PROJECTS from database
+            for (SystemUser u : UserInfoDB.getInstance().getUserDB())
+            {
+                if (u instanceof Applicant && ((Applicant)u).AppliedProject.equals(projectName))
+                { 
+                    ((Applicant)u).AppliedProject = "";
+                    ((Applicant)u).AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL;
+                    ((Applicant)u).flatTypeBooked = Enum_FlatType.DEFAULT;
+                    UserInfoDB.getInstance().ModifyDB(u, DB_Action.EDIT);
+                }
+
+                if (u instanceof HDB_Officer && ((HDB_Officer)u).project_name.equals(projectName))
+                {
+                    ((HDB_Officer)u).project_name = "";
+                    ((HDB_Officer)u).officerStatus = Enum_OfficerStatus.UNSUCCESSFUL;
+                    UserInfoDB.getInstance().ModifyDB(u, DB_Action.EDIT);
+                }
+            }
+
+            //Remove all enquiries regarding project
+            for (Enquiry e : EnquiryDB.getInstance().getEnquiryDB())
+            {
+                if (e.RegardingProject.equals(projectName))
+                {
+                    EnquiryDB.getInstance().ModifyDB(e,DB_Action.DELETE);
+                }
+            }
+
+            //Remove all requests associated with project
+            for (Request r : RequestsDB.getInstance().getRequestDB())
+            {
+                if (r.RegardingProject.equals(projectName))
+                {
+                    SystemUser initiator = UserInfoDB.getInstance().SearchDB(r.initiator.userID);
+                    //in case Applicant_Application is PENDING, need to revert initator status to UNSUCCESSFUL
+                    if (r instanceof Applicant_Application) {
+                        ((Applicant)initiator).AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL; 
+                        UserInfoDB.getInstance().ModifyDB(initiator, DB_Action.EDIT);
+                    }
+                    //in case Officer_Application is PENDING, need to revert initator status to UNSUCCESSFUL
+                    if (r instanceof Officer_Application) {
+                        ((HDB_Officer)initiator).officerStatus = Enum_OfficerStatus.UNSUCCESSFUL; 
+                        UserInfoDB.getInstance().ModifyDB(initiator, DB_Action.EDIT);
+                    }
+
+                    RequestsDB.getInstance().ModifyDB(r,DB_Action.DELETE);
+                }
+            }
+
+            }
+            catch (ConcurrentModificationException e) {}
+            catch (Exception e) { System.out.println( e.getMessage()); }
     }
+    
+
+    //////////////////////////////////////////////////////////////////////////////
+    ////////////////// MANAGER TOGGLES PROJECT VISIBILITY ////////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+
+    public void ToggleProjectVisibility(String projectName) {
+
+        try {
+            Project project = ProjectListingDB.getInstance().SearchDB(projectName);
+
+            //check if project is found
+            if (project == null) { throw new Exception("\nError: Project not found."); }
+
+            // Check if the manager is the creator of the project
+            if (!project.Details.Manager.userID.equals(this.userID)) { 
+            throw new Exception("\nError: You can only toggle visibility for projects you have created."); }
+
+            //Cannot toggle visiblity of any project ON if there is currently an active project (cannot have more than one active projects at a time)
+            if (!project.Details.visibility && 
+            ProjectListingDB.getInstance().getProjectDB().stream().anyMatch(p -> p.isActive() && p.Details.Manager.userID.equals(userID)))
+            { throw new Exception("\nError: You currently already have an active project! Cannot turn on chosen project's visibility. "); }
+
+            // Toggle project visibility
+            project.ToggleVisibility();
+            ProjectListingDB.getInstance().ModifyDB(project, DB_Action.EDIT);
+            System.out.println("\nProject visibility toggled to: " + (project.Details.visibility ? "ON" : "OFF"));
+        
+        } catch (Exception e) { System.out.println( e.getMessage()); }
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    ////////////////// MANAGER VIEWS CURRENT ACTIVE PROJECT //////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+    
+    public void ViewActiveProject() {
+
+        try { 
+        Project current_proj = ProjectListingDB.getInstance().getProjectDB().stream()
+        .filter(p -> p.isActive() && p.Details.Manager.userID.equals(userID)).findFirst().orElse(null);
+
+        System.out.println("\n"+current_proj.getProjectDetails());
+
+        } catch (NullPointerException e) { System.out.println("\nError: You currently have no active Projects!"); }
+
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    ////////////////// MANAGER VIEWS ALL PROJECTS WITH FILTERS ///////////////////
+    //////////////////////////////////////////////////////////////////////////////
+    
+    public void ViewAllProjects(ArrayList<IFilter> activeFilters) {
+        ProjectListingDB.getInstance().ViewDB(activeFilters);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////
+    ////////////////// - //////////////////////
+    //////////////////////////////////////////////////////////////////////////////
+
 
 
     public void ApproveOfficerApplication(String officerID, String projectName) {
@@ -144,10 +311,10 @@ public class HDB_Manager extends SystemUser{
             return;
         }
 
-        if (hasOverlappingProject(projectName, project.Details.OpenDate, project.Details.CloseDate)) {
-            System.out.println("You are already managing another project within the same application period.");
-            return;
-        }
+        // if (hasOverlappingActiveProject(projectName, project.Details.OpenDate, project.Details.CloseDate)) {
+        //     System.out.println("You are already managing another project within the same application period.");
+        //     return;
+        // }
 
         // Check if there are available officer slots
         if (project.Details.OfficerList.size() >= project.Details.OfficerSlots) {
@@ -161,40 +328,6 @@ public class HDB_Manager extends SystemUser{
         ((HDB_Officer) application.initiator).projectAssigned = project;
         RequestsDB.getInstance().ModifyDB(application, Database.DB_Action.EDIT);
         System.out.println("Officer application approved. Officer added to the project.");
-    }
-
-
-
-    public void ViewAllProjects() {
-        ArrayList<Project> projectList = ProjectListingDB.getInstance().getProjectDB();
-        System.out.println("All Projects:");
-        for (Project project : projectList) {
-            System.out.println(project.getProjectDetails());
-        }
-    }
-
-
-    public void ToggleProjectVisibility(String projectName) {
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
-
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
-        }
-
-        // Check if the manager is the creator of the project
-        if (!project.Details.Manager.userID.equals(this.userID)) {
-            System.out.println("You can only toggle visibility for projects you have created.");
-            return;
-        }
-
-        // Toggle project visibility
-        project.ToggleActiveStatus();
-        String visibilityStatus = project.Details.activeStatus ? "ON" : "OFF";
-        System.out.println("Project visibility toggled to: " + visibilityStatus);
     }
 
     public void ViewMyProjects() {

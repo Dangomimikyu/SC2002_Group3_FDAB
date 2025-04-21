@@ -60,12 +60,11 @@ public class Applicant extends SystemUser{
     }
 
     //applicants can only view projects that are open to their user group (S or M) and visibility turned on
-    public void viewProjectList(IFilter filter) {
+    public void viewProjectList(ArrayList<IFilter> activeFilters) {
 
-        ArrayList<IFilter> Filters = new ArrayList<>();
+        ArrayList<IFilter> Filters = new ArrayList<>(activeFilters);
         Filters.add(new Filter_Marital(this.maritalStatus));
         Filters.add(new Filter_Visibility());
-        Filters.add(filter);
         ProjectListingDB.getInstance().ViewDB(Filters);
 
     }
