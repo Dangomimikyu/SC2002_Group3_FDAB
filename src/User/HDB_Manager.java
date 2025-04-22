@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-
+import java.time.format.DateTimeParseException;
 import Database.*;
 import Database.Database.DB_Action;
 import Filter.Filter_ProjectName;
@@ -12,7 +12,6 @@ import Filter.IFilter;
 import InteractableAttributePackage.*;
 import InteractableAttributePackage.ProjectDetails.Location;
 import InteractableAttributePackage.Request.ApplicationStatus;
-import Managers.OfficerManager;
 import Service.ReportGenerator;
 import User.Applicant.ApplicantStatus;
 import User.Applicant.MaritalStatus;
@@ -20,26 +19,10 @@ import User.HDB_Officer.Enum_OfficerStatus;
 
 public class HDB_Manager extends SystemUser{
 
-    OfficerManager officerManager = OfficerManager.getInstance();
-
     public HDB_Manager(String nric, String p, String n) {
         super(nric, p, n);
         this.UserPerms = usertype.MANAGER;
     }
-
-    //*** */ this is a very complex check, 
-    // instead just make it so that editing projects can only be done if has NO ACTIVE PROJECTS, or if editted project is active
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    // If manager will have an active project during a certain period and the current project's current visibility is ON
-    // Cannot create/edit project such that new application dates overlaps the active one (otherwise will cause 2 active projects at the same time) 
-    // private boolean hasOverlappingActiveProject(String projectName, LocalDate newOpenDate, LocalDate newCloseDate) {
-    //     return ProjectListingDB.getInstance().getProjectDB().stream()
-    //             .anyMatch(p -> p.Details.Manager.userID.equals(this.userID) &&
-    //                     !p.Details.ProjectName.equals(projectName) &&
-    //                     p.Details.visibility &&
-    //                     !(newCloseDate.isBefore(p.Details.OpenDate) || newOpenDate.isAfter(p.Details.CloseDate)));
-    // }
 
     //////////////////////////////////////////////////////////////////////////////
     ////////////////// MANAGER CREATES PROJECT ///////////////////////////////////
@@ -51,14 +34,6 @@ public class HDB_Manager extends SystemUser{
         try {
 
             if (officerSlots > 10) { throw new Exception("\nError: Officer slots cannot exceed 10."); }
-
-            //Check if dates are valid
-            try {
-                LocalDate newOpenDate = LocalDate.parse(openDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                LocalDate newCloseDate = LocalDate.parse(closeDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-            }
-            catch (Exception e) {System.out.println("\nError: Open Date or Closing Date inputted is invalid"); return; }
-
 
             //Cannot create a project if currently has an active one
             if (ProjectListingDB.getInstance().getProjectDB().stream().anyMatch(p -> p.isActive() && p.Details.Manager.userID.equals(userID))) {
@@ -88,6 +63,7 @@ public class HDB_Manager extends SystemUser{
             ProjectListingDB.getInstance().ModifyDB(newProject, Database.DB_Action.ADD);
             System.out.println("\nBTO project created successfully: " + projectName);
         }
+        catch ( DateTimeParseException e ) { System.out.println( "\nError: input open or close dates are in wrong format!"); }
         catch (Exception e) { System.out.println( e.getMessage()); }
     }
 

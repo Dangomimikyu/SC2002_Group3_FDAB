@@ -31,7 +31,7 @@ public class ProjectListingDB extends Database {
         return projList;
     }
 
-    public ArrayList<Project> ViewDB() {
+    public void ViewDB() {
         System.out.println("\nAll projects in order by index: ");
         int index = 0;
         for (Project p : projList) {
@@ -39,7 +39,6 @@ public class ProjectListingDB extends Database {
             System.out.println(p.getProjectDetails());
             index++;
         }
-        return null;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -69,12 +68,12 @@ public class ProjectListingDB extends Database {
     //modify project by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> System.out.println("Error: Adding Projects not supported with index method");
+            case ADD -> System.out.println("\nError: Adding Projects not supported with index method");
             case DELETE -> {
                 writer.DeleteProject(projList.get(index));
                 projList.remove(index);
             }
-            case EDIT -> System.out.println("Error: Editing Projects not supported with index method");
+            case EDIT -> System.out.println("\nError: Editing Projects not supported with index method");
         }
     }
 
@@ -124,7 +123,7 @@ public class ProjectListingDB extends Database {
              + " in " + ((Filter_Alphabetic)filter).order + " order");
         }
         else  { 
-            System.out.println("Error: This filter type is not supported for projects");
+            System.out.println("\nError: This filter type is not supported for projects");
             return;
         }
     }
@@ -216,7 +215,7 @@ public class ProjectListingDB extends Database {
     private void displaySortedWithOriginalIndex(ArrayList<Project> SortedProjects) {
 
         if (SortedProjects.size() == 0) {
-            System.out.println("\nNo Projects found!");
+            System.out.println("\nError: No Projects found!");
         }
 
         for (Project p : SortedProjects) {

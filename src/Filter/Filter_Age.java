@@ -28,7 +28,7 @@ public class Filter_Age implements IFilter {
         else if (o instanceof Applicant) { return isWithinAgeRange((Applicant)o); }
         else if (o instanceof HDB_Manager) { return false; }
 
-        System.out.println("Error: Filtering by Age is not supported for this object type!");
+        System.out.println("\nError: Filtering by Age is not supported for this object type!");
         return false;
 
     }

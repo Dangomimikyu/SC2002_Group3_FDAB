@@ -4,8 +4,6 @@
 package Database;
 
 import java.util.ArrayList;
-
-import InteractableAttributePackage.Project;
 import InteractableAttributePackage.Request;
 import User.SystemUser;
 import Filter.*;
@@ -30,7 +28,7 @@ public class RequestsDB extends Database {
         return reqList;
     }
 
-    public ArrayList<Project> ViewDB() {
+    public void ViewDB() {
         System.out.println("\nAll requests in order by index: ");
         int index = 0;
         for (Request r : reqList) {
@@ -38,7 +36,6 @@ public class RequestsDB extends Database {
             System.out.println(r.getRequestDetails());
             index++;
         }
-        return null;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -66,12 +63,12 @@ public class RequestsDB extends Database {
     //modify request by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> System.out.println("Error: Adding Requests not supported with index method");
+            case ADD -> System.out.println("\nError: Adding Requests not supported with index method");
             case DELETE -> {
                 writer.DeleteRequest(reqList.get(index));
                 reqList.remove(index);
             }
-            case EDIT -> System.out.println("Error: Editing Requests not supported with index method");
+            case EDIT -> System.out.println("\nError: Editing Requests not supported with index method");
         }
     }
 
@@ -135,7 +132,7 @@ public class RequestsDB extends Database {
     private void displaySortedWithOriginalIndex(ArrayList<Request> sortedRequests) {
 
         if (sortedRequests.size() == 0) {
-            System.out.println("\nNo Requests found!");
+            System.out.println("\nError: No Requests found!");
         }
 
         for (Request r : sortedRequests) {

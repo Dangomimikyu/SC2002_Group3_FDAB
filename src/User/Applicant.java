@@ -40,8 +40,12 @@ public class Applicant extends SystemUser{
         super(nric, p, n);
         this.UserPerms = usertype.APPLICANT;
         this.age = a;
-        this.maritalStatus = MaritalStatus.valueOf(m);
         this.AppliedProject = appliedProj;
+        this.maritalStatus = switch(m) {
+            case "MARRIED" -> MaritalStatus.MARRIED;
+            case "SINGLE" -> MaritalStatus.SINGLE;
+            default -> MaritalStatus.ALL;
+        };
         this.AppliedProjectStatus = switch(projStatus) {
             case "SUCCESSFUL" -> ApplicantStatus.SUCCESSFUL;
             case "PENDING" -> ApplicantStatus.PENDING;
@@ -177,15 +181,17 @@ public class Applicant extends SystemUser{
     ////////////////////////////////////////////////////////////////
     ////////////////// BOOK FLAT ///////////////////////////////////
     ////////////////////////////////////////////////////////////////
-    
-    public boolean ValidateIfCanBookFlat() {
+
+    //Request for a booking
+    public void BookFlat(Enum_FlatType flat_to_book) {
+
         try {
-            // Check if the applicant has applied for the project successfully
+            // CheckProjStatus: Check if the applicant has applied for the project successfully
             if (this.AppliedProjectStatus != ApplicantStatus.SUCCESSFUL) {
                 throw new Exception("\nError: You have yet to apply for a project or have already booked a flat, or is waiting for a request to be solved.");
             }
 
-            //Cannot make booking if currently still have a request
+            // CheckCurrentRequest: Cannot make booking if currently still have a request
             if (RequestsDB.getInstance().getRequestDB().stream().anyMatch(r -> this.userID.equals(r.initiator.userID))) {
                 throw new Exception("\nError: You have unresolved/unread requests. Please resolve or read them before booking again.");
             }
@@ -194,47 +200,17 @@ public class Applicant extends SystemUser{
 
             if (project == null) { throw new Exception("\nError: Project not found."); }
 
+            // CheckEligibility and if have available units:
             // Show available flat types based on marital status
             // Single, 35 y/o and above, can ONLY apply for 2-Room
             // Married, 21 y/0 and above, can apply for both
-            System.out.println("Available flat types for project: " + project.Details.ProjectName 
-            + "\n==========================================================");
-            if (this.maritalStatus == MaritalStatus.SINGLE && this.age >= 35) {
-                System.out.println("You are eligible for only a 2-room flat in " + project.Details.ProjectName);
-                System.out.println("2-Room units left: " + project.Details.NoOfUnitsLeft_2Room +
-                                "\n2-Room unit selling price: " + project.Details.SellingPrice_2Room);
-                System.out.println("Please enter 1 if you want to book a 2-Room flat or 0 to decline booking for now: ");
-                return true;
-            }
-            else if (this.maritalStatus == MaritalStatus.MARRIED && this.age >= 21) {
-                System.out.println("You are eligible for both a 2-room and 3-room flat in " + project.Details.ProjectName);
-                System.out.println("2-Room units left: " + project.Details.NoOfUnitsLeft_2Room +
-                                "\n2-Room unit selling price: " + project.Details.SellingPrice_2Room);
-                System.out.println("3-Room units left: " + project.Details.NoOfUnitsLeft_3Room +
-                                "\n3-Room unit selling price: " + project.Details.SellingPrice_3Room);
-                System.out.println("Please enter 1 if you want to book a 2-Room flat or 2 to book a 3-room flat, or 0 to decline for now: ");
-                return true;
-            }
-            else {
-                System.out.println("You are not eligible to book for any flats." + 
-                "\nSingles and 35 y/o and above are only eligible for 2-room flats" +
-                "\nMarried and 21 y/o and above are eligible for both 2-room flats and 3-room flats");
-                return false;
-            }
-        }
-        catch (Exception e) { System.out.println( e.getMessage()); return false; }
-    }
-
-    //Request for a booking
-    public void BookFlat(Enum_FlatType flat_to_book) {
-
-        try {
-
-            Project project = ProjectListingDB.getInstance().SearchDB(this.AppliedProject);
 
             if (flat_to_book == Enum_FlatType.TWO_ROOM) {
+                if (!(this.maritalStatus == MaritalStatus.SINGLE && this.age >= 35) ||
+                 !(this.maritalStatus == MaritalStatus.MARRIED && this.age >= 21) )
+                 { throw new Exception("\nError: You are not eligible for this flat!"); }
                 if (project.Details.NoOfUnitsLeft_2Room == 0) {
-                    throw new Exception("\nError: There is no more available units of this type. Returning to main menu...");
+                    throw new Exception("\nError: There is no more available units of this type");
                 }
                 Booking booking = new Booking(this, this.AppliedProject, Enum_FlatType.TWO_ROOM);
                 RequestsDB.getInstance().ModifyDB(booking, DB_Action.ADD);
@@ -242,12 +218,11 @@ public class Applicant extends SystemUser{
                 "\nAwaiting approval from an officer of your applied project.");
             }
             else if (flat_to_book == Enum_FlatType.THREE_ROOM) {
+                if (!(this.maritalStatus == MaritalStatus.MARRIED && this.age >= 21))
+                { throw new Exception("\nError: You are not eligible for this flat!"); }
                 if (project.Details.NoOfUnitsLeft_3Room == 0) {
-                    throw new Exception("\nError: There is no more available units of this type. Returning to main menu...");
+                    throw new Exception("\nError: There is no more available units of this type");
                 }
-                else if (this.maritalStatus == MaritalStatus.SINGLE && this.age >= 35) {
-                    throw new Exception("\nError: 2 indicates 3-room flats which you can't book. Returning to main menu...");
-                }           
                 Booking booking = new Booking(this, this.AppliedProject, Enum_FlatType.THREE_ROOM);
                 RequestsDB.getInstance().ModifyDB(booking, DB_Action.ADD);
                 System.out.println("\nYou have successfully booked a 3-Room flat in " + project.Details.ProjectName + 
@@ -283,7 +258,11 @@ public class Applicant extends SystemUser{
 
     //only view all created enquiries
     public void ViewEnquiry() {
-        enquiryManager.ViewEnquiries(this);
+        if (this instanceof HDB_Officer) { 
+            //placeholder applicant variant of hdbofficer. this is so that officers can view created enquiries in applicant menu
+            enquiryManager.ViewEnquiries(new Applicant("", this.userID, -1,"", "","","", "")); 
+        }
+        else { enquiryManager.ViewEnquiries(this); }
     }
 
     ////////////////////////////////////////////////////////////////

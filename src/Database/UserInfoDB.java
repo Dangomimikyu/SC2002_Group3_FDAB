@@ -4,7 +4,6 @@
 package Database;
 
 import java.util.ArrayList;
-import InteractableAttributePackage.Project;
 import User.*;
 import Filter.*;
 
@@ -28,7 +27,7 @@ public class UserInfoDB extends Database {
         return userList;
     }
 
-    public ArrayList<Project> ViewDB() {
+    public void ViewDB() {
         System.out.println("\nAll users in order by index: ");
         int index = 0;
         for (SystemUser u : userList) {
@@ -36,7 +35,6 @@ public class UserInfoDB extends Database {
             System.out.println(u.getUserDetails());
             index++;
         }
-        return null;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -91,7 +89,7 @@ public class UserInfoDB extends Database {
                 writer.WriteNewUser(user);
                 userList.add(user);
             }
-            case DELETE -> System.out.println("Error: Deleting Users not supported");
+            case DELETE -> System.out.println("\nError: Deleting Users not supported");
             case EDIT -> {
                 writer.RewriteUser(user);
                 userList.set(userList.indexOf(user), user);
@@ -160,7 +158,7 @@ public class UserInfoDB extends Database {
     private void displaySortedWithOriginalIndex(ArrayList<SystemUser> sortedUsers) {
 
         if (sortedUsers.size() == 0) {
-            System.out.println("\nNo Users found!");
+            System.out.println("\nError: No Users found!");
         }
 
         for (SystemUser u : sortedUsers) {

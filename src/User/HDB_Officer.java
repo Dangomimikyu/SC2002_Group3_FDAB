@@ -1,11 +1,13 @@
 package User;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 import InteractableAttributePackage.*;
 import InteractableAttributePackage.Request.ApplicationStatus;
+import Managers.EnquiryManager;
 import Database.*;
 import Database.Database.DB_Action;
+import Filter.Filter_ProjectName;
+import Filter.IFilter;
 
 //HDB Officer possess all applicant’s capabilities.
 public class HDB_Officer extends Applicant{
@@ -19,6 +21,7 @@ public class HDB_Officer extends Applicant{
     public Project projectAssigned;
     public String project_name; //Managed Project Name
     public Enum_OfficerStatus officerStatus;
+    private EnquiryManager enquiryManager = EnquiryManager.getInstance();
 
     public HDB_Officer(String name, String nric, int age, String marital, String pass, 
     String applied_proj, String appStatus, String bookedflattype, String managed_proj, String offStatus)
@@ -101,7 +104,7 @@ public class HDB_Officer extends Applicant{
     }
 
     /////////////////////////////////////////////////////////////////////////////
-    ////////////////////// VIEW OFFICER STATUS //////////////////////////////////
+    ////////////////////// VIEW ASSIGNED PROJECT STATUS /////////////////////////
     /////////////////////////////////////////////////////////////////////////////
 
     public void viewAppliedProjectStatusOfficer() {
@@ -120,14 +123,9 @@ public class HDB_Officer extends Applicant{
         if (projectAssigned == null) {
             System.out.println("\nError: You are not managing any project! ");
         }
-        ArrayList<Request> handled_reqs = RequestsDB.getInstance().getRequestDB().stream()
-        .filter(req -> (req instanceof Booking) &&
-                       req.RegardingProject.equals(this.projectAssigned.Details.ProjectName) &&
-                       req.status == Request.ApplicationStatus.PENDING).map(req -> req)
-                       .collect(Collectors.toCollection(ArrayList::new));
-        for (Request req : handled_reqs) {
-            System.out.println(req.getRequestDetails());
-        }
+        ArrayList<IFilter> filters = new ArrayList<>();
+        filters.add(new Filter_ProjectName(projectAssigned.Details.ProjectName, "BOOKING"));
+        RequestsDB.getInstance().ViewDB(filters);
     }
 
     public void ResolveHandledRequest(int index, boolean approve)
@@ -155,7 +153,7 @@ public class HDB_Officer extends Applicant{
             System.out.println("\nRequest successfully resolved");
 
             //auto generate receipt
-            GenerateReceipt(req.initiator.userID);
+            if (approve) { GenerateReceipt(req.initiator.userID); }
         }
         catch (Exception e) { System.out.println( e.getMessage()); }
 
@@ -192,19 +190,7 @@ public class HDB_Officer extends Applicant{
     public void ViewEnquiries() {
         try {
             if (this.projectAssigned == null) { throw new Exception("No project assigned. Cannot view enquiries."); }
-
-            ArrayList<Enquiry> enquiries = EnquiryDB.getInstance().getEnquiryDB();
-            boolean hasEnquiries = false;
-
-            System.out.println("\nEnquiries regarding project: " + this.projectAssigned.Details.ProjectName);
-            for (Enquiry enquiry : enquiries) {
-                if (enquiry.RegardingProject.equals(this.projectAssigned.Details.ProjectName)) {
-                    System.out.println(enquiry.getEnquiryDetails());
-                    hasEnquiries = true;
-                }
-            }
-
-            if (!hasEnquiries) { throw new Exception("\nError: No enquiries found for the assigned project."); }
+            enquiryManager.ViewEnquiries(this);
         }
         catch (Exception e) { System.out.println( e.getMessage()); }
     }
@@ -216,19 +202,17 @@ public class HDB_Officer extends Applicant{
     public void ReplyToEnquiry(int index, String reply) {
 
         try {
-
             if (this.projectAssigned == null) { throw new Exception("\nError: No project assigned. Cannot reply to enquiries."); }
 
             Enquiry e = EnquiryDB.getInstance().getEnquiryDB().get(index);
             if ( !e.isUnreplied() || !projectAssigned.Details.ProjectName.equals(e.RegardingProject))
             { throw new Exception("\nError: Not allowed to handle given enquiry!"); }
 
-            e.Replier = this;
-            e.Reply = reply;
+            if (e.Enquirer.userID.equals(userID)) { throw new Exception("\nError: you cannot reply to your own created enquiries!");}
+
+            enquiryManager.ReplyEnquiry(e, this, reply);
             
-            EnquiryDB.getInstance().ModifyDB(e, DB_Action.EDIT);
             System.out.println("\nSuccessfully replied to enquiry");
-            
         }
         catch (Exception e) { System.out.println( e.getMessage()); }
     }

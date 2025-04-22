@@ -14,7 +14,7 @@ public class Filter_Visibility implements IFilter {
 
         if (o instanceof Project) { return isVisible((Project)o); }
 
-        System.out.println("Error: Filtering by visibility is not supported for this object type!");
+        System.out.println("\nError: Filtering by visibility is not supported for this object type!");
         return false;
     }
 

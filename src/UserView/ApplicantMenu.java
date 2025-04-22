@@ -2,6 +2,7 @@ package UserView;
 
 import Filter.*;
 import User.Applicant;
+import User.Applicant.MaritalStatus;
 import User.Enum_FlatType;
 import User.HDB_Officer;
 import InteractableAttributePackage.ProjectDetails.Location;
@@ -83,14 +84,20 @@ public class ApplicantMenu extends Menu
                     user.DeleteEnquiry(title,projectName);
                 }
                 case 8 -> {
-                    if (user.ValidateIfCanBookFlat()) {
-                        int flat_choice = -1;
-                        while (choice != 2 && choice != 1 && choice != 0) {
-                            flat_choice = GetIntInput("");
-                        }
-                        if (flat_choice == 1) { user.BookFlat(Enum_FlatType.TWO_ROOM); }
-                        else if (flat_choice == 2) { user.BookFlat(Enum_FlatType.THREE_ROOM); }
+                    // Single, 35 y/o and above, can ONLY apply for 2-Room
+                    // Married, 21 y/0 and above, can apply for both
+                    if (user.maritalStatus == MaritalStatus.SINGLE && user.age >= 35) {
+                        System.out.println("\nNote: you are eligible for only two-room flats");
                     }
+                    else if (user.maritalStatus == MaritalStatus.MARRIED && user.age >= 21) {
+                        System.out.println("\nNote: you are eligible for both two-room and three-room flats");
+                    }
+                    int flat_choice = -1;
+                    while (choice != 2 && choice != 1 && choice != 0) {
+                        flat_choice = GetIntInput("Enter your flat choice to book (0 to decline for now, 1 for 2-room, 2 for 3-room): ");
+                    }
+                    if (flat_choice == 1) { user.BookFlat(Enum_FlatType.TWO_ROOM); }
+                    else if (flat_choice == 2) { user.BookFlat(Enum_FlatType.THREE_ROOM); }
                 }
                 case 9 -> {
                     int yes_or_no = -1;

@@ -5,7 +5,6 @@ package Database;
 
 import java.util.ArrayList;
 import InteractableAttributePackage.Enquiry;
-import InteractableAttributePackage.Project;
 import User.SystemUser;
 import Filter.*;
 
@@ -29,7 +28,7 @@ public class EnquiryDB extends Database {
         return enqList;
     }
 
-    public ArrayList<Project> ViewDB() {
+    public void ViewDB() {
         System.out.println("\nAll enquiries in order by index: ");
         int index = 0;
         for (Enquiry e : enqList) {
@@ -37,7 +36,6 @@ public class EnquiryDB extends Database {
             System.out.println(e.getEnquiryDetails());
             index++;
         }
-        return null;
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -65,12 +63,12 @@ public class EnquiryDB extends Database {
     //modify enquiry by index. Works in conjunction with ViewDB().
     public void ModifyDB(int index, DB_Action action) {
         switch (action) {
-            case ADD -> System.out.println("Error: Adding Enquiries not supported with index method");
+            case ADD -> System.out.println("\nError: Adding Enquiries not supported with index method");
             case DELETE -> {
                 writer.DeleteEnquiry(enqList.get(index));
                 enqList.remove(index);
             }
-            case EDIT -> System.out.println("Error: Editing Enquiries not supported with index method");
+            case EDIT -> System.out.println("\nError: Editing Enquiries not supported with index method");
         }
     }
 
@@ -112,7 +110,7 @@ public class EnquiryDB extends Database {
             System.out.println("Filter by enquiries regarding project: " + (((Filter_ProjectName)filter).project_name));
         }
         else  { 
-            System.out.println("Error: This filter type is not supported for enquiries");
+            System.out.println("\nError: This filter type is not supported for enquiries");
             return;
         }
     }
@@ -134,7 +132,7 @@ public class EnquiryDB extends Database {
     private void displaySortedWithOriginalIndex(ArrayList<Enquiry> SortedEnquiries) {
 
         if (SortedEnquiries.size() == 0) {
-            System.out.println("\nNo Enquiries found!");
+            System.out.println("\nError: No Enquiries found!");
         }
 
         for (Enquiry e : SortedEnquiries) {
@@ -148,13 +146,7 @@ public class EnquiryDB extends Database {
             }
         }
     }
-
-    //placeholder. remove later
-    public Enquiry SearchDB(String title)
-    {
-        return enqList.stream().filter(e -> title.equals(e.Title)).findFirst().orElse(null);
-    }
-
+    
     //find unique enquiry by title, userid and regarding what project
     public Enquiry SearchDB(String title, String userid, String RegardingProject)
     {

@@ -81,7 +81,7 @@ public abstract class Menu
                 System.out.println("\nError: Invalid input");
                 continue;
             }
-            finally { break; }
+            break;
         }
 
         return choice;

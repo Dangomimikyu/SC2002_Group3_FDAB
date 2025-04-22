@@ -3,7 +3,6 @@
 package Database;
 
 import Service.*;
-import InteractableAttributePackage.Project;
 import java.util.ArrayList;
 
 public abstract class Database {
@@ -16,9 +15,7 @@ public abstract class Database {
     }
 
     //ViewDB without filter as an argument. Since by default, we view by alphabetical order, should we still use it?
-    public ArrayList<Project> ViewDB() {
-        return null;
-    };
+    public void ViewDB() {};
     public ArrayList<Object> getDB() {return null;};
     //ModifyDB takes in an index and an action to perform on the database.
     //ModifyDB has two different overloads, one for modifying by index and one for modifying by object.

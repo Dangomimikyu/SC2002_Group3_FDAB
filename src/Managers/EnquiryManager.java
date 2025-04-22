@@ -4,11 +4,9 @@ import Database.Database;
 import Database.EnquiryDB;
 import InteractableAttributePackage.Enquiry;
 import User.Applicant;
+import User.HDB_Officer;
 import User.SystemUser;
-
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class EnquiryManager
 {
@@ -25,54 +23,54 @@ public class EnquiryManager
         return instance;
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////////
+    /////////////// ENQUIRY MANAGER FETCH ENQUIRIES DEPENDING ON APPLICANT OR OFFICER  ///////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
     public void ViewEnquiries(SystemUser s)
     {
-        if (s instanceof Applicant)
-        {
-            // show this applicant's own enquiries
-            System.out.println("\nShowing your enquiries:" + "\n====================================");
-            ArrayList<Enquiry> enqList = EnquiryDB.getInstance().getEnquiryDB();
-
-            for (Enquiry e : enqList)
+        try {
+            boolean hasEnquiries = false;
+            //HDBOfficers can view all enquiries regarding their assigned project + created enquiries
+            if (s instanceof HDB_Officer)
             {
-                if (Objects.equals(e.Enquirer.userID, s.userID)) {
-                    System.out.println(e.getEnquiryDetails() + "\n====================================");
+                System.out.println("\nShowing handled enquiries:" + "\n====================================");
+                for (Enquiry e : EnquiryDB.getInstance().getEnquiryDB())
+                {
+                    if (e.RegardingProject.equals(((HDB_Officer)s).project_name)) {
+                        System.out.println(e.getEnquiryDetails() + "\n====================================");
+                        hasEnquiries = true;
+                    }
                 }
             }
-
+            //Applicants can only view all enquiries they have created
+            else if (s instanceof Applicant)
+            {
+                System.out.println("\nShowing your enquiries:" + "\n====================================");
+                for (Enquiry e : EnquiryDB.getInstance().getEnquiryDB())
+                {
+                    if (Objects.equals(e.Enquirer.userID, s.userID)) {
+                        System.out.println(e.getEnquiryDetails() + "\n====================================");
+                        hasEnquiries = true;
+                    }
+                }
+            }
+            if (!hasEnquiries) { throw new Exception("\nNo enquiries can be found!"); }
         }
-        else {
-            EnquiryDB.getInstance().ViewDB();
-        }
+        catch (Exception e) { System.out.println(e.getMessage()); }
     }
 
-    public void ReplyEnquiry(SystemUser s)
+    //////////////////////////////////////////////////////////////////////////////////////////
+    /////////////// ENQUIRY MANAGER REPLIES TO ENQUIRIES FOR OFFICER /////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+    public void ReplyEnquiry(Enquiry enq, SystemUser s, String reply)
     {
-        if (s instanceof Applicant)
-        {
-            // this should never happen but just in case
-            System.out.println("This user doesn't have the ability to see all enquiries");
-            return;
-        }
-        Scanner sc = new Scanner(System.in);
-
-        System.out.println("Choose an enquiry to reply to:");
-        EnquiryDB.getInstance().ViewDB();
-
-        System.out.print("Enter name of enquiry to reply to: ");
-        String enqName = sc.nextLine();
-
-        Enquiry enq = EnquiryDB.getInstance().SearchDB(enqName);
-        if (enq != null)
-        {
-            System.out.print("Enter reply:");
-            String reply = sc.nextLine();
-            enq.Reply = reply; // must replace this with the function
-        }
-        else
-        {
-            System.out.println("No enquiry with a project by that name.");
-        }
+        try {
+            enq.Replier = s;
+            enq.Reply = reply;
+            EditEnquiry(enq);
+        } catch (Exception e) { System.out.println(e.getMessage()); }
     }
 
     public Enquiry getEnquiryWithDetails(String title, SystemUser s, String projname)

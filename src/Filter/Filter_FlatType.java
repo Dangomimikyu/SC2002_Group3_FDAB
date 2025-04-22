@@ -28,7 +28,7 @@ public class Filter_FlatType implements IFilter {
         else if (o instanceof Applicant_Application || o instanceof Officer_Application) {return false; }
         else if (o instanceof Applicant) { return isBookedWith((Applicant)o); }
         else if (o instanceof HDB_Manager) { return false; }
-        System.out.println("Error: Filtering by Flat Types is not supported for this object type!");
+        System.out.println("\nError: Filtering by Flat Types is not supported for this object type!");
         return false;
     }
 

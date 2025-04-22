@@ -104,7 +104,7 @@ public class Writer
             String user_info ="";
             if (user instanceof HDB_Officer) 
             {
-                bw.write("Name,NRIC,Age,MaritalStatus,Password,AppliedProject,ApplicantStatus,BookedFlatType,ManagedProject,OfficerStatus");
+                bw.write("Name,UserID,Age,MaritalStatus,Password,AppliedProject,ApplicantStatus,BookedFlatType,ManagedProject,OfficerStatus");
                 HDB_Officer off = (HDB_Officer)user;
                 user_info = String.join(",",off.name,off.userID,String.valueOf(off.age)
                 ,String.valueOf(off.maritalStatus),off.password,off.AppliedProject,String.valueOf(off.AppliedProjectStatus)
@@ -112,7 +112,7 @@ public class Writer
             } 
             else if (user instanceof Applicant) 
             {
-                bw.write("Name,NRIC,Age,MaritalStatus,Password,AppliedProject,ApplicantStatus,BookedFlatType");
+                bw.write("Name,UserID,Age,MaritalStatus,Password,AppliedProject,ApplicantStatus,BookedFlatType");
                 Applicant app = (Applicant)user;
                 user_info = String.join(",",app.name,app.userID,String.valueOf(app.age)
                 ,String.valueOf(app.maritalStatus),app.password,app.AppliedProject,String.valueOf(app.AppliedProjectStatus)
@@ -120,7 +120,7 @@ public class Writer
             } 
             else if (user instanceof HDB_Manager) 
             {
-                bw.write("Name,NRIC,Password");
+                bw.write("Name,UserID,Password");
                 HDB_Manager manager = (HDB_Manager)user;
                 user_info = String.join(",",manager.name,manager.userID,manager.password);
             }
@@ -151,7 +151,7 @@ public class Writer
         {
             if (!fileExists) 
             {
-                bw.write("Title,RegardingProject,Description,EnquirerID,Reply,ReplySenderID");
+                bw.write("Title,RegardingProject,Description,EnquirerID,Reply,ReplierID");
             }
             bw.newLine();
             bw.write(String.join(",",enq.Title,enq.RegardingProject,enq.Description,enq.Enquirer.userID,"",""));
@@ -183,7 +183,7 @@ public class Writer
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
-            bw.write("Title,RegardingProject,Description,EnquirerID,Reply,ReplySenderID");
+            bw.write("Title,RegardingProject,Description,EnquirerID,Reply,ReplierID");
             bw.newLine();
             for (String line : lines) 
             {
@@ -225,7 +225,7 @@ public class Writer
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
-            bw.write("Title,RegardingProject,Description,EnquirerID,Reply,ReplySenderID");
+            bw.write("Title,RegardingProject,Description,EnquirerID,Reply,ReplierID");
             for (String line : lines) 
             {
                 bw.newLine();
@@ -283,7 +283,7 @@ public class Writer
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
-            bw.write("Project Name,Neighborhood,SellingPriceFor2Room,SellingPrice3Room,NoOfUnitsLeft2Room,NoOfUnitsLeft3Room,Application opening date,Application closing date,Manager,Officer Slot,Officers,Visibility,OpentoUserGroup");
+            bw.write("Project Name,Neighborhood,SellingPriceFor2Room,SellingPrice3Room,NoOfUnitsLeft2Room,NoOfUnitsLeft3Room,Application opening date,Application closing date,ManagerID,Officer Slot,OfficersID,Visibility,OpentoUserGroup");
             for (String line : lines) 
             {
                 bw.newLine();
@@ -315,7 +315,7 @@ public class Writer
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
-            bw.write("Project Name,Neighborhood,SellingPriceFor2Room,SellingPrice3Room,NoOfUnitsLeft2Room,NoOfUnitsLeft3Room,Application opening date,Application closing date,Manager,Officer Slot,Officers,Visibility,OpentoUserGroup");
+            bw.write("Project Name,Neighborhood,SellingPriceFor2Room,SellingPrice3Room,NoOfUnitsLeft2Room,NoOfUnitsLeft3Room,Application opening date,Application closing date,ManagerID,Officer Slot,OfficersID,Visibility,OpentoUserGroup");
             for (String line : lines) 
             {
                 bw.newLine();

@@ -34,7 +34,7 @@ public class OfficerMenu extends Menu
             System.out.println("| 6.  View handled bookings        |");
             System.out.println("| 7.  Resolve a Booking            |");
             System.out.println("| 8.  Update Flat Selection        |");
-            System.out.println("| 9. View Handled Enquiries        |");
+            System.out.println("| 9.  View Handled Enquiries       |");
             System.out.println("| 10. Reply to handled Enquiry     |");
             System.out.println("| 11. Change Password              |");
             System.out.println("| 12. Log out                      |");

@@ -21,7 +21,7 @@ public class Filter_ProjectName implements IFilter{
         else if (o instanceof Applicant) { return isTiedToProject((Applicant)o); }
         else if (o instanceof HDB_Manager) { return false; }
 
-        System.out.println("Error: Filtering by project name is not supported for this object type!");
+        System.out.println("\nError: Filtering by project name is not supported for this object type!");
         return false;
     }
 

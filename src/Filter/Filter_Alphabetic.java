@@ -25,7 +25,7 @@ public class Filter_Alphabetic implements IFilter {
         else if (o instanceof SystemUser) { return StartsWithChar((SystemUser)o); }
         else if (o instanceof Request) { return StartsWithChar((Request)o); }
 
-        System.out.println("Error: Filtering by Alphabetic is not supported for this object type!");
+        System.out.println("\nError: Filtering by Alphabetic is not supported for this object type!");
         return false;
     }
 

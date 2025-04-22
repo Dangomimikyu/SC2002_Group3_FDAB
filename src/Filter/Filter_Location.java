@@ -16,7 +16,7 @@ public class Filter_Location implements IFilter {
 
         if (o instanceof Project) { return isInLocation((Project)o);}
 
-        System.out.println("Error: Filtering by location is not supported for this object type!");
+        System.out.println("\nError: Filtering by location is not supported for this object type!");
         return false;
     }
 
