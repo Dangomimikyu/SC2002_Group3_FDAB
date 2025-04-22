@@ -40,6 +40,26 @@ public class UserInfoDB extends Database {
     }
 
     ///////////////////////////////////////////////////////////////////////
+    /////////////////// GET DB WITH FILTERS ///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    
+    //unique getdb method meant to be used in ReportGenerator
+    public ArrayList<SystemUser> GetDB(ArrayList<IFilter> filters) {
+
+        for ( IFilter filter : filters) { displayFilterInformation(filter); }
+
+        ArrayList<SystemUser> sortedUsers = new ArrayList<>(userList);
+
+        for (IFilter filter : filters) {
+            if (filter instanceof Filter_Alphabetic) { SortInOrder(sortedUsers, (Filter_Alphabetic)filter); }
+            else if (filter instanceof Filter_Age) { SortInOrder(sortedUsers, (Filter_Age)filter); }
+            else { sortedUsers.removeIf(u -> !filter.FilterBy(u)); }
+        }
+
+        return sortedUsers;
+    }
+
+    ///////////////////////////////////////////////////////////////////////
     /////////////////// VIEW DB WITH FILTERS //////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
@@ -87,20 +107,23 @@ public class UserInfoDB extends Database {
     private void displayFilterInformation(IFilter filter) {
         if (filter instanceof Filter_Marital) {
             System.out.println("Filter by users with marital status: " + ((Filter_Marital)filter).maritalStatus);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Age) {
             System.out.println("Filter users if is in the age group between: " + 
             ((Filter_Age)filter).minAge + " and " + ((Filter_Age)filter).maxAge + " in " + ((Filter_Age)filter).order + " order");
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Alphabetic) {
             System.out.println("Filter by user's name starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
             + " in " + ((Filter_Alphabetic)filter).order + " order");
-            System.out.println("============================================================================");
+        }
+        else if (filter instanceof Filter_ProjectName) {
+            System.out.println("Filter by " + (((Filter_ProjectName)filter).type) + " tied to project: " + (((Filter_ProjectName)filter).project_name));
+        }
+        else if (filter instanceof Filter_FlatType) {
+            System.out.println("Filter users that are booked with flat type: " + (((Filter_FlatType)filter).flatType));
         }
         else {
-            System.out.println("Error: This filter method is not supported for users");
+            System.out.println("\nError: This filter method is not supported for users");
             return;
         }
     }
@@ -151,6 +174,7 @@ public class UserInfoDB extends Database {
         }
     }
 
+    //userID is unique
     public SystemUser SearchDB(String userID)
     {
         return userList.stream().filter(u -> userID.equals(u.userID)).findFirst().orElse(null);

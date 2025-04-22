@@ -105,29 +105,27 @@ public class ProjectListingDB extends Database {
     private void displayFilterInformation(IFilter filter) {
         if (filter instanceof Filter_FlatType) {
             System.out.println("Filter by project's availability of units of flat type: " + ((Filter_FlatType)filter).flatType);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Marital) {
             System.out.println("Filter by project's open to user group of marital status: " + ((Filter_Marital)filter).maritalStatus);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Visibility) {
             System.out.println("Filter by project if active status/visibility is: " + ((Filter_Visibility)filter).isVisible);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Location) {
             System.out.println("Filter by project if is in neighbourhood: " + ((Filter_Location)filter).location);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Age) {
             System.out.println("Filter by project if it's age(years) is between: " + 
             ((Filter_Age)filter).minAge + " and " + ((Filter_Age)filter).maxAge + " in " + ((Filter_Age)filter).order + " order");
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Alphabetic) {
             System.out.println("Filter by project name starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
              + " in " + ((Filter_Alphabetic)filter).order + " order");
-             System.out.println("============================================================================");
+        }
+        else  { 
+            System.out.println("Error: This filter type is not supported for projects");
+            return;
         }
     }
 
@@ -232,6 +230,7 @@ public class ProjectListingDB extends Database {
         }
     }
 
+    //project name is the unique identifier
     public Project SearchDB(String projectName)
     {
         return projList.stream().filter(p -> projectName.equals(p.Details.ProjectName)).findFirst().orElse(null);

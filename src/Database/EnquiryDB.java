@@ -100,16 +100,16 @@ public class EnquiryDB extends Database {
     private void displayFilterInformation(IFilter filter) {
         if (filter instanceof Filter_FlatType) {
             System.out.println("Filter by enquiries containing flat type keyword: " + ((Filter_FlatType)filter).flatType);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Marital) {
             System.out.println("Filter by enquiries containing marital status keyword: " + ((Filter_Marital)filter).maritalStatus);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Alphabetic) {
             System.out.println("Filter by enquiries title starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
              + " in " + ((Filter_Alphabetic)filter).order + " order");
-             System.out.println("============================================================================");
+        }
+        else if (filter instanceof Filter_ProjectName) {
+            System.out.println("Filter by enquiries regarding project: " + (((Filter_ProjectName)filter).project_name));
         }
         else  { 
             System.out.println("Error: This filter type is not supported for enquiries");
@@ -149,8 +149,16 @@ public class EnquiryDB extends Database {
         }
     }
 
-    public Enquiry SearchDB(String projectName)
+    //placeholder. remove later
+    public Enquiry SearchDB(String title)
     {
-        return enqList.stream().filter(pp -> projectName.equals(pp.Title)).findFirst().orElse(null);
+        return enqList.stream().filter(e -> title.equals(e.Title)).findFirst().orElse(null);
+    }
+
+    //find unique enquiry by title, userid and regarding what project
+    public Enquiry SearchDB(String title, String userid, String RegardingProject)
+    {
+        return enqList.stream().filter(e -> title.equals(e.Title) && userid.equals(e.Enquirer.userID)
+        && RegardingProject.equals(e.RegardingProject)).findFirst().orElse(null);
     }
 }

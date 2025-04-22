@@ -1,5 +1,7 @@
 package Service;
 
+import java.util.regex.Pattern;
+
 import Database.UserInfoDB;
 import User.SystemUser;
 
@@ -12,15 +14,16 @@ public class Authenticator {
     }
 
     public boolean changePassword(String userID, String oldPassword, String newPassword) {
+        
         SystemUser user = login(userID, oldPassword);
+        if (newPassword.length() == 0) { System.out.println("\nError: Password cannot be empty!"); return false; }
         if (user != null) {
-
             user.password = newPassword;
             UserInfoDB.getInstance().ModifyDB(user, Database.Database.DB_Action.EDIT);
-            System.out.println("Password for user " + userID + " has been changed successfully.");
+            System.out.println("\nPassword for user " + userID + " has been changed successfully.");
             return true;
         } else {
-            System.out.println("Error: Invalid User ID or Old Password.");
+            System.out.println("\nError: Invalid User ID or Old Password.");
             return false;
         }
     }

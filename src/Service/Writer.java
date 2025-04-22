@@ -62,7 +62,7 @@ public class Writer
             }
             bw.write(user_info);
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
     public void RewriteUser(SystemUser user) 
@@ -97,7 +97,7 @@ public class Writer
                 }
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
@@ -133,7 +133,7 @@ public class Writer
             }
             bw.write(user_info);
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
 
@@ -156,7 +156,7 @@ public class Writer
             bw.newLine();
             bw.write(String.join(",",enq.Title,enq.RegardingProject,enq.Description,enq.Enquirer.userID,"",""));
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
     public void RewriteEnquiry(Enquiry enq) {
@@ -179,7 +179,7 @@ public class Writer
                 }
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
@@ -198,7 +198,7 @@ public class Writer
             }
 
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
     public void DeleteEnquiry(Enquiry enq) {
@@ -221,7 +221,7 @@ public class Writer
                 }
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
@@ -232,7 +232,7 @@ public class Writer
                 bw.write(line);
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
 
@@ -258,7 +258,7 @@ public class Writer
 
             bw.write(project_info);
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
     public void DeleteProject(Project p) {
@@ -279,7 +279,7 @@ public class Writer
                 }
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
@@ -290,7 +290,7 @@ public class Writer
                 bw.write(line);
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
     public void RewriteProject(Project p) {
@@ -311,7 +311,7 @@ public class Writer
                 }
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
@@ -333,7 +333,7 @@ public class Writer
 
             bw.write(project_info);
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -367,7 +367,7 @@ public class Writer
 
             bw.write(String.join(",",r.getRequestType(),r.RegardingProject,r.initiator.userID,handlerID,status,bookedFlatType));
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
     public void DeleteRequest(Request r) {
@@ -389,7 +389,7 @@ public class Writer
                 }
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
@@ -400,7 +400,7 @@ public class Writer
                 bw.write(line);
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 
     public void RewriteRequest(Request r) {
@@ -422,7 +422,7 @@ public class Writer
                 }
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) 
         {
@@ -447,6 +447,6 @@ public class Writer
 
             bw.write(String.join(",",r.getRequestType(),r.RegardingProject,r.initiator.userID,handlerID,status,bookedFlatType));
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
     }
 }

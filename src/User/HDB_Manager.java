@@ -3,19 +3,24 @@ package User;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
 import java.util.stream.Collectors;
 
 import Database.*;
 import Database.Database.DB_Action;
+import Filter.Filter_ProjectName;
 import Filter.IFilter;
 import InteractableAttributePackage.*;
 import InteractableAttributePackage.ProjectDetails.Location;
+import InteractableAttributePackage.Request.ApplicationStatus;
+import Managers.OfficerManager;
+import Service.ReportGenerator;
 import User.Applicant.ApplicantStatus;
 import User.Applicant.MaritalStatus;
 import User.HDB_Officer.Enum_OfficerStatus;
 
 public class HDB_Manager extends SystemUser{
+
+    OfficerManager officerManager = OfficerManager.getInstance();
 
     public HDB_Manager(String nric, String p, String n) {
         super(nric, p, n);
@@ -172,35 +177,42 @@ public class HDB_Manager extends SystemUser{
             System.out.println("\nBTO project deleted successfully: " + projectName);
 
             // Delete ALL EXISTING RECORDS OF PROJECTS from database
-            for (SystemUser u : UserInfoDB.getInstance().getUserDB())
+            // Delete all records of project and reset statuses for affected users
+            ArrayList<SystemUser> userlist_copy = new ArrayList<>(UserInfoDB.getInstance().getUserDB());
+            for (SystemUser u : userlist_copy)
             {
                 if (u instanceof Applicant && ((Applicant)u).AppliedProject.equals(projectName))
                 { 
-                    ((Applicant)u).AppliedProject = "";
-                    ((Applicant)u).AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL;
-                    ((Applicant)u).flatTypeBooked = Enum_FlatType.DEFAULT;
-                    UserInfoDB.getInstance().ModifyDB(u, DB_Action.EDIT);
+                    SystemUser original_u = UserInfoDB.getInstance().SearchDB(u.userID);
+                    ((Applicant)original_u).AppliedProject = "";
+                    ((Applicant)original_u).AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL;
+                    ((Applicant)original_u).flatTypeBooked = Enum_FlatType.DEFAULT;
+                    UserInfoDB.getInstance().ModifyDB(original_u, DB_Action.EDIT);
                 }
 
                 if (u instanceof HDB_Officer && ((HDB_Officer)u).project_name.equals(projectName))
                 {
-                    ((HDB_Officer)u).project_name = "";
-                    ((HDB_Officer)u).officerStatus = Enum_OfficerStatus.UNSUCCESSFUL;
-                    UserInfoDB.getInstance().ModifyDB(u, DB_Action.EDIT);
+                    SystemUser original_u = UserInfoDB.getInstance().SearchDB(u.userID);
+                    ((HDB_Officer)original_u).project_name = "";
+                    ((HDB_Officer)original_u).officerStatus = Enum_OfficerStatus.UNSUCCESSFUL;
+                    UserInfoDB.getInstance().ModifyDB(original_u, DB_Action.EDIT);
                 }
             }
 
             //Remove all enquiries regarding project
-            for (Enquiry e : EnquiryDB.getInstance().getEnquiryDB())
+            ArrayList<Enquiry> enqlist_copy = new ArrayList<>(EnquiryDB.getInstance().getEnquiryDB());
+            for (Enquiry e : enqlist_copy)
             {
                 if (e.RegardingProject.equals(projectName))
                 {
-                    EnquiryDB.getInstance().ModifyDB(e,DB_Action.DELETE);
+                    Enquiry original_e = EnquiryDB.getInstance().SearchDB(e.Title,e.Enquirer.userID,e.RegardingProject);
+                    EnquiryDB.getInstance().ModifyDB(original_e,DB_Action.DELETE);
                 }
             }
 
             //Remove all requests associated with project
-            for (Request r : RequestsDB.getInstance().getRequestDB())
+            ArrayList<Request> reqlist_copy = new ArrayList<>(RequestsDB.getInstance().getRequestDB());
+            for (Request r : reqlist_copy)
             {
                 if (r.RegardingProject.equals(projectName))
                 {
@@ -216,13 +228,13 @@ public class HDB_Manager extends SystemUser{
                         UserInfoDB.getInstance().ModifyDB(initiator, DB_Action.EDIT);
                     }
 
-                    RequestsDB.getInstance().ModifyDB(r,DB_Action.DELETE);
+                    Request original_r = RequestsDB.getInstance().SearchDB(r.initiator.userID);
+                    RequestsDB.getInstance().ModifyDB(original_r,DB_Action.DELETE);
                 }
             }
 
-            }
-            catch (ConcurrentModificationException e) {}
-            catch (Exception e) { System.out.println( e.getMessage()); }
+        }
+        catch (Exception e) { System.out.println( e.getMessage()); }
     }
     
 
@@ -279,355 +291,249 @@ public class HDB_Manager extends SystemUser{
         ProjectListingDB.getInstance().ViewDB(activeFilters);
     }
 
-    //////////////////////////////////////////////////////////////////////////////
-    ////////////////// - //////////////////////
-    //////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////////////// VIEW AND HANDLE OFFICER APPLICATIONS ///////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
+    public void ViewOfficerApplications()
+    {
+        try {
+            ArrayList<Project> managed_projects = ProjectListingDB.getInstance().getProjectDB().stream()
+            .filter(p -> p.Details.Manager.userID.equals(userID)).map(p -> p).collect(Collectors.toCollection(ArrayList::new));
 
+            if (managed_projects.size() == 0) { throw new Exception("\nError: you are not managing any projects!"); }
 
-
-    public void ApproveOfficerApplication(String officerID, String projectName) {
-        // Get pending officer application
-        Officer_Application application = (Officer_Application) RequestsDB.getInstance().getRequestDB().stream()
-                .filter(req -> req instanceof Officer_Application &&
-                        req.initiator.userID.equals(officerID) &&
-                        req.RegardingProject.equals(projectName) &&
-                        req.status == Request.ApplicationStatus.PENDING)
-                .findFirst()
-                .orElse(null);
-
-        if (application == null) {
-            System.out.println("No pending officer application found for the given officer and project.");
-            return;
-        }
-
-        // Get project
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
-
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
-        }
-
-        // if (hasOverlappingActiveProject(projectName, project.Details.OpenDate, project.Details.CloseDate)) {
-        //     System.out.println("You are already managing another project within the same application period.");
-        //     return;
-        // }
-
-        // Check if there are available officer slots
-        if (project.Details.OfficerList.size() >= project.Details.OfficerSlots) {
-            System.out.println("No available officer slots for this project.");
-            return;
-        }
-
-        // Approve application and update status
-        application.status = Request.ApplicationStatus.APPROVED;
-        project.Details.OfficerList.add((HDB_Officer) application.initiator);
-        ((HDB_Officer) application.initiator).projectAssigned = project;
-        RequestsDB.getInstance().ModifyDB(application, Database.DB_Action.EDIT);
-        System.out.println("Officer application approved. Officer added to the project.");
-    }
-
-    public void ViewMyProjects() {
-        ArrayList<Project> projectList = ProjectListingDB.getInstance().getProjectDB();
-        System.out.println("Projects created by you:");
-        boolean hasProjects = false;
-        for (Project project : projectList) {
-            if (project.Details.Manager.userID.equals(this.userID)) {
-                System.out.println(project.getProjectDetails());
-                hasProjects = true;
+            for (Project p : managed_projects)
+            {
+                ArrayList<IFilter> filters = new ArrayList<>();
+                filters.add(new Filter_ProjectName(p.Details.ProjectName, "OFFICER"));
+                RequestsDB.getInstance().ViewDB(filters);
             }
         }
-        if (!hasProjects) {
-            System.out.println("You have not created any projects.");
-        }
+        catch (Exception e) { System.out.println( e.getMessage()); }
+
     }
 
+    public void HandleOfficerApplications(int index, boolean approve)
+    {
+        try {
+            ArrayList<Project> managed_projects = ProjectListingDB.getInstance().getProjectDB().stream()
+            .filter(p -> p.Details.Manager.userID.equals(userID)).map(p -> p).collect(Collectors.toCollection(ArrayList::new));
 
-    public void ViewOfficerApplications(String projectName) {
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
+            Request r = RequestsDB.getInstance().getRequestDB().get(index);
+            if ( !(r instanceof Officer_Application) || r.status != ApplicationStatus.PENDING ||
+            !managed_projects.stream().anyMatch(p -> p.Details.ProjectName.equals(r.RegardingProject)))
+            { throw new Exception("\nError: Not allowed to handle given request!"); }
 
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
+            Project p = ProjectListingDB.getInstance().SearchDB(r.RegardingProject);
+            SystemUser u = UserInfoDB.getInstance().SearchDB(r.initiator.userID);
+
+            //automatically reject if project's slots are full 
+            if (p.Details.OfficerList.size() >= p.Details.OfficerSlots)
+            { 
+                System.out.println("\nYour project's slots are full. Automatically rejecting application...");
+                approve = false; 
+            } 
+
+            r.handler = this;
+            if (approve) { 
+                ((HDB_Officer)u).project_name = r.RegardingProject;
+                ((HDB_Officer)u).officerStatus = Enum_OfficerStatus.SUCCESSFUL;
+                r.status = ApplicationStatus.APPROVED;
+                p.AssignOfficer((HDB_Officer)u);
+
+            } else { 
+                ((HDB_Officer)u).officerStatus = Enum_OfficerStatus.UNSUCCESSFUL;
+                r.status = ApplicationStatus.REJECTED;
+             }
+            RequestsDB.getInstance().ModifyDB(r, DB_Action.EDIT);
+            UserInfoDB.getInstance().ModifyDB(u,  DB_Action.EDIT);
+            ProjectListingDB.getInstance().ModifyDB(p, DB_Action.EDIT);
+            System.out.println("\nSuccessfully " + (approve ? "approved" : "rejected") + " officer application");
+            
         }
+        catch (Exception e) { System.out.println( e.getMessage()); }
 
-        if (!project.Details.Manager.userID.equals(userID)) {
-            System.out.println("Project is not managed by you");
-            return;
-        }
-
-        // Get all officer applications for the project
-        ArrayList<Officer_Application> officerApplications = RequestsDB.getInstance().getRequestDB().stream()
-                .filter(req -> req instanceof Officer_Application && req.RegardingProject.equals(projectName))
-                .map(req -> (Officer_Application) req)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        if (officerApplications.isEmpty()) {
-            System.out.println("No officer applications found for the project: " + projectName);
-            return;
-        }
-
-        // Display officer applications
-        System.out.println("Officer Applications for project: " + projectName);
-        for (Officer_Application application : officerApplications) {
-            System.out.println("Officer Name: " + application.initiator.name);
-            System.out.println("Officer NRIC: " + application.initiator.userID);
-            System.out.println("Status: " + application.status);
-            System.out.println("-----------------------------");
-        }
     }
 
-    public void ViewApplicantApplications(String projectName) {
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////////////// VIEW AND HANDLE APPLICANT APPLICATIONS /////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
+    public void ViewApplicantApplications()
+    {
+        try {
+            ArrayList<Project> managed_projects = ProjectListingDB.getInstance().getProjectDB().stream()
+            .filter(p -> p.Details.Manager.userID.equals(userID)).map(p -> p).collect(Collectors.toCollection(ArrayList::new));
 
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
-        }
+            if (managed_projects.size() == 0) { throw new Exception("\nError: you are not managing any projects!"); }
 
-        if (!project.Details.Manager.userID.equals(userID)) {
-            System.out.println("Project is not managed by you");
-            return;
-        }
-
-        // Get all applicant applications and withdrawals of a project
-        ArrayList<Request> requests = RequestsDB.getInstance().getRequestDB().stream()
-                .filter(req -> req instanceof Applicant_Application || req instanceof Withdrawal && req.RegardingProject.equals(projectName))
-                .map(req -> req)
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        if (requests.isEmpty()) {
-            System.out.println("No officer applications found for the project: " + projectName);
-            return;
-        }
-
-        // Display officer applications
-        System.out.println("Officer Applications for project: " + projectName);
-        for (Request request : requests) {
-            System.out.println(request.getRequestDetails());
-        }
-    }
-
-
-    public void ApproveOfficerApplication(String officerID, String projectName, boolean approve) {
-        Officer_Application application = (Officer_Application) RequestsDB.getInstance().getRequestDB().stream()
-                .filter(req -> req instanceof Officer_Application &&
-                        req.initiator.userID.equals(officerID) &&
-                        req.RegardingProject.equals(projectName) &&
-                        req.status == Request.ApplicationStatus.PENDING)
-                .findFirst()
-                .orElse(null);
-
-        if (application == null) {
-            System.out.println("No pending officer application found for the given officer and project.");
-            return;
-        }
-
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
-
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
-        }
-
-        if (approve) {
-
-            if (project.Details.OfficerList.size() >= project.Details.OfficerSlots) {
-                System.out.println("No available officer slots for this project.");
-                return;
+            for (Project p : managed_projects)
+            {
+                ArrayList<IFilter> filters = new ArrayList<>();
+                filters.add(new Filter_ProjectName(p.Details.ProjectName, "APPLICANT"));
+                RequestsDB.getInstance().ViewDB(filters);
             }
-
-            application.status = Request.ApplicationStatus.APPROVED;
-            project.Details.OfficerList.add((HDB_Officer) application.initiator);
-            ((HDB_Officer) application.initiator).projectAssigned = project;
-            ((HDB_Officer) application.initiator).officerStatus = HDB_Officer.Enum_OfficerStatus.SUCCESSFUL;
-
-
-            RequestsDB.getInstance().ModifyDB(application, Database.DB_Action.EDIT);
-            ProjectListingDB.getInstance().ModifyDB(project, Database.DB_Action.EDIT);
-
-            System.out.println("Officer application approved. Officer added to the project.");
-        } else {
-
-            application.status = Request.ApplicationStatus.REJECTED;
-            RequestsDB.getInstance().ModifyDB(application, Database.DB_Action.EDIT);
-
-            System.out.println("Officer application rejected for officer: " + officerID);
         }
+        catch (Exception e) { System.out.println( e.getMessage()); }
+
     }
 
+    public void HandleApplicantApplications(int index, boolean approve)
+    {
+        try {
+            ArrayList<Project> managed_projects = ProjectListingDB.getInstance().getProjectDB().stream()
+            .filter(p -> p.Details.Manager.userID.equals(userID)).map(p -> p).collect(Collectors.toCollection(ArrayList::new));
 
-    public void ApproveOrRejectApplication(String applicantNRIC, String projectName, boolean approve) {
-        // Get pending application
-        Applicant_Application application = (Applicant_Application) RequestsDB.getInstance().getRequestDB().stream()
-                .filter(req -> req instanceof Applicant_Application &&
-                        req.initiator.userID.equals(applicantNRIC) &&
-                        req.RegardingProject.equals(projectName) &&
-                        req.status == Request.ApplicationStatus.PENDING)
-                .findFirst()
-                .orElse(null);
+            Request r = RequestsDB.getInstance().getRequestDB().get(index);
+            if ( !(r instanceof Applicant_Application) || r.status != ApplicationStatus.PENDING ||
+            !managed_projects.stream().anyMatch(p -> p.Details.ProjectName.equals(r.RegardingProject)))
+            { throw new Exception("\nError: Not allowed to handle given request!"); }
 
-        if (application == null) {
-            System.out.println("No pending application found for the given applicant and project.");
-            return;
+            SystemUser u = UserInfoDB.getInstance().SearchDB(r.initiator.userID);
+
+            r.handler = this;
+            if (approve) { 
+                ((Applicant)u).AppliedProject = r.RegardingProject;
+                ((Applicant)u).AppliedProjectStatus = ApplicantStatus.SUCCESSFUL;
+                r.status = ApplicationStatus.APPROVED;
+
+            } else { 
+                ((Applicant)u).AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL;
+                r.status = ApplicationStatus.REJECTED;
+             }
+            RequestsDB.getInstance().ModifyDB(r, DB_Action.EDIT);
+            UserInfoDB.getInstance().ModifyDB(u,  DB_Action.EDIT);
+            System.out.println("\nSuccessfully " + (approve ? "approved" : "rejected") + " applicant application");
+            
         }
+        catch (Exception e) { System.out.println( e.getMessage()); }
 
-        Applicant applicant = application.initiator;
-
-        // Get project
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
-
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
-        }
-
-        if (approve) {
-            // Check if there are available units for the selected flat type
-            if (Enum_FlatType.TWO_ROOM.equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_2Room > 0) {
-                project.SellUnit(Enum_FlatType.TWO_ROOM);
-            }
-            else if (Enum_FlatType.THREE_ROOM.equals(applicant.flatTypeBooked) && project.Details.NoOfUnitsLeft_3Room > 0) {
-                project.SellUnit(Enum_FlatType.THREE_ROOM);
-            }
-            else {
-                System.out.println("Not enough units available for the selected flat type. Application rejected.");
-                application.status = Request.ApplicationStatus.REJECTED;
-                RequestsDB.getInstance().ModifyDB(application, Database.DB_Action.EDIT);
-                return;
-            }
-
-            // Approve application and update status
-            application.status = Request.ApplicationStatus.APPROVED;
-            application.initiator.AppliedProjectStatus = Applicant.ApplicantStatus.SUCCESSFUL;
-            RequestsDB.getInstance().ModifyDB(application, Database.DB_Action.EDIT);
-            System.out.println("Application approved for applicant: " + applicantNRIC);
-        }
-        else {
-            // Reject application and update status
-            application.status = Request.ApplicationStatus.REJECTED;
-            RequestsDB.getInstance().ModifyDB(application, Database.DB_Action.EDIT);
-            System.out.println("Application rejected for applicant: " + applicantNRIC);
-        }
     }
 
-    public void ApproveOrRejectWithdrawal(String applicantNRIC, String projectName, boolean approve) {
-        // Get pending withdrawal request
-        Withdrawal withdrawalRequest = (Withdrawal) RequestsDB.getInstance().getRequestDB().stream()
-                .filter(req -> req instanceof Withdrawal &&
-                        req.initiator.userID.equals(applicantNRIC) &&
-                        req.RegardingProject.equals(projectName) &&
-                        req.status == Request.ApplicationStatus.PENDING)
-                .findFirst()
-                .orElse(null);
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////////////// VIEW AND HANDLE WITHDRAWALS ////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
+    public void ViewWithdrawals()
+    {
+        try {
+            ArrayList<Project> managed_projects = ProjectListingDB.getInstance().getProjectDB().stream()
+            .filter(p -> p.Details.Manager.userID.equals(userID)).map(p -> p).collect(Collectors.toCollection(ArrayList::new));
 
-        if (withdrawalRequest == null) {
-            System.out.println("No pending withdrawal request found for the given applicant and project.");
-            return;
-        }
+            if (managed_projects.size() == 0) { throw new Exception("\nError: you are not managing any projects!"); }
 
-        // Get project
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
-
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
-        }
-
-        if (approve) {
-            // If applicant has already booked a flat, release the flat
-            if (withdrawalRequest.BookedFlatType != Enum_FlatType.DEFAULT) {
-                project.UnsellUnit(withdrawalRequest.BookedFlatType);
+            for (Project p : managed_projects)
+            {
+                ArrayList<IFilter> filters = new ArrayList<>();
+                filters.add(new Filter_ProjectName(p.Details.ProjectName, "WITHDRAWAL"));
+                RequestsDB.getInstance().ViewDB(filters);
             }
-
-            // Update applicant status
-            withdrawalRequest.initiator.AppliedProjectStatus = Applicant.ApplicantStatus.UNSUCCESSFUL;
-            withdrawalRequest.initiator.AppliedProject = "";
-            withdrawalRequest.initiator.flatTypeBooked = Enum_FlatType.DEFAULT;
-
-            // Update withdrawal request status
-            withdrawalRequest.status = Request.ApplicationStatus.APPROVED;
-            RequestsDB.getInstance().ModifyDB(withdrawalRequest, Database.DB_Action.EDIT);
-            System.out.println("Withdrawal request approved for applicant: " + applicantNRIC);
-        } else {
-            // Reject withdrawal request and update status
-            withdrawalRequest.status = Request.ApplicationStatus.REJECTED;
-            RequestsDB.getInstance().ModifyDB(withdrawalRequest, Database.DB_Action.EDIT);
-            System.out.println("Withdrawal request rejected for applicant: " + applicantNRIC);
         }
+        catch (Exception e) { System.out.println( e.getMessage()); }
+
     }
 
+    public void HandleWithdrawals(int index, boolean approve)
+    {
+        try {
+            ArrayList<Project> managed_projects = ProjectListingDB.getInstance().getProjectDB().stream()
+            .filter(p -> p.Details.Manager.userID.equals(userID)).map(p -> p).collect(Collectors.toCollection(ArrayList::new));
 
-    public void ViewProjectEnquiries(String projectName) {
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
+            Request r = RequestsDB.getInstance().getRequestDB().get(index);
+            if ( !(r instanceof Withdrawal) || r.status != ApplicationStatus.PENDING ||
+            !managed_projects.stream().anyMatch(p -> p.Details.ProjectName.equals(r.RegardingProject)))
+            { throw new Exception("\nError: Not allowed to handle given request!"); }
 
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
+            SystemUser u = UserInfoDB.getInstance().SearchDB(r.initiator.userID);
+            Project p = ProjectListingDB.getInstance().SearchDB(r.RegardingProject);
+
+            r.handler = this;
+            if (approve) { 
+                ((Applicant)u).AppliedProject = "";
+                ((Applicant)u).AppliedProjectStatus = ApplicantStatus.UNSUCCESSFUL;
+                r.status = ApplicationStatus.APPROVED;
+                //if booked and withdrawing
+                if (((Withdrawal)r).BookedFlatType != Enum_FlatType.DEFAULT) {
+                    ((Applicant)u).flatTypeBooked = Enum_FlatType.DEFAULT;
+                    p.UnsellUnit(((Withdrawal)r).BookedFlatType);
+                    ProjectListingDB.getInstance().ModifyDB(p, DB_Action.EDIT);
+                 }
+
+            } else { 
+                r.status = ApplicationStatus.REJECTED;
+             }
+            RequestsDB.getInstance().ModifyDB(r, DB_Action.EDIT);
+            UserInfoDB.getInstance().ModifyDB(u,  DB_Action.EDIT);
+            System.out.println("\nSuccessfully " + (approve ? "approved" : "rejected") + " withdrawal");
+            
         }
+        catch (Exception e) { System.out.println( e.getMessage()); }
 
-        ArrayList<Enquiry> enquiries = EnquiryDB.getInstance().getEnquiryDB().stream()
-                .filter(enq -> enq.RegardingProject.equals(projectName))
-                .collect(Collectors.toCollection(ArrayList::new));
-
-        if (enquiries.isEmpty()) {
-            System.out.println("No enquiries found for the project: " + projectName);
-            return;
-        }
-
-        System.out.println("Enquiries for project: " + projectName);
-        for (Enquiry enquiry : enquiries) {
-            System.out.println(enquiry.getEnquiryDetails());
-            System.out.println("-----------------------------");
-        }
     }
 
-    public void ReplyToProjectEnquiry(String projectName, String enquiryTitle, String reply) {
-        Project project = ProjectListingDB.getInstance().getProjectDB().stream()
-                .filter(p -> p.Details.ProjectName.equals(projectName))
-                .findFirst()
-                .orElse(null);
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ////////////////// VIEW AND HANDLE ENQUIRIES //////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
 
-        if (project == null) {
-            System.out.println("Project not found.");
-            return;
+    public void ViewAllEnquiries() {
+        EnquiryDB.getInstance().ViewDB();
+    }
+
+    public void ViewHandledEnquiries() {
+        try {
+            ArrayList<Project> managed_projects = ProjectListingDB.getInstance().getProjectDB().stream()
+            .filter(p -> p.Details.Manager.userID.equals(userID)).map(p -> p).collect(Collectors.toCollection(ArrayList::new));
+
+            if (managed_projects.size() == 0) { throw new Exception("\nError: you are not managing any projects!"); }
+
+            for (Project p : managed_projects)
+            {
+                ArrayList<IFilter> filters = new ArrayList<>();
+                filters.add(new Filter_ProjectName(p.Details.ProjectName, ""));
+                EnquiryDB.getInstance().ViewDB(filters);
+            }
         }
+        catch (Exception e) { System.out.println( e.getMessage()); }
+    }
 
-        Enquiry enquiry = EnquiryDB.getInstance().getEnquiryDB().stream()
-                .filter(enq -> enq.RegardingProject.equals(projectName) && enq.Title.equals(enquiryTitle))
-                .findFirst()
-                .orElse(null);
+    public void HandleEnquiries(int index, String reply)
+    {
+        try {
+            ArrayList<Project> managed_projects = ProjectListingDB.getInstance().getProjectDB().stream()
+            .filter(p -> p.Details.Manager.userID.equals(userID)).map(p -> p).collect(Collectors.toCollection(ArrayList::new));
 
-        if (enquiry == null) {
-            System.out.println("No enquiry with the given title found for the project: " + projectName);
-            return;
+            Enquiry e = EnquiryDB.getInstance().getEnquiryDB().get(index);
+            if ( !e.isUnreplied() || !managed_projects.stream().anyMatch(p -> p.Details.ProjectName.equals(e.RegardingProject)))
+            { throw new Exception("\nError: Not allowed to handle given enquiry!"); }
+
+            e.Replier = this;
+            e.Reply = reply;
+            
+            EnquiryDB.getInstance().ModifyDB(e, DB_Action.EDIT);
+            System.out.println("\nSuccessfully replied to enquiry");
+            
         }
+        catch (Exception e) { System.out.println( e.getMessage()); }
+    }
 
-        enquiry.Reply = reply;
-        enquiry.Replier = this;
-        EnquiryDB.getInstance().ModifyDB(enquiry, Database.DB_Action.EDIT);
-        System.out.println("Reply sent successfully for enquiry: " + enquiryTitle);
+    ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////  GENERATE REPORT  /////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
+    // Able to generate a report of the list of applicants with their respective
+    //flat booking – flat type, project name, age, marital status
+    //There should be filters to generate a list based on various categories
+    //(e.g. report of married applicants’ choice of flat type) 
+
+    public void GenerateReport(String project_name, ArrayList<IFilter> activeFilters) {
+        try {
+            Project p = ProjectListingDB.getInstance().SearchDB(project_name);
+            if (p == null) { throw new Exception("\nError: could not find project!"); }
+            if (!p.Details.Manager.userID.equals(userID)) { throw new Exception("\nError: project is not managed by you!"); }
+            ReportGenerator.getInstance().GenerateReport(project_name, activeFilters);
+        }
+        catch (Exception e) { System.out.println( e.getMessage()); }
     }
 
 }

@@ -20,7 +20,6 @@ public class SystemUser{
 
     public String getUserDetails() {
         return  "User Perms: " + this.UserPerms.toString()
-                + "\nUserID: " + userID
                 + "\nName: " + name;
     }
     

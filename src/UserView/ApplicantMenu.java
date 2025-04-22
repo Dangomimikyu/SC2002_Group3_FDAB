@@ -6,7 +6,6 @@ import User.Enum_FlatType;
 import User.HDB_Officer;
 import InteractableAttributePackage.ProjectDetails.Location;
 import Filter.IFilter.orderBy;
-
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.regex.Pattern;
@@ -25,7 +24,7 @@ public class ApplicantMenu extends Menu
     {
         System.out.println("\nWelcome " + user.name + " !\nWhat would you like to do today?");
         int choice = -1;
-        while (choice != 12) {
+        while (choice != 13) {
             System.out.println("\n=======================================");
             System.out.println("|            Applicant menu           |");
             System.out.println("=======================================");
@@ -40,9 +39,10 @@ public class ApplicantMenu extends Menu
             System.out.println("|  9.  Withdraw from project          |");
             System.out.println("|  10. Choose Filter                  |");
             System.out.println("|  11. Check Request Status           |");
+            System.out.println("|  12. Change Password                |");
             System.out.println(user instanceof HDB_Officer ? 
-                                 "|  12. Return to Officer Menu         |" : 
-                                 "|  12. Log out                        |");
+                                 "|  13. Return to Officer Menu         |" : 
+                                 "|  13. Log out                        |");
             System.out.println("=======================================");
             System.out.print("Enter choice: ");
             try
@@ -52,11 +52,10 @@ public class ApplicantMenu extends Menu
             catch (final InputMismatchException e)
             {
                 System.out.println("\nError: Invalid character");
-                sc.nextLine();
                 continue;
             }
+            finally { sc.nextLine(); }
 
-            sc.nextLine();
             switch (choice)
             {
                 case 1 -> user.viewProjectList(activeFilters);
@@ -65,11 +64,34 @@ public class ApplicantMenu extends Menu
                     user.ApplyProject(sc.nextLine());
                 }
                 case 3 -> user.viewAppliedProjectStatus();
-                case 4 -> user.CreateEnquiry();
+                case 4 -> {
+                    String title = GetStringInput("Enter the title of the enquiry: ");
+                    String projectName = GetStringInput("Enter the name of the project you are referring to: ");
+                    String description = GetStringInput("Enter the description of the enquiry: ");;
+                    user.CreateEnquiry(title,projectName,description);
+                }
                 case 5 -> user.ViewEnquiry();
-                case 6 -> user.EditEnquiry();
-                case 7 -> user.DeleteEnquiry();
-                case 8 -> user.BookFlat();
+                case 6 -> {
+                    String title = GetStringInput("Enter the title of the enquiry you want to edit: ");
+                    String projectName = GetStringInput("Enter the project name your enquiry to delete is regarding: ");
+                    String description = GetStringInput("Enter the new description: ");
+                    user.EditEnquiry(title,projectName,description);
+                }
+                case 7 -> {
+                    String title = GetStringInput("Enter the title of the enquiry you want to delete: ");
+                    String projectName = GetStringInput("Enter the project name your enquiry to delete is regarding: ");
+                    user.DeleteEnquiry(title,projectName);
+                }
+                case 8 -> {
+                    if (user.ValidateIfCanBookFlat()) {
+                        int flat_choice = -1;
+                        while (choice != 2 && choice != 1 && choice != 0) {
+                            flat_choice = GetIntInput("");
+                        }
+                        if (flat_choice == 1) { user.BookFlat(Enum_FlatType.TWO_ROOM); }
+                        else if (flat_choice == 2) { user.BookFlat(Enum_FlatType.THREE_ROOM); }
+                    }
+                }
                 case 9 -> {
                     int yes_or_no = -1;
                     while (yes_or_no != 1 && yes_or_no != 2)  {
@@ -81,7 +103,14 @@ public class ApplicantMenu extends Menu
                 }
                 case 10 -> SetFilterMenu();
                 case 11 -> user.checkRequestStatus();
-                case 12 -> { System.out.println("Logging out"); return; }
+                case 12 -> {
+                    if (!(user instanceof HDB_Officer)) {
+                        String new_password = GetStringInput("Please enter your new password: ");
+                        if (authenticator.changePassword( user.userID, user.password, new_password)) { return; }
+                    }
+                    else {System.out.println("\nTo change password, change it in officer menu (HOME MENU)"); }
+                }
+                case 13 -> { System.out.println("Logging out"); return; }
                 default -> System.out.println("\nError: Invalid number");
 
             }
@@ -107,11 +136,10 @@ public class ApplicantMenu extends Menu
                 choice = sc.nextInt();
             } catch (final InputMismatchException e) {
                 System.out.println("\nError: Invalid character");
-                sc.nextLine(); // ignore and move the cursor to next line
                 continue;
             }
+            finally { sc.nextLine(); }
 
-            sc.nextLine();
             switch (choice) {
                 case 1: 
                     activeFilters.removeIf(f -> f instanceof Filter_Alphabetic);
@@ -196,12 +224,12 @@ public class ApplicantMenu extends Menu
                     int minPrice = -99;
                     int maxPrice = -99;
                     while (true) {
-                        minPrice = GetIntInput2("\nEnter min price of units in filtered projects (enter -1 if you would like no min price): ");
+                        minPrice = GetIntInputAlt("\nEnter min price of units in filtered projects (enter -1 if you would like no min price): ");
                         if (minPrice == -1 || minPrice > 0) { break; }
                         if (minPrice <= 0) { System.out.println("\nError: Invalid input"); }
                     }
                     while (true) {
-                        maxPrice = GetIntInput2("\nEnter max price of units in filtered projects (enter -1 if you would like no max price): ");
+                        maxPrice = GetIntInputAlt("\nEnter max price of units in filtered projects (enter -1 if you would like no max price): ");
                         if (maxPrice == -1 || (maxPrice > 0 && maxPrice >=  minPrice)) { break; }
                         if (maxPrice <= 0 || maxPrice < minPrice) { System.out.println("\nError: Invalid input"); }
                     }

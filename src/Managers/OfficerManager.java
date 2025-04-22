@@ -176,12 +176,7 @@ public class OfficerManager {
                     return;
                 }
             }
-            // TODO: if not here means it's either been approved or rejected, either way theres no status
-            // if they are an officer means approved
-            // if neither means rejected / not applied
         }
-
-        // End officer functions ============================================================
     }
 
 }

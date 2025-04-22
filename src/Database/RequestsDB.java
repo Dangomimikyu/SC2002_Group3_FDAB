@@ -101,19 +101,19 @@ public class RequestsDB extends Database {
     private void displayFilterInformation(IFilter filter) {
         if (filter instanceof Filter_FlatType) {
             System.out.println("Filter by bookings and withdrawals that are booked/trying to book flat type: " + ((Filter_FlatType)filter).flatType);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Marital) {
             System.out.println("Filter by requests with initiators that are of marital status: " + ((Filter_Marital)filter).maritalStatus);
-            System.out.println("============================================================================");
         }
         else if (filter instanceof Filter_Alphabetic) {
             System.out.println("Filter by request initiator's name starting with: " + (((Filter_Alphabetic)filter).first_char == null ? "any character" : ((Filter_Alphabetic)filter).first_char)
             + " in " + ((Filter_Alphabetic)filter).order + " order");           
-            System.out.println("============================================================================");
+        }
+        else if (filter instanceof Filter_ProjectName) {
+            System.out.println("Filter by requests of type " + (((Filter_ProjectName)filter).type) +" regarding project: " + (((Filter_ProjectName)filter).project_name));
         }
         else {
-            System.out.println("Error: This filter type is not supported for requests");
+            System.out.println("\nError: This filter type is not supported for requests");
             return;
         }
     }
@@ -149,8 +149,9 @@ public class RequestsDB extends Database {
         }
     }
 
-    public Request SearchDB(String projectName)
+    //Requests unique by userid (since only one user can have one request at a time)
+    public Request SearchDB(String userid)
     {
-        return reqList.stream().filter(pp -> projectName.equals(pp.RegardingProject)).findFirst().orElse(null);
+        return reqList.stream().filter(r -> userid.equals(r.initiator.userID)).findFirst().orElse(null);
     }
 }

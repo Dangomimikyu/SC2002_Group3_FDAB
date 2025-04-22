@@ -2,10 +2,12 @@ package UserView;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import Service.Authenticator;
 
 public abstract class Menu
 {
     protected static Scanner sc = new Scanner(System.in);
+    protected static Authenticator authenticator = new Authenticator();
 
     public Menu() { sc = new Scanner(System.in);}
     public static void start() {}
@@ -29,7 +31,7 @@ public abstract class Menu
     }
 
     //helper function to get repeated until valid int choice with repeat message (with the exception of -1)
-    public static int GetIntInput2(String repeat)
+    public static int GetIntInputAlt(String repeat)
     {
         int choice = -99;
 

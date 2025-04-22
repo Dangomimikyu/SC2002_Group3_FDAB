@@ -1,19 +1,14 @@
 package UserView;
 
 import Filter.*;
-import InteractableAttributePackage.ProjectDetails;
 import InteractableAttributePackage.ProjectDetails.Location;
-import Service.ReportGenerator;
-import User.Applicant;
 import User.HDB_Manager;
 import User.Applicant.MaritalStatus;
 import User.Enum_FlatType;
 import Filter.IFilter.orderBy;
-
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.regex.Pattern;
-import java.util.Objects;
 
 public class ManagerMenu extends Menu
 {
@@ -28,7 +23,7 @@ public class ManagerMenu extends Menu
     {
         System.out.println("\nWelcome " + user.name + " !\nWhat would you like to do today?");
         int choice = -1;
-        while (choice != 14) {
+        while (choice != 15) {
             System.out.println("\n======================================");
             System.out.println("|            Manager menu            |");
             System.out.println("======================================");
@@ -38,19 +33,15 @@ public class ManagerMenu extends Menu
             System.out.println("| 4.  Toggle Project Visibility      |");
             System.out.println("| 5.  View Current Project Details   |");
             System.out.println("| 6.  View Projects                  |");
-
             System.out.println("| 7.  Handle Officer Applications    |");
             System.out.println("| 8.  Handle Applicant Applications  |");
             System.out.println("| 9.  Handle Withdrawals             |");
-
-            System.out.println("| 10. Generate Report                |");
-
-            System.out.println("| 11. View Enquiries                 |");
-            System.out.println("| 12. Handle Enquiries               |");
-
+            System.out.println("| 10. View Enquiries                 |");
+            System.out.println("| 11. Handle Enquiries               |");
+            System.out.println("| 12. Generate Report on Project     |");
             System.out.println("| 13. Set Filters                    |");
-
-            System.out.println("| 14. Log out                        |");
+            System.out.println("| 14. Change Password                |");
+            System.out.println("| 15. Log out                        |");
             System.out.println("======================================");
             System.out.print("Enter choice: ");
             try {
@@ -65,25 +56,22 @@ public class ManagerMenu extends Menu
             {
                 case 1 -> MakeProject();
                 case 2 -> EditProject();
-                case 3 -> { 
-                    System.out.print("Enter name of project to delete: ");
-                    user.DeleteBTOProject(sc.nextLine());
-                }
-                case 4 -> {
-                    System.out.print("Enter name of created project to toggle visibility: ");                
-                    user.ToggleProjectVisibility(sc.nextLine());
-                }
+                case 3 -> DeleteProject();
+                case 4 -> ToggleProject();
                 case 5 -> user.ViewActiveProject();
                 case 6 -> user.ViewAllProjects(activeFilters);
-
-                case 7 -> HandleApplicantRequest();
-                case 8 -> MakeReport();
-                case 9 -> ViewEnquiries();
-                case 10 -> ReplyEnquiry();
-                case 11 -> ViewHandledRequests();
-                case 12 -> HandleWithdrawal();
+                case 7 -> ManageOfficerApplications();
+                case 8 -> ManageApplicantApplications();
+                case 9 -> ManageWithdrawals();
+                case 10 -> user.ViewAllEnquiries();
+                case 11 -> ManageEnquiries();
+                case 12 -> MakeReport();
                 case 13 -> SetFilterMenu();
-                case 14 -> { System.out.println("Logging out"); return; }
+                case 14 -> {
+                    String new_password = GetStringInput("Please enter your new password: ");
+                    if (authenticator.changePassword( user.userID, user.password, new_password)) { return; }
+                }
+                case 15 -> { System.out.println("Logging out"); return; }
                 default -> System.out.println("Invalid number");
             }
         }
@@ -127,6 +115,66 @@ public class ManagerMenu extends Menu
 
         user.EditBTOProject(name, neighbourhood, selling2, selling3, avail2, avail3, openDate, closeDate, offrSlots, 
         (group == 1 ? "SINGLE" : group == 2 ? "MARRIED" : group == 3 ? "ALL" : null));
+    }
+
+    private static void DeleteProject()
+    { 
+        System.out.print("Enter name of project to delete: ");
+        user.DeleteBTOProject(sc.nextLine());
+    }
+
+    private static void ToggleProject()
+    { 
+        System.out.print("Enter name of created project to toggle visibility: ");                
+        user.ToggleProjectVisibility(sc.nextLine());
+    }
+
+    private static void ManageOfficerApplications()
+    { 
+        user.ViewOfficerApplications();
+        int index = GetIntInput("\nPlease enter the index of the officer application you wish to handle: ");
+        int approve = -1;
+        while (approve != 0 && approve != 1) {
+            approve = GetIntInput("Would you like to approve(1) or reject(0) it ?: ");
+        }
+        user.HandleOfficerApplications(index, (approve == 1));
+    }
+
+    private static void ManageApplicantApplications()
+    { 
+        user.ViewApplicantApplications();
+        int index = GetIntInput("\nPlease enter the index of the applicant application you wish to handle: ");
+        int approve = -1;
+        while (approve != 0 && approve != 1) {
+            approve = GetIntInput("Would you like to approve(1) or reject(0) it ?: ");
+        }
+        user.HandleApplicantApplications(index, (approve == 1));
+    }
+
+    private static void ManageWithdrawals()
+    { 
+        user.ViewWithdrawals();
+        int index = GetIntInput("\nPlease enter the index of the withdrawal you wish to handle: ");
+        int approve = -1;
+        while (approve != 0 && approve != 1) {
+            approve = GetIntInput("Would you like to approve(1) or reject(0) it ?: ");
+        }
+        user.HandleWithdrawals(index, (approve == 1));
+    }
+
+    private static void ManageEnquiries()
+    {
+        user.ViewHandledEnquiries();
+        int index = GetIntInput("\nPlease enter the index of the withdrawal you wish to handle: ");
+        sc.nextLine();
+        String reply = GetStringInput("Please enter your reply: ");
+        user.HandleEnquiries(index, reply);
+    }
+
+    private static void MakeReport()
+    {
+        String project_name = GetStringInput("\nEnter the name of your project you would like to make a report about: ");
+        user.GenerateReport(project_name, activeFilters);
     }
 
     private static void SetFilterMenu() {
@@ -251,12 +299,12 @@ public class ManagerMenu extends Menu
                     int minPrice = -99;
                     int maxPrice = -99;
                     while (true) {
-                        minPrice = GetIntInput2("\nEnter min price of units in filtered projects (enter -1 if you would like no min price): ");
+                        minPrice = GetIntInputAlt("\nEnter min price of units in filtered projects (enter -1 if you would like no min price): ");
                         if (minPrice == -1 || minPrice > 0) { break; }
                         if (minPrice <= 0) { System.out.println("\nError: Invalid input"); }
                     }
                     while (true) {
-                        maxPrice = GetIntInput2("\nEnter max price of units in filtered projects (enter -1 if you would like no max price): ");
+                        maxPrice = GetIntInputAlt("\nEnter max price of units in filtered projects (enter -1 if you would like no max price): ");
                         if (maxPrice == -1 || (maxPrice > 0 && maxPrice >=  minPrice)) { break; }
                         if (maxPrice <= 0 || maxPrice < minPrice) { System.out.println("\nError: Invalid input"); }
                     }
@@ -307,186 +355,5 @@ public class ManagerMenu extends Menu
 
             }
         }
-    }
-    
-    private static void ViewOtherProject()
-    {}
-
-    private static void ViewHandledRequests()
-    {
-        // for officer applying to be a part of this manager's projects
-        System.out.print("Enter one of your projects name to see all applicant and officer applications: ");
-        String projname = sc.nextLine();
-        user.ViewApplicantApplications(projname);
-        user.ViewOfficerApplications(projname);
-    }
-
-    private static void HandleApplicantRequest()
-    {
-        System.out.print("Enter userID of the applicant's application you wish to resolve: ");
-        String appID = sc.nextLine();
-        System.out.print("Enter the project name to which applicant is trying to apply to: ");
-        String projname = sc.nextLine();
-        int status_choice = -1;
-        while (status_choice != 1 || status_choice != 2) {
-            status_choice = GetIntInput("Would you like to approve or reject it? (1 for yes and 2 for no): ");
-        }
-        boolean status = false;
-        if (status_choice == 1) {status = true;}
-        user.ApproveOrRejectApplication(appID, projname, status);
-    }
-
-    private static void HandleOfficerRegistration()
-    {
-        System.out.print("Enter userID of the officer's application you wish to resolve: ");
-        String officerID = sc.nextLine();
-        System.out.print("Enter the project name to which officer is trying to apply to: ");
-        String projname = sc.nextLine();
-        int status_choice = -1;
-        while (status_choice != 1 || status_choice != 2) {
-            status_choice = GetIntInput("Would you like to approve or reject it? (1 for yes and 2 for no): ");
-        }
-        boolean status = false;
-        if (status_choice == 1) {status = true;}
-        user.ApproveOfficerApplication(officerID, projname, status);
-    }
-
-    private static void HandleWithdrawal()
-    {
-        System.out.print("Enter userID of the applicant's withdrawal you wish to resolve: ");
-        String appID = sc.nextLine();
-        System.out.print("Enter the project name to which applicant is trying to apply to: ");
-        String projname = sc.nextLine();
-        int status_choice = -1;
-        while (status_choice != 1 || status_choice != 2) {
-            status_choice = GetIntInput("Would you like to approve or reject it? (1 for yes and 2 for no): ");
-        }
-        boolean status = false;
-        if (status_choice == 1) {status = true;}
-        user.ApproveOrRejectWithdrawal(appID, projname, status);
-    }
-
-    private static void MakeReport()
-    {
-        String projName = "";
-        IFilter filterType = null;
-        int filterChoice = -1;
-
-        System.out.print("Enter name of project for report (leave blank to see all projects): ");
-        projName = sc.nextLine();
-
-        while (filterChoice < 0 || filterChoice > 7) {
-
-            System.out.println("========================");
-            System.out.println(" 0. No filter");
-            System.out.println(" 1. Age");
-            System.out.println(" 2. Alphabet");
-            System.out.println(" 3. Flat type");
-            System.out.println(" 4. Location");
-            System.out.println(" 5. Marital status");
-            System.out.println(" 6. Selling price");
-            System.out.println(" 7. Visibility");
-            System.out.println("========================");
-            System.out.print("Enter choice of filter: ");
-            try {
-                filterChoice = sc.nextInt();
-            } catch (final InputMismatchException e) {
-                System.out.println("Invalid character");
-                sc.nextLine(); // ignore and move the cursor to next line
-            }
-        }
-        
-        if (filterChoice == 0)
-        {
-            if (Objects.equals(projName, ""))
-            {
-                ReportGenerator.getInstance().GenerateReport();
-            }
-            else {
-                ReportGenerator.getInstance().GenerateReport(projName);
-            }
-        }
-        
-        switch (filterChoice)
-        {
-            case 1:
-                System.out.print("Order by (0 for ascending, 1 for descending): ");
-                int temp1 = GetIntInput("Order by (0 for ascending, 1 for descending): ");
-                while (temp1 < 0 || temp1 > 1)
-                {
-                    temp1 = GetIntInput("Order by (0 for ascending, 1 for descending): ");
-                }
-
-                if (temp1 == 0)
-                {
-                    filterType = new Filter_Age(-1, -1, IFilter.orderBy.ASCENDING);
-                }
-                else {
-                    filterType = new Filter_Age(-1, -1, IFilter.orderBy.DESCENDING);
-                }
-                break;
-
-            case 2:
-                System.out.print("Order by (0 for ascending, 1 for descending): ");
-                int temp2 = GetIntInput("Order by (0 for ascending, 1 for descending): ");
-                while (temp2 < 0 || temp2 > 1)
-                {
-                    temp2 = GetIntInput("Order by (0 for ascending, 1 for descending): ");
-                }
-
-                if (temp2 == 0)
-                {
-                    filterType = new Filter_Alphabetic("a", IFilter.orderBy.ASCENDING);
-                }
-                else {
-                    filterType = new Filter_Alphabetic("z", IFilter.orderBy.DESCENDING);
-                }
-                break;
-
-            case 3:
-                filterType = new Filter_FlatType(Enum_FlatType.DEFAULT, IFilter.orderBy.ASCENDING);
-                break;
-
-            case 4:
-                filterType = new Filter_Location(ProjectDetails.Location.ANG_MO_KIO);
-                break;
-
-            case 5:
-                filterType = new Filter_Marital(Applicant.MaritalStatus.ALL);
-                break;
-
-            case 6:
-                filterType = new Filter_SellingPrice(-1, -1, IFilter.orderBy.ASCENDING, Enum_FlatType.DEFAULT);
-                break;
-
-            case 7:
-                filterType = new Filter_Visibility();
-                break;
-
-        }
-
-        if (Objects.equals(projName, "")) {
-            ReportGenerator.getInstance().GenerateReport(filterType);
-        }
-        else {
-            ReportGenerator.getInstance().GenerateReport(projName, filterType);
-        }
-    }
-
-    private static void ViewEnquiries()
-    {
-        System.out.print("Enter the project name you wish to view all enquiries for: ");
-        user.ViewProjectEnquiries(sc.nextLine());
-    }
-
-    private static void ReplyEnquiry()
-    {
-        System.out.print("Enter the project name of the enquiry you wish to reply to: ");
-        String projname = sc.nextLine();
-        System.out.print("Enter the title of the enquiry you wish to reply to: ");
-        String enqTitle = sc.nextLine();
-        System.out.print("Enter your reply: ");
-        String reply = sc.nextLine();
-        user.ReplyToProjectEnquiry(projname,enqTitle,reply);
     }
 }

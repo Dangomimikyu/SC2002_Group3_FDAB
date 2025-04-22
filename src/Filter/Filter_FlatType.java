@@ -2,7 +2,10 @@
 
 package Filter;
 import InteractableAttributePackage.*;
+import User.Applicant;
 import User.Enum_FlatType;
+import User.HDB_Manager;
+
 import java.util.List;
 
 public class Filter_FlatType implements IFilter {
@@ -22,8 +25,9 @@ public class Filter_FlatType implements IFilter {
         else if (o instanceof Withdrawal) { return isRegardingFlatType((Withdrawal)o); }
         else if (o instanceof Booking) { return isRegardingFlatType((Booking)o); }
         //applicant and officer application request classes don't have flat type attributes hence will return false
-        else if (o instanceof Applicant_Application || o instanceof Officer_Application) {return false;}
-
+        else if (o instanceof Applicant_Application || o instanceof Officer_Application) {return false; }
+        else if (o instanceof Applicant) { return isBookedWith((Applicant)o); }
+        else if (o instanceof HDB_Manager) { return false; }
         System.out.println("Error: Filtering by Flat Types is not supported for this object type!");
         return false;
     }
@@ -64,6 +68,12 @@ public class Filter_FlatType implements IFilter {
     private boolean isRegardingFlatType(Booking b) {
         if (flatType == Enum_FlatType.DEFAULT) {return true;}
         return b.flatTypeToBook == flatType;
+    }
+
+    //isBookedWith checks if the applicant is booked with specific flat type
+    private boolean isBookedWith(Applicant u) {
+        if (flatType == Enum_FlatType.DEFAULT) {return true;}
+        return u.flatTypeBooked == flatType;
     }
 
 }

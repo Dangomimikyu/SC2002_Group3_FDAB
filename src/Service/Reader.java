@@ -37,7 +37,7 @@ public class Reader
 
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedReader br = new BufferedReader(new FileReader(OfficerFilePath))) 
         {
@@ -61,7 +61,7 @@ public class Reader
                 userList.add(new HDB_Officer(name, NRIC, age, marital_status, password, applied_project, applied_project_status, booked_flat_type, managed_project, officer_status));
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         try (BufferedReader br = new BufferedReader(new FileReader(ManagerFilePath))) 
         {
@@ -78,7 +78,7 @@ public class Reader
                 userList.add(new HDB_Manager(NRIC, password, name));
             }
         } 
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
         
         return userList;
     }
@@ -131,7 +131,7 @@ public class Reader
 
             }
         }
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         return projList;
     }
@@ -177,7 +177,7 @@ public class Reader
                 enqList.add(e);
             }
         }
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         return enqList;
     }
@@ -238,7 +238,7 @@ public class Reader
                 reqList.add(r);
             }
         }
-        catch (IOException | NumberFormatException e) {}
+        catch (IOException | NumberFormatException e) { System.out.println(e.getMessage()); }
 
         return reqList;
     }
