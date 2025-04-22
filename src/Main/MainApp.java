@@ -21,12 +21,12 @@ public class MainApp {
     //initialise file paths
     private static void Init()
     {
-        ApplicantFilePath = "../src/localdata/ApplicantList.csv";
-        OfficerFilePath = "../src/localdata/OfficerList.csv";
-        ManagerFilePath = "../src/localdata/ManagerList.csv";
-        ProjectsFilePath = "../src/localdata/ProjectList.csv";
-        EnquiriesFilePath = "../src/localdata/Enquiries.csv";
-        RequestsFilePath = "../src/localdata/Requests.csv";
+        ApplicantFilePath = "src/localdata/ApplicantList.csv";
+        OfficerFilePath = "src/localdata/OfficerList.csv";
+        ManagerFilePath = "src/localdata/ManagerList.csv";
+        ProjectsFilePath = "src/localdata/ProjectList.csv";
+        EnquiriesFilePath = "src/localdata/Enquiries.csv";
+        RequestsFilePath = "src/localdata/Requests.csv";
 
     }
 

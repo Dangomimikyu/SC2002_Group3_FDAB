@@ -93,7 +93,7 @@ public class ApplicantMenu extends Menu
                         System.out.println("\nNote: you are eligible for both two-room and three-room flats");
                     }
                     int flat_choice = -1;
-                    while (choice != 2 && choice != 1 && choice != 0) {
+                    while (flat_choice != 2 && choice != 1 && choice != 0) {
                         flat_choice = GetIntInput("Enter your flat choice to book (0 to decline for now, 1 for 2-room, 2 for 3-room): ");
                     }
                     if (flat_choice == 1) { user.BookFlat(Enum_FlatType.TWO_ROOM); }
