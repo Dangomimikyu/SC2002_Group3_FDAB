@@ -154,7 +154,7 @@ public class HDB_Officer extends Applicant{
 
             //auto generate receipt
             if (approve) { GenerateReceipt(req.initiator.userID); 
-                System.out.println("\nRemember to update flat availability for your assigned project!")}
+                System.out.println("\nRemember to update flat availability for your assigned project!"); }
         }
         catch (Exception e) { System.out.println( e.getMessage()); }
 
