@@ -32,7 +32,7 @@ public class ReceiptGenerator {
 
         if (applicant != null && project != null && officer != null) {
             
-            Applicant_Application application = (Applicant_Application) RequestsDB.getInstance().getDB().stream()
+            Applicant_Application application = (Applicant_Application) RequestsDB.getInstance().getRequestDB().stream()
                     .filter(request -> request instanceof Applicant_Application &&
                                       ((Applicant_Application) request).initiator.userID.equals(applicantNRIC) &&
                                       ((Applicant_Application) request).RegardingProject.equals(projectName) &&

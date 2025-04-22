@@ -153,7 +153,8 @@ public class HDB_Officer extends Applicant{
             System.out.println("\nRequest successfully resolved");
 
             //auto generate receipt
-            if (approve) { GenerateReceipt(req.initiator.userID); }
+            if (approve) { GenerateReceipt(req.initiator.userID); 
+                System.out.println("\nRemember to update flat availability for your assigned project!")}
         }
         catch (Exception e) { System.out.println( e.getMessage()); }
 

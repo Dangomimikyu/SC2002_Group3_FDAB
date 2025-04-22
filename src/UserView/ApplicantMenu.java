@@ -68,14 +68,14 @@ public class ApplicantMenu extends Menu
                 case 4 -> {
                     String title = GetStringInput("Enter the title of the enquiry: ");
                     String projectName = GetStringInput("Enter the name of the project you are referring to: ");
-                    String description = GetStringInput("Enter the description of the enquiry: ");;
+                    String description = GetStringInput("Enter the description of the enquiry: ");
                     user.CreateEnquiry(title,projectName,description);
                 }
                 case 5 -> user.ViewEnquiry();
                 case 6 -> {
                     String title = GetStringInput("Enter the title of the enquiry you want to edit: ");
-                    String projectName = GetStringInput("Enter the project name your enquiry to delete is regarding: ");
-                    String description = GetStringInput("Enter the new description: ");
+                    String projectName = GetStringInput("Enter the project name your enquiry to edit is regarding: ");
+                    String description = GetStringInput("Enter the new editted description: ");
                     user.EditEnquiry(title,projectName,description);
                 }
                 case 7 -> {
@@ -93,7 +93,7 @@ public class ApplicantMenu extends Menu
                         System.out.println("\nNote: you are eligible for both two-room and three-room flats");
                     }
                     int flat_choice = -1;
-                    while (flat_choice != 2 && choice != 1 && choice != 0) {
+                    while (flat_choice != 2 && flat_choice != 1 && flat_choice != 0) {
                         flat_choice = GetIntInput("Enter your flat choice to book (0 to decline for now, 1 for 2-room, 2 for 3-room): ");
                     }
                     if (flat_choice == 1) { user.BookFlat(Enum_FlatType.TWO_ROOM); }

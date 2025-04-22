@@ -206,7 +206,7 @@ public class Applicant extends SystemUser{
             // Married, 21 y/0 and above, can apply for both
 
             if (flat_to_book == Enum_FlatType.TWO_ROOM) {
-                if (!(this.maritalStatus == MaritalStatus.SINGLE && this.age >= 35) ||
+                if (!(this.maritalStatus == MaritalStatus.SINGLE && this.age >= 35) &&
                  !(this.maritalStatus == MaritalStatus.MARRIED && this.age >= 21) )
                  { throw new Exception("\nError: You are not eligible for this flat!"); }
                 if (project.Details.NoOfUnitsLeft_2Room == 0) {
